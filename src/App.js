@@ -187,7 +187,7 @@ function App() {
         });
 
       function reset() {
-        map
+        d3.select("svg g")
           .transition()
           .duration(750)
           .call(zoom.transform, d3.zoomIdentity.translate(0, 0).scale(1));
