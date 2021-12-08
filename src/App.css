@@ -4,13 +4,50 @@ body,html{
     box-sizing: border-box;
     position: relative;
 }
+
+.nav{
+    opacity: 1;
+    text-align: center;
+    color: white;
+    font-size: 24px;
+    height: 60px;
+    width: 100%;
+    /* background:#14181d; */
+    background:blue;
+}
+.container{
+    display: flex;
+}
+.action{
+    opacity: 1;
+    border-left: 3px solid white;
+    border-right: 3px solid white;
+    z-index: 9999;
+    top: 60px;
+    left: 95px;
+    position: absolute;
+    width: 260px;
+    height: 100vh;
+    background:#1d232a;
+    color: white !important;
+    font-size: 32px;
+}
+.action input {
+    
+    transform: scale(2);
+    margin-left: 30px;
+    margin-right: 20px;
+}
 #map{
-    margin-top: 100px;
-    margin-left: 200px;
-    width: 800px;
-    height: 600px;
+    /* width: calc(100vw - 95px - 130px);
+    height: calc(100vh); */
+    /* padding-top: 100px; */
+    width: 1400px;
+    height: calc(100vh);
     border: 1px solid black;
     position: relative;
+    background: #1b2026;
+
     overflow: hidden;
 }
 #map #square{
@@ -25,16 +62,26 @@ body,html{
   .field-image {
     pointer-events: none;
   }
-
-#info{
-    position: absolute;
-    top: 0;
-    right: 0;
+.info{
+    /* background: #14181d; */
     width: 200px;
-    height: 400px;
-    background: #8d8686;
+    z-index: 999 !important;
+    
 }
-#info img{
+.ant-drawer-wrapper-body{
+    
+    font-weight: 700;
+    background:#1d232a;
+}
+.ant-drawer-body{
+    font-size: 30px !important;
+    color: white;
+}
+.ant-drawer-wrapper-body img{
+    height: 200px;
+    margin-top: 20px;
+}
+.info img{
     width: 100%;
 }
 
@@ -42,7 +89,16 @@ body,html{
     /* background: red; */
     position: absolute;
     margin-top:10px;
-    top: 0;
-    left: 220px;
-    border: 2px solid blue;
+    top: 75px;
+    left: 400px;
+    border: 1px solid white;
+}
+
+
+/* ------------------------ */
+.menu{
+    opacity: 1;
+    width: 95px;
+    min-height: 100vh;
+    background: #14181d;
 }
