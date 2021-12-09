@@ -5,10 +5,16 @@ import { useEffect, useState } from "react";
 import { Drawer, Button } from "antd";
 import "antd/dist/antd.css";
 import { data1 } from "./data1.js";
+import styles from "./app.module.scss";
+import cn from "classnames/bind";
+
+const cx = cn.bind(styles);
 function App() {
   const [visible, setVisible] = useState(false);
   const [field, setField] = useState({});
   const [check, setCheck] = useState([]);
+  const [min, setMin] = useState(null);
+  const [max, setMax] = useState(null);
   const calSize = (width, height, row, col) => {
     let size;
     let colWidth = Math.floor(width / col);
@@ -48,35 +54,24 @@ function App() {
     // ======================
     function handleZoom(e, a) {
       let transform = e.transform;
-      if(transform.k < 1) transform.k = 1;
-
+      if (transform.k < 1) transform.k = 1;
       d3.select("svg g").attr("transform", transform);
-      
-
-
-// let factor = mapWidth / d3.select('#map svg').attr('viewBox').split(' ')[2]
-// console.log(d3.select('#map svg')._groups[0][0].width.animVal.value)
-d3.select('#minimapRect').remove();
-let mapWidth = d3.select('#map')._groups[0][0].offsetWidth;
-let mapHeight = d3.select('#map')._groups[0][0].offsetHeight;
-let factor = mapWidth / d3.select('#map svg')._groups[0][0].width.animVal.value;
-let minimapWidth = 130;
-      let minimapHeight = 140;
-let dx =  -transform.x / transform.k;
-console.log(transform)
-      let dy =  -transform.y / transform.k;
-      
-      console.log( transform.k)
-      let minimapRect = d3.select("#mini-map svg g").append('rect')
-          .attr('id', 'minimapRect')
-          .attr('width', minimapWidth/ (transform.k) )
-          .attr('height', minimapHeight / (transform.k) )
-          .attr('stroke', 'red')
-          .attr('stroke-width', 2)
-          .attr('fill', 'none')
-          .attr('transform', `translate(${+dx/12 + 5},${+dy/12})`);
+      d3.select("#minimapRect").remove();
+      let minimapWidth = 120;
+      let minimapHeight = 130;
+      let dx = -transform.x / transform.k;
+      let dy = -transform.y / transform.k;
+      let minimapRect = d3
+        .select("#mini-map svg g")
+        .append("rect")
+        .attr("id", "minimapRect")
+        .attr("width", minimapWidth / transform.k)
+        .attr("height", minimapHeight / transform.k)
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+        .attr("transform", `translate(${+dx / 12 + 5},${+dy / 12})`);
     }
-
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
     let zoom = d3
@@ -87,7 +82,7 @@ console.log(transform)
         [0, 0],
         [width, 1200],
       ]);
-    d3.select("svg").call(zoom).call(zoom.transform, transform)
+    d3.select("svg").call(zoom).call(zoom.transform, transform);
 
     drawMap();
     drawMinimap();
@@ -173,15 +168,16 @@ console.log(transform)
         .append("rect")
         .attr("class", "field")
         .attr("x", function (d) {
-          return (d.position[1][0] + 6) * size;
+          return (d.position.colStart + 6) * size;
         })
         .attr("y", function (d) {
-          return d.position[0][0] * size;
+          return d.position.rowStart * size;
         })
         .attr("width", function (d) {
-          if (d.position[1].length > 1) {
+          let area = d.position.colEnd - d.position.colStart;
+          if ((area) > 1) {
             return (
-              (d.position[1][d.position[1].length - 1] - d.position[1][0] + 1) *
+              (area + 1) *
               size
             );
           }
@@ -189,9 +185,10 @@ console.log(transform)
           return size;
         })
         .attr("height", function (d) {
-          if (d.position[0].length > 1) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          if (area > 1) {
             return (
-              (d.position[0][d.position[0].length - 1] - d.position[0][0] + 1) *
+              (area + 1) *
               size
             );
           }
@@ -300,15 +297,16 @@ console.log(transform)
         .append("rect")
         .attr("class", "field")
         .attr("x", function (d) {
-          return (d.position[1][0] + 6) * minimapSize;
+          return (d.position.colStart + 6) * minimapSize;
         })
         .attr("y", function (d) {
-          return d.position[0][0] * minimapSize;
+          return d.position.rowStart * minimapSize;
         })
         .attr("width", function (d) {
-          if (d.position[1].length > 1) {
+          let area = d.position.colEnd - d.position.colStart;
+          if (area > 1) {
             return (
-              (d.position[1][d.position[1].length - 1] - d.position[1][0] + 1) *
+              (area + 1) *
               minimapSize
             );
           }
@@ -316,9 +314,10 @@ console.log(transform)
           return minimapSize;
         })
         .attr("height", function (d) {
-          if (d.position[0].length > 1) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          if (area > 1) {
             return (
-              (d.position[0][d.position[0].length - 1] - d.position[0][0] + 1) *
+              (area + 1) *
               minimapSize
             );
           }
@@ -343,7 +342,9 @@ console.log(transform)
       let fields = d3.selectAll(".field");
       fields
         .filter(function (d, i) {
-          if (d.position[0].length === Number(e.target.value)) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          if ((area + 1) === Number(e.target.value)) {
+            
             return this;
           }
         })
@@ -359,7 +360,8 @@ console.log(transform)
       let fields = d3.selectAll(".field");
       fields
         .filter(function (d, i) {
-          if (d.position[0].length === Number(e.target.value)) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          if ((area+1)=== Number(e.target.value)) {
             return this;
           }
         })
@@ -386,10 +388,32 @@ console.log(transform)
 
     return JSON.stringify(obj) === JSON.stringify({});
   }
+  const submit = () => {
+    let data = data1;
+    // const size = calSize(width, height, data.nRow, data.nCol);
+
+    let rStart = 2 + 6;
+    let rEnd = 3+6;
+    let cStart = 2;
+    let cEnd = 3;
+    // min.forEach(a => a * size)
+    // max.forEach(a => a * size)
+    
+    let fields = d3.selectAll(".field");
+    fields.filter(function(d){
+      let endpoint = [];
+ 
+      if(d.position.rowStart >= rStart && d.position.colStart >= cStart && d.position.rowEnd <= rEnd && d.position.colEnd <= cEnd){
+        
+        return this;
+      }
+    }).style("fill", "blue")
+    
+  }
   return (
     <div className="App">
       <Drawer
-        className="info"
+        className={cx("info")}
         mask={false}
         autoFocus={false}
         title="Infomation"
@@ -403,18 +427,19 @@ console.log(transform)
           <>
             <div>Name: {field.name || field.id}</div>
             <div>
-              Position: {field.position[0][0]} x {field.position[1][0]}
+              Position: {field.position.rowStart} x {field.position.colStart}
             </div>
             <div>
-              Area: {field.position[0].length} x {field.position[0].length}
+              Area: {field.position.rowEnd - field.position.rowStart + 1} x {field.position.rowEnd - field.position.rowStart + 1}
             </div>
             <img src={field.img || "green.jpg"} />{" "}
           </>
         )}
       </Drawer>
-      <div className="nav">Nav</div>
-      <div className="action">
+      <div className={cx("nav")}>Nav</div>
+      <div className={cx("action")}>
         <div>Map</div>
+        <div>Size</div>
         <div>
           <input
             type="checkbox"
@@ -447,9 +472,28 @@ console.log(transform)
           />
           1x1
         </div>
+        <div>Coordinates</div>
+      <div className={cx("coordinates")}>
+        <div>
+          <div>
+            MIN(X,Y)
+          </div>
+          <input name="min" value={min} onChange={(e) => setMin(e.target.value)} placeholder="0,0"/>
+        </div>
+        <div>
+          <div>
+            MAX(X,Y)
+          </div>
+          <input name="max" value={max} onChange={(e) => setMax(e.target.value)} placeholder="10,8"/>
+        </div>
+        
       </div>
-      <div className="container">
-        <div className="menu"></div>
+      <div><button className={cx("btn")} onClick={submit}>Apply</button></div>
+      
+      </div>
+      
+      <div className={cx("container")}>
+        <div className={cx("menu")}></div>
 
         <div id="map"></div>
         <div id="mini-map"></div>
