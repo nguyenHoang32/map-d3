@@ -1,4 +1,4 @@
-export const data1 = {
+export  const data1 = {
   nRow: 20,
   nCol: 20,
   data: [
