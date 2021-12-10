@@ -3,6 +3,8 @@ body,html{
     padding: 0;
     box-sizing: border-box;
     position: relative;
+    font-family: 'Montserrat', sans-serif;
+   
 }
 
 .nav{
@@ -18,30 +20,12 @@ body,html{
 .container{
     display: flex;
 }
-.action{
-    opacity: 1;
-    border-left: 3px solid white;
-    border-right: 3px solid white;
-    z-index: 9999;
-    top: 60px;
-    left: 95px;
-    position: absolute;
-    width: 260px;
-    height: 100vh;
-    background:#1d232a;
-    color: white !important;
-    font-size: 32px;
-}
-.action input {
-    
-    transform: scale(2);
-    margin-left: 30px;
-    margin-right: 20px;
-}
+
 #map{
     /* width: calc(100vw - 95px - 130px);
     height: calc(100vh); */
     /* padding-top: 100px; */
+    
     width: 1400px;
     height: calc(100vh);
     border: 1px solid black;

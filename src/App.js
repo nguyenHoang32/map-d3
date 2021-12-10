@@ -4,6 +4,8 @@ import { nest } from "d3-collection";
 import { useEffect, useState } from "react";
 import { Drawer, Button } from "antd";
 import "antd/dist/antd.css";
+import Action from "./components/Action/Action";
+
 import { data1 } from "./data1.js";
 import styles from "./app.module.scss";
 import cn from "classnames/bind";
@@ -175,25 +177,11 @@ function App() {
         })
         .attr("width", function (d) {
           let area = d.position.colEnd - d.position.colStart;
-          if ((area) > 1) {
-            return (
-              (area + 1) *
-              size
-            );
-          }
-
-          return size;
+          return (area + 1) * size;
         })
         .attr("height", function (d) {
           let area = d.position.rowEnd - d.position.rowStart;
-          if (area > 1) {
-            return (
-              (area + 1) *
-              size
-            );
-          }
-
-          return size;
+          return (area + 1) * size;
         })
         .style("cursor", "pointer")
         .style("fill", function (d) {
@@ -304,25 +292,12 @@ function App() {
         })
         .attr("width", function (d) {
           let area = d.position.colEnd - d.position.colStart;
-          if (area > 1) {
-            return (
-              (area + 1) *
-              minimapSize
-            );
-          }
 
-          return minimapSize;
+          return (area + 1) * minimapSize;
         })
         .attr("height", function (d) {
           let area = d.position.rowEnd - d.position.rowStart;
-          if (area > 1) {
-            return (
-              (area + 1) *
-              minimapSize
-            );
-          }
-
-          return minimapSize;
+          return (area + 1) * minimapSize;
         })
         .style("fill", function (d) {
           if (!d.img) return "green";
@@ -343,8 +318,7 @@ function App() {
       fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
-          if ((area + 1) === Number(e.target.value)) {
-            
+          if (area + 1 === Number(e.target.value)) {
             return this;
           }
         })
@@ -361,7 +335,7 @@ function App() {
       fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
-          if ((area+1)=== Number(e.target.value)) {
+          if (area + 1 === Number(e.target.value)) {
             return this;
           }
         })
@@ -393,23 +367,28 @@ function App() {
     // const size = calSize(width, height, data.nRow, data.nCol);
 
     let rStart = 2 + 6;
-    let rEnd = 3+6;
+    let rEnd = 3 + 6;
     let cStart = 2;
     let cEnd = 3;
     // min.forEach(a => a * size)
     // max.forEach(a => a * size)
-    
+
     let fields = d3.selectAll(".field");
-    fields.filter(function(d){
-      let endpoint = [];
- 
-      if(d.position.rowStart >= rStart && d.position.colStart >= cStart && d.position.rowEnd <= rEnd && d.position.colEnd <= cEnd){
-        
-        return this;
-      }
-    }).style("fill", "blue")
-    
-  }
+    fields
+      .filter(function (d) {
+        let endpoint = [];
+
+        if (
+          d.position.rowStart >= rStart &&
+          d.position.colStart >= cStart &&
+          d.position.rowEnd <= rEnd &&
+          d.position.colEnd <= cEnd
+        ) {
+          return this;
+        }
+      })
+      .style("fill", "blue");
+  };
   return (
     <div className="App">
       <Drawer
@@ -430,68 +409,18 @@ function App() {
               Position: {field.position.rowStart} x {field.position.colStart}
             </div>
             <div>
-              Area: {field.position.rowEnd - field.position.rowStart + 1} x {field.position.rowEnd - field.position.rowStart + 1}
+              Area: {field.position.rowEnd - field.position.rowStart + 1} x{" "}
+              {field.position.rowEnd - field.position.rowStart + 1}
             </div>
             <img src={field.img || "green.jpg"} />{" "}
           </>
         )}
       </Drawer>
       <div className={cx("nav")}>Nav</div>
-      <div className={cx("action")}>
-        <div>Map</div>
-        <div>Size</div>
-        <div>
-          <input
-            type="checkbox"
-            value={4}
-            onChange={(value) => handleFilter(value)}
-          />
-          4x4
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            value={3}
-            onChange={(value) => handleFilter(value)}
-          />
-          3x3
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            value={2}
-            onChange={(value) => handleFilter(value)}
-          />
-          2x2
-        </div>
-        <div>
-          <input
-            type="checkbox"
-            value={1}
-            onChange={(value) => handleFilter(value)}
-          />
-          1x1
-        </div>
-        <div>Coordinates</div>
-      <div className={cx("coordinates")}>
-        <div>
-          <div>
-            MIN(X,Y)
-          </div>
-          <input name="min" value={min} onChange={(e) => setMin(e.target.value)} placeholder="0,0"/>
-        </div>
-        <div>
-          <div>
-            MAX(X,Y)
-          </div>
-          <input name="max" value={max} onChange={(e) => setMax(e.target.value)} placeholder="10,8"/>
-        </div>
-        
-      </div>
-      <div><button className={cx("btn")} onClick={submit}>Apply</button></div>
-      
-      </div>
-      
+      <Action 
+      submit={submit}
+      handleFilter={handleFilter} setMin={setMin} setMax={setMax} min={min} max={max}/>
+
       <div className={cx("container")}>
         <div className={cx("menu")}></div>
 

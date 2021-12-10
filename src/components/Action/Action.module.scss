@@ -1,0 +1,185 @@
+$txt-color: #a0a4a7;
+$sq-1: #ff8c00;
+$sq-2: #ffe047;
+$sq-3: #f2f2f2;
+$bg: #1d232a;
+
+.action {
+  &::-webkit-scrollbar {
+    width: 3px;
+    height: 20px;
+  }
+  &::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px black;
+    border-radius: 10px;
+    
+  }
+  
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: $txt-color;
+    border-radius: 10px;
+  }
+  opacity: 1;
+  z-index: 9999;
+  top: 60px;
+  left: 86px;
+  position: absolute;
+  padding: 0px 18px;
+  width: 235px;
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  background: #1d232a;
+  color: white !important;
+  //
+  .title-wraper {
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .title {
+      font-size: 22px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .clear {
+      color: #0084ff;
+      font-size: 16px;
+      text-decoration: underline;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  }
+  //
+  .litemap {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0px;
+    font-size: 20px;
+    font-weight: 500;
+    color: $txt-color;
+  }
+
+  //
+  .status{
+    padding: 10px 0px;
+    .status-item{
+      display: flex;
+      align-items: center;
+      .square-color{
+        width: 20px;
+        height: 20px;
+        border: 1px solid white;
+        margin: 0px 10px;
+      }
+      .square-color-1{
+        @extend .square-color;
+        background: $sq-1;
+      }
+      .square-color-2{
+        @extend .square-color;
+        background: $sq-2;
+      }
+      .square-color-3{
+        @extend .square-color;
+        background: $sq-3;
+      }
+      .status-title{
+        color: $txt-color;
+        font-size: 15px;
+      }
+    }
+    
+  }
+  .check-box{
+    width: 20px;
+    height: 20px;
+    margin-bottom: 6px;
+    :global{
+     .ant-checkbox-inner{
+       background: $bg;
+       height: 20px;
+       width: 20px;
+       margin-bottom: 2px;
+       border: 2px solid $txt-color;
+     }
+   
+    
+    }
+  }
+  .find-land{
+    padding: 8px 0px;
+    font-size: 16px;
+    color: white;
+    font-weight: bold;
+  }
+  .size{
+    margin: 12px 0px 24px 0px;
+    .size-title{
+      margin-left: 5px;
+      font-size: 15px;
+      font-weight: bold;
+      color: $txt-color;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+  
+    }
+    .size-item{
+      margin-bottom: 10px;
+      display: flex;
+      gap: 12px;
+      .size-name{
+        color: $txt-color;
+          font-size: 15px;
+      }
+    }
+  }
+  .coordinates{
+    margin: 12px 0px;
+    color: $txt-color;
+    .coordinates-title{
+      font-size: 15px;
+      color: $txt-color;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .coordinates-body{
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 15px;
+      input{
+        margin-top: 4px;
+        width: 90px;
+        height: 40px;
+        text-align: center;
+        background: $bg;
+        border: 2px solid $txt-color;
+        border-radius: 4px;
+        color: white;
+      }
+    }
+  }
+  .btn{
+    width: 100%;
+    background: #0084ff;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+    border: none;
+    cursor: pointer;
+  }
+  hr {
+    width: 226px;
+    margin-left: -16px;
+    background-color: #14181d;
+    color: #14181d;
+    border-color: #14181d;
+  }
+}
