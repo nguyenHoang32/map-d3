@@ -6,32 +6,26 @@ import { Checkbox, Drawer } from "antd";
 
 const cx = cn.bind(styles);
 
-const Action = ({ handleFilter, setMin, setMax, min, max, submit }) => {
+const Action = ({ handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
   const [checked, setChecked] = useState(false);
-  const [visible, setVisible] = useState(true);
-  const showDrawer = () => {
-    setVisible(true);
-  };
-
-  const onClose = () => {
-    setVisible(false);
-  };
+  
+  
   const clickClose = () => {
     console.log("click")
-    setVisible(!visible)
+    setVisibleAction(!visibleAction)
   }
   return (
     <div className={cx("container")}>
       <button 
-      className={cx("close-btn", !visible ? cx("close-btn--left") : cx("close-btn--right"))} 
+      className={cx("close-btn", !visibleAction ? cx("close-btn--left") : cx("close-btn--right"))} 
       onClick={clickClose}
-      style={{left: `${!visible ? '95px' : "335px"}`}}
-      > {!visible ? ">" : "<" } </button>
+      style={{left: `${!visibleAction ? '95px' : "335px"}`}}
+      > {!visibleAction ? ">" : "<" } </button>
       <Drawer
         mask={false}
         autoFocus={false}
         placement="left"
-        visible={visible}
+        visible={visibleAction}
         className={cx("action")}
         
       >

@@ -35,6 +35,11 @@ $bg: #1d232a;
   background: none !important;
   
   :global{
+    .ant-drawer-wrapper-body{
+    
+      font-weight: 700;
+      background:#1d232a;
+  }
     .ant-drawer-body{
       padding-top: 10px;
       overflow-x:hidden;

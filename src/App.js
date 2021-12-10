@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Drawer } from "antd";
 import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
-
+import Information from "./components/Information/index";
 import { data1 } from "./data1.js";
 import styles from "./app.module.scss";
 import cn from "classnames/bind";
@@ -17,6 +17,7 @@ function App() {
   const [check, setCheck] = useState([]);
   const [min, setMin] = useState(null);
   const [max, setMax] = useState(null);
+  const [visibleAction, setVisibleAction] = useState(true);
   const calSize = (width, height, row, col) => {
     let size;
     let colWidth = Math.floor(width / col);
@@ -391,41 +392,22 @@ function App() {
   };
   return (
     <div className="App">
-      <Drawer
-        className={cx("info")}
-        mask={false}
-        autoFocus={false}
-        title="Infomation"
-        placement="right"
-        onClose={onClose}
-        visible={visible}
-        width={250}
-        style={{ marginTop: 60 }}
-      >
-        {!isEmpty(field) && visible && (
-          <>
-            <div>Name: {field.name || field.id}</div>
-            <div>
-              Position: {field.position.rowStart} x {field.position.colStart}
-            </div>
-            <div>
-              Area: {field.position.rowEnd - field.position.rowStart + 1} x{" "}
-              {field.position.rowEnd - field.position.rowStart + 1}
-            </div>
-            <img src={field.img || "green.jpg"} />{" "}
-          </>
-        )}
-      </Drawer>
+      <Information visible={visible} field={field} isEmpty={isEmpty} onClose={onClose}/>
       <div className={cx("nav")}>Nav</div>
       <Action 
       submit={submit}
-      handleFilter={handleFilter} setMin={setMin} setMax={setMax} min={min} max={max}/>
+      visibleAction={visibleAction}
+      setVisibleAction={setVisibleAction}
+      handleFilter={handleFilter} 
+      setMin={setMin} 
+      setMax={setMax} 
+      min={min} max={max}/>
 
       <div className={cx("container")}>
         <div className={cx("menu")}></div>
 
         <div id="map"></div>
-        <div id="mini-map"></div>
+        <div id="mini-map" style={{left: `${visibleAction ? '400px' : '200px'}` }}></div>
       </div>
     </div>
   );
