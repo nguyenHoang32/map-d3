@@ -2,7 +2,7 @@ import "./App.css";
 import * as d3 from "d3";
 import { nest } from "d3-collection";
 import { useEffect, useState } from "react";
-import { Drawer, Button } from "antd";
+import { Drawer } from "antd";
 import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
 
