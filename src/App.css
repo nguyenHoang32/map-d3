@@ -66,10 +66,11 @@ body,html{
   right: -5px;
   bottom: -5px;
   border: 1px solid white;
+  pointer-events: none;
 }
 
 /* ------------------------ */
 .blur-field{
-    z-index: 999999999 !important;
+    z-index: 100 !important;
     pointer-events: none;
 }

@@ -52,7 +52,7 @@ function App() {
     //   "transform",
     //   `translate(${initialTranslate[0]}, ${initialTranslate[1]})scale(${initialScale})`
     // );
-    
+
     console.log(size * Math.floor(data.nRow / 2));
     // --------------------------
     image(map, data);
@@ -108,12 +108,14 @@ function App() {
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
-    let zoom = d3.zoom().on("zoom", handleZoom);
-    // .scaleExtent([0.01, 3])
-    // .translateExtent([
-    //   [0, 0],
-    //   [width, 1200],
-    // ]);
+    let zoom = d3
+      .zoom()
+      .on("zoom", handleZoom)
+      .scaleExtent([0.1, 3])
+      .translateExtent([
+        [-50, 0],
+        [width, 1200],
+      ]);
     d3.select("svg").call(zoom).call(zoom.transform, transform);
 
     drawMap();
@@ -159,7 +161,6 @@ function App() {
       let gridRow = map.append("g").attr("class", "grid-square");
       let array = [];
 
-      
       for (let i = 0; i < data.nCol; i++) {
         let row = [];
         for (let j = 0; j < data.nRow; j++) {
@@ -250,36 +251,35 @@ function App() {
             showDrawer();
           }
           // Blur
-      
         })
         .on("dblclick", function (e) {
           return e.preventDefault();
+        });
+      d3.select("#map svg g")
+        .selectAll(".blur-field")
+        .data(data.data)
+        .enter()
+        .append("rect")
+        .attr("class", "blur-field")
+        .attr("x", function (d) {
+          return d.position.colStart * size;
         })
-        d3.select("#map svg g").selectAll(".blur-field")
-      .data(data.data)
-      .enter()
-      .append("rect")
-      .attr("class", "blur-field")
-      .attr("x", function (d) {
-        return d.position.colStart * size;
-      })
-      .attr("y", function (d) {
-        return d.position.rowStart * size;
-      })
-      .attr("width", function (d) {
-        let area = d.position.colEnd - d.position.colStart;
-        return (area + 1) * size;
-      })
-      .attr("height", function (d) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        return (area + 1) * size;
-      })
-      .style("fill", function(d){
-        
-          return "grey"
-        
-      }).style("fill-opacity", 0)
-      // 
+        .attr("y", function (d) {
+          return d.position.rowStart * size;
+        })
+        .attr("width", function (d) {
+          let area = d.position.colEnd - d.position.colStart;
+          return (area + 1) * size;
+        })
+        .attr("height", function (d) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          return (area + 1) * size;
+        })
+        .style("fill", function (d) {
+          return "grey";
+        })
+        .style("fill-opacity", 0);
+      //
     }
     function drawMinimap() {
       let minimapWidth = width / 8;
@@ -364,31 +364,30 @@ function App() {
         })
         .style("stroke", "black");
 
-
-        d3.select("#mini-map svg g").selectAll(".blur-field")
-      .data(data.data)
-      .enter()
-      .append("rect")
-      .attr("class", "blur-field")
-      .attr("x", function (d) {
-        return d.position.colStart * minimapSize;
-      })
-      .attr("y", function (d) {
-        return d.position.rowStart * minimapSize;
-      })
-      .attr("width", function (d) {
-        let area = d.position.colEnd - d.position.colStart;
-        return (area + 1) * minimapSize;
-      })
-      .attr("height", function (d) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        return (area + 1) * minimapSize;
-      })
-      .style("fill", function(d){
-        
-          return "grey"
-        
-      }).style("fill-opacity", 0)
+      d3.select("#mini-map svg g")
+        .selectAll(".blur-field")
+        .data(data.data)
+        .enter()
+        .append("rect")
+        .attr("class", "blur-field")
+        .attr("x", function (d) {
+          return d.position.colStart * minimapSize;
+        })
+        .attr("y", function (d) {
+          return d.position.rowStart * minimapSize;
+        })
+        .attr("width", function (d) {
+          let area = d.position.colEnd - d.position.colStart;
+          return (area + 1) * minimapSize;
+        })
+        .attr("height", function (d) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          return (area + 1) * minimapSize;
+        })
+        .style("fill", function (d) {
+          return "grey";
+        })
+        .style("fill-opacity", 0);
     }
     function reset() {
       d3.select("svg g")
@@ -415,67 +414,70 @@ function App() {
           }
           return `url(#${d.id})`;
         });
-        // ---------
-        let disableArray = []
-        let activeArray = []
-      let disableField = fields
-      .filter(function (d, i) {
+      // ---------
+      let disableArray = [];
+      let activeArray = [];
+      let disableField = fields.filter(function (d, i) {
         let area = d.position.rowEnd - d.position.rowStart;
         if (newCheck.includes(area + 1)) {
-          activeArray.push(d)
-        }else{
+          activeArray.push(d);
+        } else {
           disableArray.push(d);
         }
-      })
-    
+      });
+
       //  d3.selectAll(".blur-field").filter(function(d){
       //   return this;
       // }).style("fill-opacity", 0)
 
-      d3.selectAll(".blur-field").filter(function(d){
-        if(activeArray.includes(d)){
-          return d;
-        }
-      }).style("fill-opacity", 0)
-      d3.selectAll(".blur-field").filter(function(d){
-        if(disableArray.includes(d)){
-          return d;
-        }
-        
-      }).style("fill-opacity", 0.5)
-      if(newCheck.length === 0) {
-        d3.selectAll(".blur-field").style("fill-opacity", 0)
+      d3.selectAll(".blur-field")
+        .filter(function (d) {
+          if (activeArray.includes(d)) {
+            return d;
+          }
+        })
+        .style("fill-opacity", 0);
+      d3.selectAll(".blur-field")
+        .filter(function (d) {
+          if (disableArray.includes(d)) {
+            return d;
+          }
+        })
+        .style("fill-opacity", 0.5);
+      if (newCheck.length === 0) {
+        d3.selectAll(".blur-field").style("fill-opacity", 0);
       }
-      
     } else {
-      
       let fields = d3.selectAll(".field");
       let activeArray = [];
-      let disableArray = []
+      let disableArray = [];
       let activeField = fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
           if (area + 1 === Number(e.target.value) || check.includes(area + 1)) {
-            activeArray.push(d)
+            activeArray.push(d);
             return this;
-          }else{
+          } else {
             disableArray.push(d);
           }
-          
         })
-        .style("fill", "orange");
-        
-        d3.selectAll(".blur-field").filter(function(d){
-          if(activeArray.includes(d)){
+        // .style("fill", "orange");
+
+      d3.selectAll(".blur-field")
+        .filter(function (d) {
+          if (activeArray.includes(d)) {
             return this;
           }
-        }).style("fill-opacity", 0)
-      d3.selectAll(".blur-field").filter(function(d){
-        if(disableArray.includes(d)){
-          return this;
-        }
-      }).style("fill-opacity", 0.6)
-      
+        })
+        .style("fill-opacity", 0);
+      d3.selectAll(".blur-field")
+        .filter(function (d) {
+          if (disableArray.includes(d)) {
+            return this;
+          }
+        })
+        .style("fill-opacity", 0.6);
+
       let newCheck = [...check];
       newCheck.push(Number(e.target.value));
       setCheck(newCheck);
@@ -503,40 +505,52 @@ function App() {
   }
   const submit = () => {
     // const size = calSize(width, height, data.nRow, data.nCol);
-    
+
     let rStart = min.split(",")[0];
     let rEnd = max.split(",")[0];
-    let cStart =  min.split(",")[1];
+    let cStart = min.split(",")[1];
     let cEnd = max.split(",")[1];
     // min.forEach(a => a * size)
     // max.forEach(a => a * size)
 
     let fields = d3.selectAll(".field");
     let active = [];
-    fields
+    fields.filter(function (d) {
+      let condition1 =
+        inRange(d.rowStartNew, rStart, rEnd) ||
+        inRange(d.rowEndNew, rStart, rEnd);
+      let condition2 =
+        inRange(d.colStartNew, cStart, cEnd) ||
+        inRange(d.colEndNew, cStart, cEnd);
+      if (condition1 && condition2) {
+        active.push(d);
+        return this;
+      }
+    });
+    d3.selectAll(".blur-field")
       .filter(function (d) {
-        let condition1 =
-          inRange(d.rowStartNew, rStart, rEnd) ||
-          inRange(d.rowEndNew, rStart, rEnd);
-        let condition2 =
-          inRange(d.colStartNew, cStart, cEnd) ||
-          inRange(d.colEndNew, cStart, cEnd);
-        if (condition1 && condition2) {
-          active.push(d)
+        if (!active.includes(d)) {
           return this;
         }
       })
-      d3.selectAll(".blur-field").filter(function(d){
-        if(!active.includes(d)){
-          return this;
-        }
-      }).style("fill-opacity", 0.7)
-
-
+      .style("fill-opacity", 0.7);
   };
   const resetCoordinate = () => {
-    d3.selectAll(".blur-field").style("fill-opacity", 0)
-  }
+    d3.selectAll(".blur-field").style("fill-opacity", 0);
+  };
+  const zoomInMini = (e) => {
+    e.preventDefault();
+    console.log(e.target.value)
+    let zoom = d3.zoom();
+    let svg = d3.select("svg")
+     
+      // 
+      svg.transition().duration(750).call(
+        zoom.transform,
+        d3.zoomIdentity.translate(width/2, height/2).scale(Number(e.target.value)),
+        
+      );
+  };
   return (
     <div className="App">
       <Information
@@ -565,7 +579,17 @@ function App() {
         <div
           id="mini-map"
           style={{ left: `${visibleAction ? "400px" : "200px"}` }}
-        ></div>
+        >
+          <input
+            onChange={zoomInMini}
+            type="range"
+            orient="vertical"
+            className={cx("input-range")}
+            min={0.2}
+            max={3}
+            step={0.2}
+          />
+        </div>
       </div>
     </div>
   );
