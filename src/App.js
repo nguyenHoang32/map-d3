@@ -7,6 +7,8 @@ import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
 import Information from "./components/Information/index";
 import { data1 } from "./data1.js";
+// import { data1 } from "./data2.js";
+
 import styles from "./app.module.scss";
 import cn from "classnames/bind";
 
@@ -15,8 +17,8 @@ function App() {
   const [visible, setVisible] = useState(false);
   const [field, setField] = useState({});
   const [check, setCheck] = useState([]);
-  const [min, setMin] = useState(null);
-  const [max, setMax] = useState(null);
+  const [min, setMin] = useState("");
+  const [max, setMax] = useState("");
   const [visibleAction, setVisibleAction] = useState(true);
   const calSize = (width, height, row, col) => {
     let size;
@@ -40,19 +42,47 @@ function App() {
       .attr("height", `calc(100vh)`);
     // .attr("transform","translate(-150,-300) scale(0.5,0.5)");
 
-    const initialScale = 2;
-    const initialTranslate = [
-      (width * (1 - initialScale)) / 2,
-      (height * (1 - initialScale)) / 2,
-    ];
+    // const initialScale = 2;
+    // const initialTranslate = [
+    //   (width * (1 - initialScale)) / 2,
+    //   (height * (1 - initialScale)) / 2,
+    // ];
     // map.attr(
     //   "transform",
     //   `translate(${initialTranslate[0]}, ${initialTranslate[1]})scale(${initialScale})`
     // );
     const size = calSize(width, height, data.nRow, data.nCol);
-
+    console.log(size * Math.floor(data.nRow / 2));
     // --------------------------
     image(map, data);
+    let center = {
+      rowStart: Math.floor(data.nRow / 2),
+      colStart: Math.floor(data.nCol / 2),
+    };
+
+    data.data.forEach((item) => {
+      if (item.position.rowStart <= center.rowStart) {
+        item.rowStartNew = center.rowStart - item.position.rowStart;
+      } else {
+        item.rowStartNew = item.position.rowStart - center.rowStart;
+      }
+      if (item.position.colStart <= center.colStart) {
+        item.colStartNew = item.position.colStart - center.colStart;
+      } else {
+        item.colStartNew = center.colStart - item.position.colStart;
+      }
+      if (item.position.rowEnd <= center.rowStart) {
+        item.rowEndNew = center.rowStart - item.position.rowEnd;
+      } else {
+        item.rowEndNew = item.position.rowEnd - center.rowStart;
+      }
+      if (item.position.colEnd <= center.colStart) {
+        item.colEndNew = item.position.colEnd - center.colStart;
+      } else {
+        item.colEndNew = center.colStart - item.position.colEnd;
+      }
+      return item;
+    });
 
     // ======================
     function handleZoom(e, a) {
@@ -77,14 +107,12 @@ function App() {
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
-    let zoom = d3
-      .zoom()
-      .on("zoom", handleZoom)
-      .scaleExtent([0.6, 3])
-      .translateExtent([
-        [0, 0],
-        [width, 1200],
-      ]);
+    let zoom = d3.zoom().on("zoom", handleZoom);
+    // .scaleExtent([0.01, 3])
+    // .translateExtent([
+    //   [0, 0],
+    //   [width, 1200],
+    // ]);
     d3.select("svg").call(zoom).call(zoom.transform, transform);
 
     drawMap();
@@ -171,7 +199,7 @@ function App() {
         .append("rect")
         .attr("class", "field")
         .attr("x", function (d) {
-          return (d.position.colStart + 6) * size;
+          return d.position.colStart * size;
         })
         .attr("y", function (d) {
           return d.position.rowStart * size;
@@ -286,7 +314,7 @@ function App() {
         .append("rect")
         .attr("class", "field")
         .attr("x", function (d) {
-          return (d.position.colStart + 6) * minimapSize;
+          return d.position.colStart * minimapSize;
         })
         .attr("y", function (d) {
           return d.position.rowStart * minimapSize;
@@ -363,28 +391,30 @@ function App() {
 
     return JSON.stringify(obj) === JSON.stringify({});
   }
+  function inRange(x, min, max) {
+    return (x - min) * (x - max) <= 0;
+  }
   const submit = () => {
-    let data = data1;
     // const size = calSize(width, height, data.nRow, data.nCol);
-
-    let rStart = 2 + 6;
-    let rEnd = 3 + 6;
-    let cStart = 2;
-    let cEnd = 3;
+    
+    let rStart = min.split(",")[0];
+    let rEnd = max.split(",")[0];
+    let cStart =  min.split(",")[1];
+    let cEnd = max.split(",")[1];
     // min.forEach(a => a * size)
     // max.forEach(a => a * size)
 
     let fields = d3.selectAll(".field");
     fields
       .filter(function (d) {
-        let endpoint = [];
-
-        if (
-          d.position.rowStart >= rStart &&
-          d.position.colStart >= cStart &&
-          d.position.rowEnd <= rEnd &&
-          d.position.colEnd <= cEnd
-        ) {
+        let condition1 =
+          inRange(d.rowStartNew, rStart, rEnd) ||
+          inRange(d.rowEndNew, rStart, rEnd);
+        let condition2 =
+          inRange(d.colStartNew, cStart, cEnd) ||
+          inRange(d.colEndNew, cStart, cEnd);
+        if (condition1 && condition2) {
+          console.log(d);
           return this;
         }
       })
@@ -392,22 +422,32 @@ function App() {
   };
   return (
     <div className="App">
-      <Information visible={visible} field={field} isEmpty={isEmpty} onClose={onClose}/>
+      <Information
+        visible={visible}
+        field={field}
+        isEmpty={isEmpty}
+        onClose={onClose}
+      />
       <div className={cx("nav")}>Nav</div>
-      <Action 
-      submit={submit}
-      visibleAction={visibleAction}
-      setVisibleAction={setVisibleAction}
-      handleFilter={handleFilter} 
-      setMin={setMin} 
-      setMax={setMax} 
-      min={min} max={max}/>
+      <Action
+        submit={submit}
+        visibleAction={visibleAction}
+        setVisibleAction={setVisibleAction}
+        handleFilter={handleFilter}
+        setMin={setMin}
+        setMax={setMax}
+        min={min}
+        max={max}
+      />
 
       <div className={cx("container")}>
         <div className={cx("menu")}></div>
 
         <div id="map"></div>
-        <div id="mini-map" style={{left: `${visibleAction ? '400px' : '200px'}` }}></div>
+        <div
+          id="mini-map"
+          style={{ left: `${visibleAction ? "400px" : "200px"}` }}
+        ></div>
       </div>
     </div>
   );

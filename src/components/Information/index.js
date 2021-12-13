@@ -28,9 +28,12 @@ const Information = ({ visible, field, isEmpty, onClose }) => {
             <div className={cx("link-site")}>Visit site</div>
           </div>
           <div className={cx("body")}>
-          <div>
-            Location: {field.position.rowStart} x {field.position.colStart}
+          <div className={cx("location")}>
+           
+            Location: 
+            
           </div>
+          <div className={cx("location-value")}>{field.colStartNew},{field.rowStartNew}</div>
           <div>
             Size: {field.position.rowEnd - field.position.rowStart + 1} x{" "}
             {field.position.rowEnd - field.position.rowStart + 1}

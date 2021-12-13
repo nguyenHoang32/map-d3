@@ -15,6 +15,7 @@ export const data1 = {
     img: 'usa.png'
   },
 { id: 9, position: { rowStart: 4, rowEnd: 4, colStart: 4, colEnd: 4 } },
+{ id: 100, position: { rowStart: 10, rowEnd: 10, colStart: 10, colEnd: 10 }, name: 'Australia', img: 'australia.png' },
 {
     id: 10,
     position: { rowStart: 4, rowEnd: 4, colStart: 5, colEnd: 5 }

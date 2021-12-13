@@ -11,7 +11,7 @@ const Action = ({ handleFilter, setMin, setMax, min, max, submit,visibleAction,s
   
   
   const clickClose = () => {
-    console.log("click")
+    
     setVisibleAction(!visibleAction)
   }
   return (
@@ -47,18 +47,18 @@ const Action = ({ handleFilter, setMin, setMax, min, max, submit,visibleAction,s
         <hr />
         <div className={cx("status")}>
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} />
+            <Checkbox className={cx("check-box")} disabled/>
 
             <div className={cx("square-color-1")}></div>
             <div className={cx("status-title")}>For Sale</div>
           </div>
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} />
+            <Checkbox className={cx("check-box")} disabled/>
             <div className={cx("square-color-2")}></div>
             <div className={cx("status-title")}>For Sale</div>
           </div>
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} />
+            <Checkbox className={cx("check-box")} disabled/>
             <div className={cx("square-color-3")}></div>
             <div className={cx("status-title")}>For Sale</div>
           </div>
