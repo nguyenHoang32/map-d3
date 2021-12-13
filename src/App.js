@@ -33,6 +33,7 @@ function App() {
   let width = 1200;
   // let height = map._groups[0][0].height.baseVal.value;
   let height = 2000;
+  const size = calSize(width, height, data1.nRow, data1.nCol);
   useEffect(() => {
     let data = data1;
     const map = d3
@@ -51,7 +52,7 @@ function App() {
     //   "transform",
     //   `translate(${initialTranslate[0]}, ${initialTranslate[1]})scale(${initialScale})`
     // );
-    const size = calSize(width, height, data.nRow, data.nCol);
+    
     console.log(size * Math.floor(data.nRow / 2));
     // --------------------------
     image(map, data);
@@ -157,6 +158,8 @@ function App() {
     function drawMap() {
       let gridRow = map.append("g").attr("class", "grid-square");
       let array = [];
+
+      
       for (let i = 0; i < data.nCol; i++) {
         let row = [];
         for (let j = 0; j < data.nRow; j++) {
@@ -246,10 +249,37 @@ function App() {
             setField(d);
             showDrawer();
           }
+          // Blur
+      
         })
         .on("dblclick", function (e) {
           return e.preventDefault();
-        });
+        })
+        d3.select("#map svg g").selectAll(".blur-field")
+      .data(data.data)
+      .enter()
+      .append("rect")
+      .attr("class", "blur-field")
+      .attr("x", function (d) {
+        return d.position.colStart * size;
+      })
+      .attr("y", function (d) {
+        return d.position.rowStart * size;
+      })
+      .attr("width", function (d) {
+        let area = d.position.colEnd - d.position.colStart;
+        return (area + 1) * size;
+      })
+      .attr("height", function (d) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        return (area + 1) * size;
+      })
+      .style("fill", function(d){
+        
+          return "grey"
+        
+      }).style("fill-opacity", 0)
+      // 
     }
     function drawMinimap() {
       let minimapWidth = width / 8;
@@ -333,6 +363,32 @@ function App() {
           return `url(#${d.id})`;
         })
         .style("stroke", "black");
+
+
+        d3.select("#mini-map svg g").selectAll(".blur-field")
+      .data(data.data)
+      .enter()
+      .append("rect")
+      .attr("class", "blur-field")
+      .attr("x", function (d) {
+        return d.position.colStart * minimapSize;
+      })
+      .attr("y", function (d) {
+        return d.position.rowStart * minimapSize;
+      })
+      .attr("width", function (d) {
+        let area = d.position.colEnd - d.position.colStart;
+        return (area + 1) * minimapSize;
+      })
+      .attr("height", function (d) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        return (area + 1) * minimapSize;
+      })
+      .style("fill", function(d){
+        
+          return "grey"
+        
+      }).style("fill-opacity", 0)
     }
     function reset() {
       d3.select("svg g")
@@ -344,6 +400,8 @@ function App() {
   const handleFilter = (e) => {
     if (check.includes(Number(e.target.value))) {
       let fields = d3.selectAll(".field");
+      let newCheck = check.filter((a) => a !== Number(e.target.value));
+      setCheck(newCheck);
       fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
@@ -357,18 +415,67 @@ function App() {
           }
           return `url(#${d.id})`;
         });
-      let newCheck = check.filter((a) => a !== Number(e.target.value));
-      setCheck(newCheck);
+        // ---------
+        let disableArray = []
+        let activeArray = []
+      let disableField = fields
+      .filter(function (d, i) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        if (newCheck.includes(area + 1)) {
+          activeArray.push(d)
+        }else{
+          disableArray.push(d);
+        }
+      })
+    
+      //  d3.selectAll(".blur-field").filter(function(d){
+      //   return this;
+      // }).style("fill-opacity", 0)
+
+      d3.selectAll(".blur-field").filter(function(d){
+        if(activeArray.includes(d)){
+          return d;
+        }
+      }).style("fill-opacity", 0)
+      d3.selectAll(".blur-field").filter(function(d){
+        if(disableArray.includes(d)){
+          return d;
+        }
+        
+      }).style("fill-opacity", 0.5)
+      if(newCheck.length === 0) {
+        d3.selectAll(".blur-field").style("fill-opacity", 0)
+      }
+      
     } else {
+      
       let fields = d3.selectAll(".field");
-      fields
+      let activeArray = [];
+      let disableArray = []
+      let activeField = fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
-          if (area + 1 === Number(e.target.value)) {
+          if (area + 1 === Number(e.target.value) || check.includes(area + 1)) {
+            activeArray.push(d)
             return this;
+          }else{
+            disableArray.push(d);
           }
+          
         })
         .style("fill", "orange");
+        
+        d3.selectAll(".blur-field").filter(function(d){
+          if(activeArray.includes(d)){
+            return this;
+          }
+        }).style("fill-opacity", 0)
+      d3.selectAll(".blur-field").filter(function(d){
+        if(disableArray.includes(d)){
+          return this;
+        }
+      }).style("fill-opacity", 0.6)
+      
       let newCheck = [...check];
       newCheck.push(Number(e.target.value));
       setCheck(newCheck);
@@ -405,6 +512,7 @@ function App() {
     // max.forEach(a => a * size)
 
     let fields = d3.selectAll(".field");
+    let active = [];
     fields
       .filter(function (d) {
         let condition1 =
@@ -414,12 +522,21 @@ function App() {
           inRange(d.colStartNew, cStart, cEnd) ||
           inRange(d.colEndNew, cStart, cEnd);
         if (condition1 && condition2) {
-          console.log(d);
+          active.push(d)
           return this;
         }
       })
-      .style("fill", "blue");
+      d3.selectAll(".blur-field").filter(function(d){
+        if(!active.includes(d)){
+          return this;
+        }
+      }).style("fill-opacity", 0.7)
+
+
   };
+  const resetCoordinate = () => {
+    d3.selectAll(".blur-field").style("fill-opacity", 0)
+  }
   return (
     <div className="App">
       <Information
@@ -438,6 +555,7 @@ function App() {
         setMax={setMax}
         min={min}
         max={max}
+        resetCoordinate={resetCoordinate}
       />
 
       <div className={cx("container")}>

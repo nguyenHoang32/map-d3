@@ -212,6 +212,9 @@ $bg: #1d232a;
       }
     }
   }
+  .btn-wrapper{
+    margin-bottom: 40px;
+  }
   .btn{
     width: 100%;
     background: #0084ff;
@@ -220,7 +223,7 @@ $bg: #1d232a;
     font-weight: bold;
     border-radius: 8px;
     padding: 8px 12px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     border: none;
     cursor: pointer;
   }

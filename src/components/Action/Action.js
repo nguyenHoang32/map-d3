@@ -6,7 +6,7 @@ import { Checkbox, Drawer } from "antd";
 
 const cx = cn.bind(styles);
 
-const Action = ({ handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
+const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
   const [checked, setChecked] = useState(false);
   
   
@@ -127,9 +127,12 @@ const Action = ({ handleFilter, setMin, setMax, min, max, submit,visibleAction,s
             </div>
           </div>
         </div>
-        <div>
+        <div className={cx("btn-wrapper")}>
           <button className={cx("btn")} onClick={submit}>
             Apply
+          </button>
+          <button className={cx("btn")} onClick={resetCoordinate}>
+            Reset 
           </button>
         </div>
       </Drawer>
