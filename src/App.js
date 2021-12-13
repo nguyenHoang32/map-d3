@@ -99,12 +99,12 @@ function App() {
         .select("#mini-map svg g")
         .append("rect")
         .attr("id", "minimapRect")
-        .attr("width", minimapWidth / transform.k)
-        .attr("height", minimapHeight / transform.k)
+        .attr("width", (minimapWidth / transform.k) / 1.5)
+        .attr("height", (minimapHeight / transform.k) / 1.5)
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("fill", "none")
-        .attr("transform", `translate(${+dx / 12 + 5},${+dy / 12})`);
+        .attr("transform", `translate(${+dx / 12 + 40},${+dy / 12 + 20})`);
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
@@ -113,8 +113,8 @@ function App() {
       .on("zoom", handleZoom)
       .scaleExtent([0.1, 3])
       .translateExtent([
-        [-50, 0],
-        [width, 1200],
+        [-300, -200],
+        [width*1.5, 1200],
       ]);
     d3.select("svg").call(zoom).call(zoom.transform, transform);
 
