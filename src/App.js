@@ -242,7 +242,7 @@ function App() {
               .call(
                 zoom.transform,
                 d3.zoomIdentity
-                  .translate(width / 8 + 400, height / 8)
+                  .translate(width / 7 + 400, height / 7)
                   .scale(d3.zoomTransform(this).k)
                   .translate(-+active.attr("x"), -+active.attr("y"))
               );
@@ -282,13 +282,13 @@ function App() {
       //
     }
     function drawMinimap() {
-      let minimapWidth = width / 8;
-      let minimapHeight = height / 8;
+      let minimapWidth = width / 7;
+      let minimapHeight = height / 7;
       let minimap = d3
         .select("#mini-map")
         .append("svg")
-        .attr("width", minimapWidth - 15)
-        .attr("height", minimapHeight - 110);
+        .attr("width", minimapWidth - 20)
+        .attr("height", minimapHeight - 170);
 
       const minimapSize = calSize(
         minimapWidth,
@@ -333,7 +333,7 @@ function App() {
         .attr("width", minimapSize)
         .attr("height", minimapSize)
         .style("fill", "#212137")
-        .style("stroke", "black");
+        // .style("stroke", "black");
       //
 
       //
@@ -362,7 +362,7 @@ function App() {
           if (!d.img) return "green";
           return `url(#${d.id})`;
         })
-        .style("stroke", "black");
+        // .style("stroke", "black");
 
       d3.select("#mini-map svg g")
         .selectAll(".blur-field")
