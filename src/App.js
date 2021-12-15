@@ -53,34 +53,37 @@ function App() {
     //   `translate(${initialTranslate[0]}, ${initialTranslate[1]})scale(${initialScale})`
     // );
 
-    console.log(size * Math.floor(data.nRow / 2));
     // --------------------------
     image(map, data);
     let center = {
       rowStart: Math.floor(data.nRow / 2),
       colStart: Math.floor(data.nCol / 2),
     };
-
+    console.log(center)
     data.data.forEach((item) => {
+      item.rowStartNew = center.rowStart - item.position.rowStart;
+      item.rowEndNew = center.rowStart - item.position.rowEnd;
+      item.colStartNew =  center.colStart - item.position.colStart;
+      item.colEndNew = center.colStart - item.position.colEnd;
       if (item.position.rowStart <= center.rowStart) {
-        item.rowStartNew = center.rowStart - item.position.rowStart;
+        item.rowStartNew = Math.abs(item.rowStartNew)
       } else {
-        item.rowStartNew = item.position.rowStart - center.rowStart;
+        item.rowStartNew = -Math.abs(item.rowStartNew)
       }
       if (item.position.colStart <= center.colStart) {
-        item.colStartNew = item.position.colStart - center.colStart;
+        item.colStartNew =  -Math.abs(item.colStartNew)
       } else {
-        item.colStartNew = center.colStart - item.position.colStart;
+        item.colStartNew = Math.abs(item.colStartNew)
       }
       if (item.position.rowEnd <= center.rowStart) {
-        item.rowEndNew = center.rowStart - item.position.rowEnd;
+        item.rowEndNew = Math.abs(item.rowEndNew)
       } else {
-        item.rowEndNew = item.position.rowEnd - center.rowStart;
+        item.rowEndNew = -Math.abs(item.rowEndNew)
       }
       if (item.position.colEnd <= center.colStart) {
-        item.colEndNew = item.position.colEnd - center.colStart;
+        item.colEndNew = -Math.abs(item.colEndNew);
       } else {
-        item.colEndNew = center.colStart - item.position.colEnd;
+        item.colEndNew = Math.abs(item.colEndNew);
       }
       return item;
     });
@@ -95,12 +98,16 @@ function App() {
       let minimapHeight = 130;
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
+     
       let minimapRect = d3
         .select("#mini-map svg g")
         .append("rect")
         .attr("id", "minimapRect")
-        .attr("width", (minimapWidth / transform.k) / 1.5)
-        .attr("height", (minimapHeight / transform.k) / 1.5)
+
+        .attr("width", (minimapWidth / transform.k))
+        .attr("height", (minimapHeight / transform.k))
+
+ 
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("fill", "none")
@@ -539,17 +546,26 @@ function App() {
     d3.selectAll(".blur-field").style("fill-opacity", 0);
   };
   const zoomInMini = (e) => {
-    e.preventDefault();
-    console.log(e.target.value)
+    // e.preventDefault();
     let zoom = d3.zoom();
-    let svg = d3.select("svg")
-     
+    let svg = d3.select("svg g")
+    let minimapWidth = 120;
+    let minimapHeight = 130;
       // 
-      svg.transition().duration(750).call(
-        zoom.transform,
-        d3.zoomIdentity.translate(width/2, height/2).scale(Number(e.target.value)),
-        
-      );
+      const scale = Number(e.target.value);
+      d3.select("svg").attr("transform", "scale(" + scale+ ")");
+    // d3.select("#minimapRect").remove();
+    // let minimapRect = d3
+    //   .select("#mini-map svg g")
+    //   .append("rect")
+    //   .attr("id", "minimapRect")
+    //   .attr("width", minimapWidth / scale)
+    //   .attr("height", minimapHeight / scale)
+    //   .attr("stroke", "red")
+    //   .attr("stroke-width", 2)
+    //   .attr("fill", "none")
+    //   .attr("transform", `scale(${scale})`);
+      
   };
   return (
     <div className="App">
@@ -585,7 +601,7 @@ function App() {
             type="range"
             orient="vertical"
             className={cx("input-range")}
-            min={0.2}
+            min={0.8}
             max={3}
             step={0.2}
           />
