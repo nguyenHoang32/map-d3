@@ -103,12 +103,15 @@ function App() {
         .select("#mini-map svg g")
         .append("rect")
         .attr("id", "minimapRect")
+
         .attr("width", (minimapWidth / transform.k))
         .attr("height", (minimapHeight / transform.k))
+
+ 
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("fill", "none")
-        .attr("transform", `translate(${+dx / 12 + 5},${+dy / 12})`);
+        .attr("transform", `translate(${+dx / 12 + 40},${+dy / 12 + 20})`);
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
