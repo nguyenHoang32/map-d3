@@ -121,11 +121,12 @@ function App() {
       .zoom()
       .on("zoom", handleZoom)
       .scaleExtent([0.4, 3])
+      
       .translateExtent([
-        [-300, -200],
-        [width * 1.5, 1200],
+        [-100, -100],
+        [width, height + 100],
       ]);
-    d3.select("svg g").call(zoom)
+    d3.select("svg").call(zoom)
     .call(zoom.transform, transform);
     function image() {
       let defs = map.append("defs");
@@ -269,7 +270,7 @@ function App() {
               .translate(width / 2, height / 2)
               .scale(k)
               .translate(-x, -y);
-            d3.select("svg g").transition()
+            d3.select("svg").transition()
             .duration(1000).call(zoom.transform, transform);
             setField(d);
             showDrawer();
