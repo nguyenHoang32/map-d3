@@ -32,6 +32,8 @@ function App() {
   };
   const width = Number(window.screen.width - 95 - 235);
   const height = Number(window.screen.height - 60);
+  let minimapWidth = width / 7;
+  let minimapHeight = height / 7;
   const size = calSize(width, height, data1.nRow, data1.nCol);
   useEffect(() => {
     let data = data1;
@@ -95,27 +97,26 @@ function App() {
       // const myTransform = d3.select("svg g").attr("transform");
       d3.select("svg g").attr("transform", transform);
       setCurrentZoom(transform.k)
-      // d3.select("#minimapRect").remove();
-      // let minimapWidth = 120;
-      // let minimapHeight = 130;
-      // let dx = -transform.x / transform.k;
-      // let dy = -transform.y / transform.k;
+      d3.select("#minimapRect").remove();
+      
+      let dx = -transform.x / transform.k;
+      let dy = -transform.y / transform.k;
 
-      // let minimapRect = d3
-      //   .select("#mini-map svg g")
-      //   .append("rect")
-      //   .attr("id", "minimapRect")
+      let minimapRect = d3
+        .select("#mini-map svg g")
+        .append("rect")
+        .attr("id", "minimapRect")
 
-      //   .attr("width", (minimapWidth / transform.k))
-      //   .attr("height", (minimapHeight / transform.k))
+        .attr("width", (minimapWidth / transform.k))
+        .attr("height", (minimapHeight / transform.k))
 
-      //   .attr("stroke", "red")
-      //   .attr("stroke-width", 2)
-      //   .attr("fill", "none")
-      //   .attr("transform", `translate(${+dx / 12 + 40},${+dy / 12 + 20})`);
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("fill", "none")
+        .attr("transform", `translate(${+dx / 7 },${+dy / 7 })`);
     }
 
-    // let transform = d3.zoomIdentity.translate(0, 0).scale(1);
+    let transform = d3.zoomIdentity.translate(0, 0).scale(1);
     let zoom = d3
       .zoom()
       .on("zoom", handleZoom)
@@ -124,8 +125,8 @@ function App() {
         [-300, -200],
         [width * 1.5, 1200],
       ]);
-    d3.select("svg g").call(zoom);
-    // .call(zoom.transform, transform);
+    d3.select("svg g").call(zoom)
+    .call(zoom.transform, transform);
     function image() {
       let defs = map.append("defs");
       defs
@@ -305,8 +306,7 @@ function App() {
       //
     }
     function drawMinimap() {
-      let minimapWidth = width / 7;
-      let minimapHeight = height / 7;
+      
       let minimap = d3
         .select("#mini-map")
         .append("svg")
@@ -319,7 +319,6 @@ function App() {
         data.nRow,
         data.nCol
       );
-
       let minimapGrid = minimap.append("g").attr("class", "minimap-grid");
 
       let arrayMini = [];

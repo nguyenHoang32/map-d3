@@ -27,7 +27,8 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
         placement="left"
         visible={visibleAction}
         className={cx("action")}
-        
+        style={{display: `${!visibleAction && 'none'}`}}
+        destroyOnClose={true}
       >
         <div className={cx("title-wraper")}>
           <div className={cx("title")}>Map</div>
