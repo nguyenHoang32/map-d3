@@ -41,8 +41,8 @@ function App() {
       .select("#map")
       .append("svg")
       .attr("width", width)
-      .attr("height", height);
-    // .attr("transform","translate(-150,-300) scale(0.5,0.5)");
+      .attr("height", height)
+    .attr("transform","translate(115,0)");
 
     // const initialScale = 2;
     // const initialTranslate = [
@@ -143,14 +143,14 @@ function App() {
 
     
     
-  d3.select("#mini-map svg g").call(brush).call(brush.move, [[0, 0], [minimapWidth / 1.5, minimapHeight / 1.5]]);
+  d3.select("#mini-map svg g").call(brush).call(brush.move, [[0, 0], [minimapWidth / 1.5 +10, minimapHeight / 1.5 + 10]]);
   function brushed(e){
     
     const x = e.selection[0][0];
     const  y = e.selection[0][1];
     d3.select(".selection").attr("x", -x).attr("y", -y).attr("width",  ((minimapWidth/3) / currentZoom)).attr("height", ((minimapHeight/3) / currentZoom ))
     const minimapReact = d3.select("#minimapRect")
-    .attr("transform", `translate(${x},${y})`);
+    .attr("transform", `translate(${x-10},${y-10})`);
     d3.select("#map svg g").attr("transform", `translate(${-x * 7},${-y * 7})`);
 
     // console.log()
