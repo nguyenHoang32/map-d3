@@ -127,6 +127,8 @@ function App() {
         [width, height + 100],
       ]);
     d3.select("svg").call(zoom)
+    .on("touchstart.zoom", null)
+    .on("touchend.zoom", null)
     .call(zoom.transform, transform);
     function image() {
       let defs = map.append("defs");
