@@ -1,7 +1,7 @@
 export const data1 = {
 
   nRow: 20,
-  nCol: 20,
+  nCol: 16,
   data: [{ id: 1, position: { rowStart: 2, rowEnd: 3, colStart: 2, colEnd: 3 } },
 { id: 2, position: { rowStart: 2, rowEnd: 2, colStart: 4, colEnd: 4 } },
 { id: 4, position: { rowStart: 2, rowEnd: 2, colStart: 5, colEnd: 5 } },

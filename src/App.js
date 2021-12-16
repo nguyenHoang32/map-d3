@@ -14,6 +14,7 @@ import cn from "classnames/bind";
 
 const cx = cn.bind(styles);
 function App() {
+  const [currentZoom, setCurrentZoom] = useState(1);
   const [visible, setVisible] = useState(false);
   const [field, setField] = useState({});
   const [check, setCheck] = useState([]);
@@ -25,22 +26,20 @@ function App() {
     let colWidth = Math.floor(width / col);
 
     let rowWidth = Math.floor(height / row);
-    size = Math.min(colWidth, rowWidth);
+    size = Math.max(colWidth, rowWidth);
 
     return size;
   };
-
-  let width = 1200;
-  // let height = map._groups[0][0].height.baseVal.value;
-  let height = 2000;
+  const width = Number(window.screen.width - 95 - 235);
+  const height = Number(window.screen.height - 60);
   const size = calSize(width, height, data1.nRow, data1.nCol);
   useEffect(() => {
     let data = data1;
     const map = d3
       .select("#map")
       .append("svg")
-      .attr("width", `calc(100vw - 95px - 130px)`)
-      .attr("height", `calc(100vh)`);
+      .attr("width", width)
+      .attr("height", height);
     // .attr("transform","translate(-150,-300) scale(0.5,0.5)");
 
     // const initialScale = 2;
@@ -59,26 +58,25 @@ function App() {
       rowStart: Math.floor(data.nRow / 2),
       colStart: Math.floor(data.nCol / 2),
     };
-    console.log(center)
     data.data.forEach((item) => {
       item.rowStartNew = center.rowStart - item.position.rowStart;
       item.rowEndNew = center.rowStart - item.position.rowEnd;
-      item.colStartNew =  center.colStart - item.position.colStart;
+      item.colStartNew = center.colStart - item.position.colStart;
       item.colEndNew = center.colStart - item.position.colEnd;
       if (item.position.rowStart <= center.rowStart) {
-        item.rowStartNew = Math.abs(item.rowStartNew)
+        item.rowStartNew = Math.abs(item.rowStartNew);
       } else {
-        item.rowStartNew = -Math.abs(item.rowStartNew)
+        item.rowStartNew = -Math.abs(item.rowStartNew);
       }
       if (item.position.colStart <= center.colStart) {
-        item.colStartNew =  -Math.abs(item.colStartNew)
+        item.colStartNew = -Math.abs(item.colStartNew);
       } else {
-        item.colStartNew = Math.abs(item.colStartNew)
+        item.colStartNew = Math.abs(item.colStartNew);
       }
       if (item.position.rowEnd <= center.rowStart) {
-        item.rowEndNew = Math.abs(item.rowEndNew)
+        item.rowEndNew = Math.abs(item.rowEndNew);
       } else {
-        item.rowEndNew = -Math.abs(item.rowEndNew)
+        item.rowEndNew = -Math.abs(item.rowEndNew);
       }
       if (item.position.colEnd <= center.colStart) {
         item.colEndNew = -Math.abs(item.colEndNew);
@@ -89,44 +87,45 @@ function App() {
     });
 
     // ======================
-    function handleZoom(e, a) {
-      let transform = e.transform;
-      if (transform.k < 1) transform.k = 1;
-      d3.select("svg g").attr("transform", transform);
-      d3.select("#minimapRect").remove();
-      let minimapWidth = 120;
-      let minimapHeight = 130;
-      let dx = -transform.x / transform.k;
-      let dy = -transform.y / transform.k;
-     
-      let minimapRect = d3
-        .select("#mini-map svg g")
-        .append("rect")
-        .attr("id", "minimapRect")
-
-        .attr("width", (minimapWidth / transform.k))
-        .attr("height", (minimapHeight / transform.k))
-
- 
-        .attr("stroke", "red")
-        .attr("stroke-width", 2)
-        .attr("fill", "none")
-        .attr("transform", `translate(${+dx / 12 + 40},${+dy / 12 + 20})`);
-    }
-
-    let transform = d3.zoomIdentity.translate(0, 0).scale(1);
-    let zoom = d3
-      .zoom()
-      .on("zoom", handleZoom)
-      .scaleExtent([0.1, 3])
-      .translateExtent([
-        [-300, -200],
-        [width*1.5, 1200],
-      ]);
-    d3.select("svg").call(zoom).call(zoom.transform, transform);
 
     drawMap();
     drawMinimap();
+    function handleZoom(e, a) {
+      let transform = e.transform;
+      // const myTransform = d3.select("svg g").attr("transform");
+      d3.select("svg g").attr("transform", transform);
+      setCurrentZoom(transform.k)
+      // d3.select("#minimapRect").remove();
+      // let minimapWidth = 120;
+      // let minimapHeight = 130;
+      // let dx = -transform.x / transform.k;
+      // let dy = -transform.y / transform.k;
+
+      // let minimapRect = d3
+      //   .select("#mini-map svg g")
+      //   .append("rect")
+      //   .attr("id", "minimapRect")
+
+      //   .attr("width", (minimapWidth / transform.k))
+      //   .attr("height", (minimapHeight / transform.k))
+
+      //   .attr("stroke", "red")
+      //   .attr("stroke-width", 2)
+      //   .attr("fill", "none")
+      //   .attr("transform", `translate(${+dx / 12 + 40},${+dy / 12 + 20})`);
+    }
+
+    // let transform = d3.zoomIdentity.translate(0, 0).scale(1);
+    let zoom = d3
+      .zoom()
+      .on("zoom", handleZoom)
+      .scaleExtent([0.4, 3])
+      .translateExtent([
+        [-300, -200],
+        [width * 1.5, 1200],
+      ]);
+    d3.select("svg g").call(zoom);
+    // .call(zoom.transform, transform);
     function image() {
       let defs = map.append("defs");
       defs
@@ -233,27 +232,44 @@ function App() {
         .style("stroke", "black")
         .on("click", function (e, d) {
           let active = d3.select(this);
-          e.preventDefault();
           if (active.attr("class").includes("active")) {
             // reset();
           } else {
             let allField = document.querySelectorAll(".field");
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
-            // field.style("fill", "red")
+            const size = Number(active.attr("height"));
+
+            const x = Number(active.attr("x")) + size / 2;
+            const y = Number(active.attr("y")) + size / 2;
+            const k = 2.6;
+
             active.style("opacity", 1);
 
-            d3.select("svg g")
+            d3.select("#map svg g")
               .transition()
               .duration(1000)
-              .call(
-                zoom.transform,
-                d3.zoomIdentity
-                  .translate(width / 7 + 400, height / 7)
-                  .scale(d3.zoomTransform(this).k)
-                  .translate(-+active.attr("x"), -+active.attr("y"))
+              .attr(
+                "transform",
+                "translate(" +
+                  width / 2 +
+                  "," +
+                  height / 2 +
+                  ")scale(" +
+                  k +
+                  ")translate(" +
+                  -x +
+                  "," +
+                  -y +
+                  ")"
               );
 
+            var transform = d3.zoomIdentity
+              .translate(width / 2, height / 2)
+              .scale(k)
+              .translate(-x, -y);
+            d3.select("svg g").transition()
+            .duration(1000).call(zoom.transform, transform);
             setField(d);
             showDrawer();
           }
@@ -294,8 +310,8 @@ function App() {
       let minimap = d3
         .select("#mini-map")
         .append("svg")
-        .attr("width", minimapWidth - 20)
-        .attr("height", minimapHeight - 170);
+        .attr("width", minimapWidth)
+        .attr("height", minimapHeight);
 
       const minimapSize = calSize(
         minimapWidth,
@@ -339,8 +355,8 @@ function App() {
         })
         .attr("width", minimapSize)
         .attr("height", minimapSize)
-        .style("fill", "#212137")
-        // .style("stroke", "black");
+        .style("fill", "#212137");
+      // .style("stroke", "black");
       //
 
       //
@@ -368,8 +384,8 @@ function App() {
         .style("fill", function (d) {
           if (!d.img) return "green";
           return `url(#${d.id})`;
-        })
-        // .style("stroke", "black");
+        });
+      // .style("stroke", "black");
 
       d3.select("#mini-map svg g")
         .selectAll(".blur-field")
@@ -395,12 +411,6 @@ function App() {
           return "grey";
         })
         .style("fill-opacity", 0);
-    }
-    function reset() {
-      d3.select("svg g")
-        .transition()
-        .duration(750)
-        .call(zoom.transform, d3.zoomIdentity.translate(-95, -60).scale(1));
     }
   }, []);
   const handleFilter = (e) => {
@@ -458,17 +468,16 @@ function App() {
       let fields = d3.selectAll(".field");
       let activeArray = [];
       let disableArray = [];
-      let activeField = fields
-        .filter(function (d, i) {
-          let area = d.position.rowEnd - d.position.rowStart;
-          if (area + 1 === Number(e.target.value) || check.includes(area + 1)) {
-            activeArray.push(d);
-            return this;
-          } else {
-            disableArray.push(d);
-          }
-        })
-        // .style("fill", "orange");
+      let activeField = fields.filter(function (d, i) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        if (area + 1 === Number(e.target.value) || check.includes(area + 1)) {
+          activeArray.push(d);
+          return this;
+        } else {
+          disableArray.push(d);
+        }
+      });
+      // .style("fill", "orange");
 
       d3.selectAll(".blur-field")
         .filter(function (d) {
@@ -511,15 +520,10 @@ function App() {
     return (x - min) * (x - max) <= 0;
   }
   const submit = () => {
-    // const size = calSize(width, height, data.nRow, data.nCol);
-
     let rStart = min.split(",")[0];
     let rEnd = max.split(",")[0];
     let cStart = min.split(",")[1];
     let cEnd = max.split(",")[1];
-    // min.forEach(a => a * size)
-    // max.forEach(a => a * size)
-
     let fields = d3.selectAll(".field");
     let active = [];
     fields.filter(function (d) {
@@ -548,12 +552,13 @@ function App() {
   const zoomInMini = (e) => {
     // e.preventDefault();
     let zoom = d3.zoom();
-    let svg = d3.select("svg g")
+    let svg = d3.select("svg g");
     let minimapWidth = 120;
     let minimapHeight = 130;
-      // 
-      const scale = Number(e.target.value);
-      d3.select("svg").attr("transform", "scale(" + scale+ ")");
+    //
+    const scale = Number(e.target.value);
+    setCurrentZoom(scale);
+    d3.select("svg").attr("transform", "scale(" + scale + ")");
     // d3.select("#minimapRect").remove();
     // let minimapRect = d3
     //   .select("#mini-map svg g")
@@ -565,7 +570,6 @@ function App() {
     //   .attr("stroke-width", 2)
     //   .attr("fill", "none")
     //   .attr("transform", `scale(${scale})`);
-      
   };
   return (
     <div className="App">
@@ -601,9 +605,10 @@ function App() {
             type="range"
             orient="vertical"
             className={cx("input-range")}
+            value={currentZoom}
             min={0.8}
             max={3}
-            step={0.2}
+            step={0.1}
           />
         </div>
       </div>
