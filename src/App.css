@@ -77,3 +77,6 @@ body,html{
     fill: none;
     stroke: none;
 }
+#minimapRect{
+    pointer-events: none;
+}

@@ -92,7 +92,10 @@ function App() {
 
     drawMap();
     drawMinimap();
-   
+    var brush = d3.brush()
+    .extent([[0, 0], [minimapWidth, minimapHeight]])
+    
+    .on("start brush", brushed);
     function handleZoom(e, a) {
       let transform = e.transform;
       // const myTransform = d3.select("svg g").attr("transform");
@@ -115,6 +118,9 @@ function App() {
         .attr("stroke-width", 2)
         .attr("fill", "none")
         .attr("transform", `translate(${+dx / 7 },${+dy / 7 })`);
+
+        d3.select(".selection").attr("x", +dx / 7).attr("y", dy / 7).attr("width",  ((minimapWidth/1.5) / transform.k)).attr("height", ((minimapHeight/1.5) / transform.k ))
+
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(1);
@@ -133,17 +139,19 @@ function App() {
     .call(zoom.transform, transform);
 
 
-    var brush = d3.brush()
-    .extent([[0, 0], [minimapWidth, minimapHeight]])
-    .on("start brush", brushed);
+    
     
   d3.select("#mini-map svg g").call(brush).call(brush.move, [[0, 0], [minimapWidth / 1.5, minimapHeight / 1.5]]);
   function brushed(e){
+    
     const x = e.selection[0][0];
     const  y = e.selection[0][1];
     const minimapReact = d3.select("#minimapRect")
     .attr("transform", `translate(${x},${y})`);
     d3.select("#map svg g").attr("transform", `translate(${-x * 7},${-y * 7})`);
+    d3.select(".selection").attr("x", +x).attr("y", y).attr("width",  ((minimapWidth/1.5) / currentZoom)).attr("height", ((minimapHeight/1.5) / currentZoom ))
+
+    // console.log()
   }
     function image() {
       let defs = map.append("defs");
