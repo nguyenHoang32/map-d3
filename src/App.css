@@ -73,3 +73,7 @@ body,html{
     z-index: 100 !important;
     pointer-events: none;
 }
+.selection{
+    fill: none;
+    stroke: none;
+}

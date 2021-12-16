@@ -92,6 +92,7 @@ function App() {
 
     drawMap();
     drawMinimap();
+   
     function handleZoom(e, a) {
       let transform = e.transform;
       // const myTransform = d3.select("svg g").attr("transform");
@@ -107,8 +108,8 @@ function App() {
         .append("rect")
         .attr("id", "minimapRect")
 
-        .attr("width", (minimapWidth / transform.k))
-        .attr("height", (minimapHeight / transform.k))
+        .attr("width", ((minimapWidth/1.5) / transform.k))
+        .attr("height", ((minimapHeight/1.5) / transform.k ))
 
         .attr("stroke", "red")
         .attr("stroke-width", 2)
@@ -130,6 +131,20 @@ function App() {
     .on("touchstart.zoom", null)
     .on("touchend.zoom", null)
     .call(zoom.transform, transform);
+
+
+    var brush = d3.brush()
+    .extent([[0, 0], [minimapWidth, minimapHeight]])
+    .on("start brush", brushed);
+    
+  d3.select("#mini-map svg g").call(brush).call(brush.move, [[0, 0], [minimapWidth / 1.5, minimapHeight / 1.5]]);
+  function brushed(e){
+    const x = e.selection[0][0];
+    const  y = e.selection[0][1];
+    const minimapReact = d3.select("#minimapRect")
+    .attr("transform", `translate(${x},${y})`);
+    d3.select("#map svg g").attr("transform", `translate(${-x * 7},${-y * 7})`);
+  }
     function image() {
       let defs = map.append("defs");
       defs
