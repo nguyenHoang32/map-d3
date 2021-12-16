@@ -93,9 +93,11 @@ function App() {
     drawMap();
     drawMinimap();
     var brush = d3.brush()
-    .extent([[0, 0], [minimapWidth, minimapHeight]])
+    
+    .extent([[0, 0], [minimapWidth*1.5, minimapHeight*1.5]])
     
     .on("start brush", brushed);
+    
     function handleZoom(e, a) {
       let transform = e.transform;
       // const myTransform = d3.select("svg g").attr("transform");
@@ -131,7 +133,7 @@ function App() {
       
       .translateExtent([
         [-100, -100],
-        [width, height + 100],
+        [width*1.5, height*1.5],
       ]);
     d3.select("svg").call(zoom)
     .on("touchstart.zoom", null)
@@ -146,10 +148,10 @@ function App() {
     
     const x = e.selection[0][0];
     const  y = e.selection[0][1];
+    d3.select(".selection").attr("x", -x).attr("y", -y).attr("width",  ((minimapWidth/3) / currentZoom)).attr("height", ((minimapHeight/3) / currentZoom ))
     const minimapReact = d3.select("#minimapRect")
     .attr("transform", `translate(${x},${y})`);
     d3.select("#map svg g").attr("transform", `translate(${-x * 7},${-y * 7})`);
-    d3.select(".selection").attr("x", +x).attr("y", y).attr("width",  ((minimapWidth/1.5) / currentZoom)).attr("height", ((minimapHeight/1.5) / currentZoom ))
 
     // console.log()
   }
