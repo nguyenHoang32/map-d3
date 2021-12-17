@@ -292,11 +292,7 @@ function App() {
                 current_scale = +current_scale_string.substring(6,current_scale_string.length-1);
             }
             console.log(current_scale)
-            d3.select("#map svg g")
-            .attr(
-              "transform",
-              `scale(${current_scale}),translate(${Number(width / 2 - x)}, ${Number(height / 2 - y)})`
-            );
+           
             var transform = d3.zoomIdentity
               .translate(width / 2, height / 2)
               .scale(current_scale)
