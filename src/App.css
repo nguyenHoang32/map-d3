@@ -74,9 +74,14 @@ body,html{
     pointer-events: none;
 }
 .selection{
-    fill: none;
-    stroke: none;
+    /* fill: none; */
+    /* stroke: none; */
+    cursor: default;
+}
+.overlay{
+    /* pointer-events: none; */
 }
 #minimapRect{
-    pointer-events: none;
+    pointer-events: all;
+    z-index: 9999999999999 !important;
 }
