@@ -55,6 +55,10 @@ body,html{
     /* left: 400px; */
     transition:all 300ms ease;
     border: 3px solid black;
+    
+}
+#mini-map svg g{
+    pointer-events: none;
 }
 #mini-map:before{
     content: " ";

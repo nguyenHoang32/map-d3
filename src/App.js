@@ -16,6 +16,7 @@ const cx = cn.bind(styles);
 function App() {
   const [currentZoom, setCurrentZoom] = useState(1);
   const [visible, setVisible] = useState(false);
+  const [transformMinimapRect, setTransformMinimapRect] = useState(null);
   const [field, setField] = useState({});
   const [check, setCheck] = useState([]);
   const [min, setMin] = useState("");
@@ -97,11 +98,18 @@ function App() {
     // .extent([[0, 0], [minimapWidth, minimapHeight]])
 
     // .on("start brush", brushed);
-
+    function update(transform) {
+      zoom.transform(d3.select("svg g"), transform);
+      // update the '__zoom' property with the new transform on the rootGroup which is where the zoomBehavior stores it since it was the
+      // call target during initialization
+      d3.select("svg").property("__zoom", transform);
+    }
     function handleZoom(e, a) {
-      console.log(e);
-      if (e.type === "brush") return;
+      // console.log(d3.select("svg")._groups[0][0].__zoom);
+      // console.log(e.transform)
 
+      if (e.type === "brush") return;
+      // d3.select("svg").property("__zoom", e.transform);
       let transform = e.transform;
       // const myTransform = d3.select("svg g").attr("transform");
       d3.select("svg g").attr("transform", transform);
@@ -123,9 +131,12 @@ function App() {
         .attr("stroke-width", 2)
         .attr("fill", "none")
         .attr("transform", `translate(${+dx / 7},${+dy / 7})`);
+      // zoom.transform(minimapRect, d3.zoomIdentity.translate(dx / 7, dy / 7));
+
+      d3.select("svg").property("__zoom", transform);
       // d3.select("#mini-map svg g").call(brush).call(brush.move, [[Math.abs(dx),Math.abs(dy)], [Math.abs(minimapWidth/(1.5*transform.k)), Math.abs(minimapHeight / (2 * transform.k))]]);
       // d3.select(".selection").attr("x", +dx / 7).attr("y", dy / 7)
-      d3.select("#minimapRect").call(d3.drag().on("drag", started));
+      // d3.select("#minimapRect").call(d3.drag().on("drag", started));
     }
 
     let transform = d3.zoomIdentity.translate(0, 0);
@@ -278,24 +289,28 @@ function App() {
 
             const x = Number(active.attr("x")) + size / 2;
             const y = Number(active.attr("y")) + size / 2;
-            
+
             active.style("opacity", 1);
-            let current_scale,current_scale_string;
-            if (d3.select("#map svg g").attr("transform") === null)
-            
-            {
-                current_scale = 1; 
-            } 
-            //case where we have transformed the circle 
-            else {
-                current_scale_string = d3.select("#map svg g").attr("transform").split(' ')[1];
-                current_scale = +current_scale_string.substring(6,current_scale_string.length-1);
+            let currentScale, currentScaleString;
+            if (d3.select("#map svg g").attr("transform") === null) {
+              currentScale = 1;
             }
-            console.log(current_scale)
-           
+            //case where we have transformed the circle
+            else {
+              currentScaleString = d3
+                .select("#map svg g")
+                .attr("transform")
+                .split(" ")[1];
+              currentScale = +currentScaleString.substring(
+                6,
+                currentScaleString.length - 1
+              );
+            }
+            console.log(currentScale);
+
             var transform = d3.zoomIdentity
               .translate(width / 2, height / 2)
-              .scale(current_scale)
+              .scale(currentScale)
               .translate(-x, -y);
             d3.select("svg")
               .transition()
@@ -440,18 +455,49 @@ function App() {
         })
         .style("fill-opacity", 0);
     }
-    d3.select("#minimapRect").call(d3.drag().on("drag", started));
+    d3.select("#mini-map svg g").call(d3.drag().on("drag", started));
     function started(e) {
+      const current = d3.select("#minimapRect");
+      let currentScale, currentScaleString;
+      if (d3.select("#map svg g").attr("transform") === null) {
+        currentScale = 1;
+      }
+      else {
+        currentScaleString = d3
+          .select("#map svg g")
+          .attr("transform")
+          .split(" ")[1];
+        currentScale = +currentScaleString.substring(
+          6,
+          currentScaleString.length - 1
+        );
+      }
       
-      const current = d3.select(this);
+      
       const currentWidth = Number(current.attr("width"));
       const currentHeight = Number(current.attr("height"));
-      current.attr("x", e.x - currentWidth/2).attr("y", e.y - currentHeight/2);
-      d3.select("#map svg g")
-      .attr(
-        "transform",
-        `translate(${Number(width / 2 - e.x*7)}, ${Number(height / 2 - e.x*7)})`
+      current.attr("transform", `translate(${(e.x - currentWidth / 2)* currentScale}, ${(e.y - currentHeight / 2)* currentScale})`)
+      
+      
+      // d3.select("#map svg g").attr(
+      //   "transform",
+      //   `translate(${Number(width / 2 - e.x * 7)}, ${Number(
+      //     height / 2 - e.y * 7
+      //   )})`
+      // );
+      
+      d3.select("#map svg")
+      .call(
+        zoom.transform,
+        d3.zoomIdentity.translate(
+          -Number(e.x - currentWidth / 2)*7*currentScale,
+          -Number(e.y - currentHeight / 2)*7*currentScale
+        ).scale(currentScale)
       );
+      // const minimapZoomTransform = d3.zoomIdentity.translate(e.x * 7, e.y * 7);
+
+      // d3.select("#map svg g").property("__zoom", minimapZoomTransform);
+      // d3.select("#map svg").property("__zoom", minimapZoomTransform);
     }
   }, []);
   const handleFilter = (e) => {
