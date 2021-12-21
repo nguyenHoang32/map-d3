@@ -9,7 +9,6 @@ const cx = cn.bind(styles);
 const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
   const [checked, setChecked] = useState(false);
   
-  
   const clickClose = () => {
     
     setVisibleAction(!visibleAction)
@@ -19,7 +18,6 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
       <button 
       className={cx("close-btn", !visibleAction ? cx("close-btn--left") : cx("close-btn--right"))} 
       onClick={clickClose}
-      style={{left: `${!visibleAction ? '95px' : "335px"}`}}
       > {!visibleAction ? ">" : "<" } </button>
       <Drawer
         mask={false}

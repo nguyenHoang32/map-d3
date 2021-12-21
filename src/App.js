@@ -30,8 +30,11 @@ function App() {
 
     return size;
   };
-  const width = Number(window.screen.width - 95 - 235);
-  const height = Number(window.screen.height - 60);
+  let width = Number(window.screen.width - 90 - 235);
+  let height = Number(window.screen.height - 60);
+  if(window.screen.width < 800){
+    width = Number(window.screen.width);
+  }
   let minimapWidth = width / 7;
   let minimapHeight = height / 7;
   const minimapSize = calSize(
@@ -653,7 +656,9 @@ function App() {
       />
 
       <div className={cx("container")}>
-        <div className={cx("menu")}></div>
+        <div className={cx("menu")}>
+          Menu
+        </div>
 
         <div id="map"></div>
         <div

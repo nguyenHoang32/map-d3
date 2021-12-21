@@ -5,9 +5,10 @@ $sq-3: #f2f2f2;
 $bg: #1d232a;
 .container{
   position: relative;
+  box-sizing: border-box;
   .close-btn{
     position: absolute;
-    z-index: 999999;
+    z-index: 18;
     top: 20px;
     background: #0084ff;
     border: none;
@@ -17,14 +18,22 @@ $bg: #1d232a;
     color: white;
     font-weight: bold;
     cursor: pointer;
+    
     &--left{
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
-  
+      left: 95px;
+      @media (max-width: 800px){
+        left: 20px;
+      }
     }
     &--right{
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;
+      left: 335px;
+      @media (max-width: 800px){
+        left: 255px;
+      }
     }
   }
 }
@@ -79,6 +88,9 @@ $bg: #1d232a;
   overflow-x: hidden;
   background: #1d232a;
   color: white !important;
+  @media(max-width:800px){
+    left: 0px;
+  }
   //
   
   // 

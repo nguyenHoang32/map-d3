@@ -5,6 +5,7 @@ import cn from "classnames/bind";
 
 const cx = cn.bind(styles);
 const Information = ({ visible, field, isEmpty, onClose }) => {
+  
   return (
     <Drawer
       className={cx("info")}
@@ -14,7 +15,7 @@ const Information = ({ visible, field, isEmpty, onClose }) => {
       placement="right"
       onClose={onClose}
       visible={visible}
-      width={250}
+      width={window.innerWidth > 800 ? 420 : window.innerWidth}
       style={{ marginTop: 50 }}
     >
       {!isEmpty(field) && visible && (
