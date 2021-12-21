@@ -21,6 +21,7 @@ function App() {
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [visibleAction, setVisibleAction] = useState(true);
+  const isMobile = window.screen.width < 800;
   const calSize = (width, height, row, col) => {
     let size;
     let colWidth = Math.floor(width / col);
@@ -35,8 +36,10 @@ function App() {
   if(window.screen.width < 800){
     width = Number(window.screen.width);
   }
-  let minimapWidth = width / 7;
-  let minimapHeight = height / 7;
+  const ratio = 1/7;
+  let minimapWidth = width * ratio;
+  let minimapHeight = height *ratio;;
+
   const minimapSize = calSize(
     minimapWidth,
     minimapHeight,
@@ -103,12 +106,13 @@ function App() {
       
       d3.select("svg g").attr("transform", transform);
       setCurrentZoom(transform.k);
-      d3.select("#minimapRect").remove();
+      
 
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
-
-      let minimapRect = d3
+      if(!isMobile){
+        d3.select("#minimapRect").remove();
+        let minimapRect = d3
         .select("#mini-map svg g")
         .append("rect")
         .attr("id", "minimapRect")
@@ -117,7 +121,9 @@ function App() {
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("fill", "none")
-        .attr("transform", `translate(${2 + dx / 7},${2 + dy / 7})`);
+        .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
+      }
+      
     }
 
     let transform = d3.zoomIdentity.translate(0, 0);
@@ -271,15 +277,22 @@ function App() {
                 currentScaleString.length - 1
               );
             }
-
-            var transform = d3.zoomIdentity
+            if(window.screen.width < 800){
+              d3.select("svg g").attr("transform", `translate(${-x/2}, ${-y/2})`)
+              console.log(window.screen.width)
+            }
+            else{
+              console.log("not mobile")
+              var transform = d3.zoomIdentity
               .translate(width / 2, height / 2)
               .scale(currentScale)
               .translate(-x, -y);
+            
             d3.select("svg")
               .transition()
               .duration(750)
               .call(zoom.transform, transform);
+            }
             setField(d);
             showDrawer();
           }
@@ -442,8 +455,8 @@ function App() {
         zoom.transform,
         d3.zoomIdentity
           .translate(
-            -Number(e.x - currentWidth / 2) * 7 * transform.k,
-            -Number(e.y - currentHeight / 2) * 7 * transform.k
+            -Number(e.x - currentWidth / 2) * (1/ratio) * transform.k,
+            -Number(e.y - currentHeight / 2) * (1/ratio) * transform.k
           )
           .scale(transform.k)
       );
@@ -631,7 +644,7 @@ function App() {
 
     d3.select("#map svg").call(
       zoom.transform,
-      d3.zoomIdentity.scale(scale).translate(-Number(x + dx)*7,-Number(y+dy)*7)
+      d3.zoomIdentity.scale(scale).translate(-Number(x + dx)*(1/ratio),-Number(y+dy)*(1/ratio))
     );
   };
   return (
