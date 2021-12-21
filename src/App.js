@@ -279,7 +279,7 @@ function App() {
             }
             if(window.screen.width < 800){
               d3.select("svg g").attr("transform", `translate(${-x/2}, ${-y/2})`)
-              console.log(window.screen.width)
+              
             }
             else{
               console.log("not mobile")
