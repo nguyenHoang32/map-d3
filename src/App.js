@@ -122,10 +122,10 @@ function App() {
       .on("zoom", handleZoom)
       .scaleExtent([1, 3])
 
-      .translateExtent([
-        [-100, -100],
-        [width * 1.5, height * 1.5],
-      ]);
+      // .translateExtent([
+      //   [-100, -100],
+      //   [width * 1.5, height * 1.5],
+      // ]);
     d3.select("svg")
       .call(zoom)
       .on("touchstart.zoom", null)
