@@ -33,8 +33,8 @@ function App() {
   };
   let width = Number(window.screen.width - 90 - 235);
   let height = Number(window.screen.height - 60);
-  if(window.innerWidth < 800){
-    width = Number(window.innerWidth);
+  if(window.screen.width < 800){
+    // width = Number(window.innerWidth);
   }
   const ratio = 1/7;
   let minimapWidth = width * ratio;

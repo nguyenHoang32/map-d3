@@ -26,7 +26,8 @@ body,html{
     height: calc(100vh); */
     /* padding-top: 100px; */
     
-    
+    width: 100%;
+    height: calc(100vh);
     border: 1px solid black;
     position: relative;
     background: #1b2026;
