@@ -56,9 +56,9 @@ body,html{
     transition:all 300ms ease;
     border: 2px solid white;
 }
-@media (max-width: 756px){
+@media (max-width: 800px){
     #mini-map{
-        display: none;
+        display: none !important; 
     }
 }
 #mini-map svg{

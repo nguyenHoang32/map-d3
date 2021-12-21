@@ -31,11 +31,12 @@ function App() {
 
     return size;
   };
-  let width = Number(window.screen.width - 90 - 235);
-  let height = Number(window.screen.height - 60);
-  if(window.screen.width < 800){
-    // width = Number(window.innerWidth);
+  let width = Number(window.screen.availWidth - 90 - 235);
+  let height = Number(window.screen.availHeight - 60);
+  if(window.innerWidth < 800){
+    width = Number(window.innerWidth);
   }
+  console.log(width)
   const ratio = 1/7;
   let minimapWidth = width * ratio;
   let minimapHeight = height *ratio;;
@@ -46,6 +47,7 @@ function App() {
     data1.nRow,
     data1.nCol
   );
+  
   minimapWidth = minimapSize * data1.nCol;
   minimapHeight = minimapSize * data1.nRow;
   const size = calSize(width, height, data1.nRow, data1.nCol);
@@ -107,7 +109,7 @@ function App() {
       d3.select("svg g").attr("transform", transform);
       setCurrentZoom(transform.k);
       
-
+      
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
       if(!isMobile){
@@ -116,8 +118,8 @@ function App() {
         .select("#mini-map svg g")
         .append("rect")
         .attr("id", "minimapRect")
-        .attr("width", minimapWidth / 1.5 / transform.k)
-        .attr("height", minimapHeight / 1.5 / transform.k)
+        .attr("width", minimapWidth / ( transform.k) - 4)
+        .attr("height", minimapHeight / ( transform.k) - 4)
         .attr("stroke", "red")
         .attr("stroke-width", 2)
         .attr("fill", "none")
