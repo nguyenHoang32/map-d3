@@ -33,8 +33,8 @@ function App() {
   };
   let width = Number(window.screen.width - 90 - 235);
   let height = Number(window.screen.height - 60);
-  if(window.screen.width < 800){
-    width = Number(window.screen.width);
+  if(window.innerWidth < 800){
+    width = Number(window.innerWidth);
   }
   const ratio = 1/7;
   let minimapWidth = width * ratio;
@@ -101,9 +101,9 @@ function App() {
     function handleZoom(e) {
       // if(e.sourceEvent === null) return;
 
-      
-      const transform = d3.zoomTransform(d3.select("#map svg").node());
-      
+      console.log("zoom")
+      // const transform = d3.zoomTransform(d3.select("#map svg").node());
+      const transform = e.transform;
       d3.select("svg g").attr("transform", transform);
       setCurrentZoom(transform.k);
       
@@ -278,12 +278,11 @@ function App() {
               );
             }
             if(window.screen.width < 800){
-              d3.select("svg g").attr("transform", `translate(${-x/2}, ${-y/2})`)
-              
+              d3.select("svg g").attr("transform", `translate(${-x+window.innerWidth/2}, ${-y + window.innerHeight/2})`)
+            
             }
             else{
-              console.log("not mobile")
-              var transform = d3.zoomIdentity
+              let transform = d3.zoomIdentity
               .translate(width / 2, height / 2)
               .scale(currentScale)
               .translate(-x, -y);
@@ -293,6 +292,10 @@ function App() {
               .duration(750)
               .call(zoom.transform, transform);
             }
+            
+            // d3.select("svg g").transition()
+            //   .duration(750).attr("transform", `translate(${width / 2 - x }, ${height / 2 - y})scale(${currentScale})`)
+              
             setField(d);
             showDrawer();
           }
