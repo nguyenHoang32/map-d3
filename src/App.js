@@ -670,7 +670,13 @@ function App() {
     const scale = Number(value);
     setCurrentZoom(value);
 
-    d3.select("svg g").attr("transform", `scale(${scale})`)
+    d3.select("#map svg").call(
+      zoom.transform,
+      d3.zoomIdentity
+        .scale(scale)
+        .translate(width/2, height/2)
+    );
+    d3.select("#map svg").attr("transform", "scale(" + scale + ")");
   }
   return (
     <div className="App">
