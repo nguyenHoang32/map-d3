@@ -55,7 +55,12 @@ body,html{
     /* left: 400px; */
     border: 2px solid white;
 }
-
+@media(max-width: 800){
+    
+#mini-map{
+    display: none;
+}
+}
 #mini-map svg{
     
 }
