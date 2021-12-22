@@ -74,4 +74,48 @@
     background: #0084ff;
     border: none;
   }
+  
+}
+.mobile{
+  display: none;
+  
+  position: absolute;
+  z-index: 9 !important;
+  bottom: 130px;
+  right: 20px ;
+  @media(max-width: 800px) {
+    display: block;
+ }
+  &-menu{
+    color: white;
+    height: 40px;
+    width: 44px;
+    background: black;
+    border-radius: 8px;
+    border: 1px solid gray;
+    display: flex;
+    
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 4px;
+    font-size: 20px;
+  }
+  &-zoom{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    border-radius: 8px;
+    border: 1px solid gray;
+    width: 44px;
+    height: 80px;
+    background: black;
+    color: white;
+    font-size: 20px;
+  }
+}
+.divider{
+  width: 60%;
+  height: 2px;
+  background: gray;
 }

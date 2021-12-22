@@ -1,13 +1,11 @@
 import "./App.css";
 import * as d3 from "d3";
-import { nest } from "d3-collection";
 import { useEffect, useState } from "react";
-import { Drawer } from "antd";
 import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
 import Information from "./components/Information/index";
 import { data1 } from "./data1.js";
-
+import {MenuOutlined} from '@ant-design/icons';
 import styles from "./app.module.scss";
 import cn from "classnames/bind";
 
@@ -20,7 +18,7 @@ function App() {
   const [checkSize, setCheckSize] = useState([]);
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
-  const [visibleAction, setVisibleAction] = useState(true);
+  const [visibleAction, setVisibleAction] = useState(false);
   const isMobile = window.screen.width < 800;
   const calSize = (width, height, row, col) => {
     let size;
@@ -36,7 +34,7 @@ function App() {
   if (window.innerWidth < 800) {
     width = Number(window.innerWidth);
   }
-  const ratio = 1 / 5;
+  const ratio = 1 / 6;
   let minimapWidth = width * ratio;
   let minimapHeight = height * ratio;
 
@@ -685,7 +683,7 @@ function App() {
           }}
         >
           <div className={cx("inputrange-wrapper")}>
-            <button onClick={() => {handleInputRange(Number(Math.min(currentZoom + 0.1, 3)))}}>+</button>
+            <button onClick={() => {handleInputRange(Number(Math.min(currentZoom + 0.2, 3)))}}>+</button>
             <input
               style={{width: 24}}
               onChange={(e) => handleInputRange(e.target.value)}
@@ -695,11 +693,22 @@ function App() {
               value={currentZoom}
               min={1}
               max={3}
-              step={0.1}
+              step={0.2}
             />
-            <button onClick={() => {handleInputRange(Number(Math.max(currentZoom - 0.1, 1)))}}>-</button>
+            <button onClick={() => {handleInputRange(Number(Math.max(currentZoom - 0.2, 1)))}}>-</button>
           </div>
+          
         </div>
+        <div className={cx("mobile")}>
+            <div className={cx("mobile-menu")}>
+            <MenuOutlined />
+            </div>
+            <div className={cx("mobile-zoom")}>
+              <div onClick={() => {handleInputRange(Number(Math.min(currentZoom + 0.2, 3)))}}>+</div>
+              <div className={cx("divider")}></div>
+              <div onClick={() => {handleInputRange(Number(Math.max(currentZoom - 0.2, 1)))}}>-</div>
+            </div>
+          </div>
       </div>
     </div>
   );

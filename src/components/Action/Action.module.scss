@@ -3,35 +3,35 @@ $sq-1: #ff8c00;
 $sq-2: #ffe047;
 $sq-3: #f2f2f2;
 $bg: #1d232a;
-.container{
+.container {
   position: relative;
   box-sizing: border-box;
-  .close-btn{
+  .close-btn {
     position: absolute;
     z-index: 18;
     top: 20px;
     background: #0084ff;
     border: none;
     padding: 4px 8px;
-    transition:all 300ms ease;
+    transition: all 300ms ease;
     font-size: 24px;
     color: white;
     font-weight: bold;
     cursor: pointer;
-    
-    &--left{
+    outline: none;
+    &--left {
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
       left: 95px;
-      @media (max-width: 800px){
+      @media (max-width: 800px) {
         left: 20px;
       }
     }
-    &--right{
+    &--right {
       border-top-left-radius: 8px;
       border-bottom-left-radius: 8px;
       left: 335px;
-      @media (max-width: 800px){
+      @media (max-width: 800px) {
         left: 255px;
       }
     }
@@ -42,16 +42,15 @@ $bg: #1d232a;
   opacity: 1;
   overflow: hidden !important;
   background: none !important;
-  
-  :global{
-    .ant-drawer-wrapper-body{
-    
+
+  :global {
+    .ant-drawer-wrapper-body {
       font-weight: 700;
-      background:#1d232a;
-  }
-    .ant-drawer-body{
+      background: #1d232a;
+    }
+    .ant-drawer-body {
       padding-top: 10px;
-      overflow-x:hidden;
+      overflow-x: hidden;
       &::-webkit-scrollbar {
         width: 3px;
         height: 20px;
@@ -59,23 +58,22 @@ $bg: #1d232a;
       &::-webkit-scrollbar-track {
         box-shadow: inset 0 0 5px black;
         border-radius: 10px;
-        
       }
-      
+
       /* Handle */
       &::-webkit-scrollbar-thumb {
         background: $txt-color;
         border-radius: 10px;
       }
     }
-    .ant-drawer-header{
+    .ant-drawer-header {
       display: none;
     }
-    .ant-drawer-content-wrapper{
-      transition:all 300ms ease;
+    .ant-drawer-content-wrapper {
+      transition: all 300ms ease;
     }
   }
-  
+
   opacity: 1;
   z-index: 10;
   top: 60px;
@@ -88,18 +86,18 @@ $bg: #1d232a;
   overflow-x: hidden;
   background: #1d232a;
   color: white !important;
-  @media(max-width:800px){
+  @media (max-width: 800px) {
     left: 0px;
   }
   //
-  
-  // 
+
+  //
   .title-wraper {
     height: 40px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    
+
     .title {
       font-size: 22px;
       font-weight: bold;
@@ -125,94 +123,90 @@ $bg: #1d232a;
   }
 
   //
-  .status{
+  .status {
     padding: 10px 0px;
-    .status-item{
+    .status-item {
       display: flex;
       align-items: center;
-      .square-color{
+      .square-color {
         width: 20px;
         height: 20px;
         border: 1px solid white;
         margin: 0px 10px;
       }
-      .square-color-1{
+      .square-color-1 {
         @extend .square-color;
         background: $sq-1;
       }
-      .square-color-2{
+      .square-color-2 {
         @extend .square-color;
         background: $sq-2;
       }
-      .square-color-3{
+      .square-color-3 {
         @extend .square-color;
         background: $sq-3;
       }
-      .status-title{
+      .status-title {
         color: $txt-color;
         font-size: 15px;
       }
     }
-    
   }
-  .check-box{
+  .check-box {
     width: 20px;
     height: 20px;
     margin-bottom: 6px;
-    :global{
-     .ant-checkbox-inner{
-       background: $bg;
-       height: 20px;
-       width: 20px;
-       margin-bottom: 2px;
-       border: 2px solid $txt-color;
-     }
-   
-    
+    :global {
+      .ant-checkbox-inner {
+        background: $bg;
+        height: 20px;
+        width: 20px;
+        margin-bottom: 2px;
+        border: 2px solid $txt-color;
+      }
     }
   }
-  .find-land{
+  .find-land {
     padding: 8px 0px;
     font-size: 16px;
     color: white;
     font-weight: bold;
   }
-  .size{
+  .size {
     margin: 12px 0px 24px 0px;
-    .size-title{
+    .size-title {
       margin-left: 5px;
       font-size: 15px;
       font-weight: bold;
       color: $txt-color;
       margin-bottom: 10px;
       text-transform: uppercase;
-  
     }
-    .size-item{
+    .size-item {
       margin-bottom: 10px;
       display: flex;
       gap: 12px;
-      .size-name{
+      .size-name {
         color: $txt-color;
-          font-size: 15px;
+        font-size: 15px;
       }
     }
   }
-  .coordinates{
+  .coordinates {
     margin: 12px 0px;
     color: $txt-color;
-    .coordinates-title{
+    .coordinates-title {
       font-size: 15px;
       color: $txt-color;
       text-transform: uppercase;
       font-weight: bold;
     }
-    .coordinates-body{
+    .coordinates-body {
       display: flex;
       justify-content: space-between;
       margin-top: 8px;
       font-size: 15px;
-      input{
+      input {
         margin-top: 4px;
         width: 90px;
         height: 40px;
@@ -224,10 +218,10 @@ $bg: #1d232a;
       }
     }
   }
-  .btn-wrapper{
-    margin-bottom: 40px;
+  .btn-wrapper {
+    padding-bottom: 40px;
   }
-  .btn{
+  .btn {
     width: 100%;
     background: #0084ff;
     color: white;
