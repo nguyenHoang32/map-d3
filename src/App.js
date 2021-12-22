@@ -616,8 +616,8 @@ function App() {
     d3.select("#mini-map svg #minimapRect").remove();
     let myTransform;
     let x, y;
-    const baseWidth = minimapWidth / (scale);
-    const baseHeight = minimapHeight / (scale);
+    const baseWidth = minimapWidth / scale;
+    const baseHeight = minimapHeight / scale;
     const dx = (baseWidth - baseWidth / (scale / currentZoom)) / 2;
     const dy = (baseHeight - baseHeight / (scale / currentZoom)) / 2;
 
@@ -641,8 +641,8 @@ function App() {
       .append("rect")
       .attr("id", "minimapRect")
 
-      .attr("width", minimapWidth / (scale))
-      .attr("height", minimapHeight / (scale))
+      .attr("width", minimapWidth / scale)
+      .attr("height", minimapHeight / scale)
 
       .attr("stroke", "red")
       .attr("stroke-width", 2)
@@ -680,9 +680,9 @@ function App() {
       <div className={cx("container")}>
         <div className={cx("menu")}>Menu</div>
 
-        <div id="map" ></div>
+        <div id="map"></div>
         <div
-          className={cx("mini-map-wrapper")}
+          className={cx("minimap-container")}
           style={{ left: `${visibleAction ? "400px" : "200px"}` }}
         >
           <div
@@ -691,9 +691,8 @@ function App() {
               height: minimapHeight + 4,
               width: minimapWidth + 30,
               visibility: `${displayMinimap ? "" : "hidden"}`,
-              pointerEvents: displayMinimap ? 'all' : "none"
+              pointerEvents: displayMinimap ? "all" : "none",
             }}
-            
           >
             <div className={cx("inputrange-wrapper")}>
               <button
@@ -725,36 +724,48 @@ function App() {
           </div>
           <div
             className={cx(
-              "mini-map-action",
+              "minimap-action",
               displayMinimap
-                ? cx("mini-map-action--active")
-                : cx("mini-map-action--close")
+                ? cx("minimap-action--active")
+                : cx("minimap-action--close")
             )}
           >
             <div
-              className={cx("mini-map-action-close")}
+              className={cx("minimap-action-closeBtn")}
               onClick={() => setDisplayMinimap(!displayMinimap)}
             >
               {displayMinimap ? <LeftOutlined /> : <RightOutlined />}
             </div>
-            <div className={cx("mini-map-action-info")}>
+            <div className={cx("minimap-action-info")}>
               <InfoCircleOutlined />
             </div>
-            <div className={cx("mini-map-action-info")}>
+            <div className={cx("minimap-action-info")}>
               <MenuOutlined />
             </div>
           </div>
         </div>
         <div className={cx("mobile")}>
-            <div className={cx("mobile-menu")}>
+          <div className={cx("mobile-menu")}>
             <MenuOutlined />
+          </div>
+          <div className={cx("mobile-zoom")}>
+            <div
+              onClick={() => {
+                handleInputRange(Number(Math.min(currentZoom + 0.2, 3)));
+              }}
+            >
+              +
             </div>
-            <div className={cx("mobile-zoom")}>
-              <div onClick={() => {handleInputRange(Number(Math.min(currentZoom + 0.2, 3)))}}>+</div>
-              <div className={cx("divider")}></div>
-              <div onClick={() => {handleInputRange(Number(Math.max(currentZoom - 0.2, 1)))}}>-</div>
+            <div className={cx("divider")}></div>
+            <div
+              onClick={() => {
+                handleInputRange(Number(Math.max(currentZoom - 0.2, 1)));
+              }}
+            >
+              -
             </div>
           </div>
+        </div>
       </div>
     </div>
   );
