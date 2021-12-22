@@ -89,7 +89,10 @@
 .minimap-action{
   position: absolute;
   top: 0;
-  
+  display: block;
+  @media(max-width: 800px){
+    display: none;
+  }
   
   &-closeBtn{
     background: #0084ff;
