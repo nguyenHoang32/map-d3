@@ -265,20 +265,7 @@ function App() {
 
             active.style("opacity", 1);
             let currentScale, currentScaleString;
-            if (d3.select("#map svg g").attr("transform") === null) {
-              currentScale = 1;
-            }
-            //case where we have transformed the circle
-            else {
-              currentScaleString = d3
-                .select("#map svg g")
-                .attr("transform")
-                .split(" ")[1];
-              currentScale = +currentScaleString.substring(
-                6,
-                currentScaleString.length - 1
-              );
-            }
+            
             if (window.screen.width < 800) {
               d3.select("svg g").attr(
                 "transform",
@@ -287,6 +274,20 @@ function App() {
                 })`
               );
             } else {
+              if (d3.select("#map svg g").attr("transform") === null) {
+                currentScale = 1;
+              }
+              //case where we have transformed the circle
+              else {
+                currentScaleString = d3
+                  .select("#map svg g")
+                  .attr("transform")
+                  .split(" ")[1];
+                currentScale = +currentScaleString.substring(
+                  6,
+                  currentScaleString.length - 1
+                );
+              }
               let transform = d3.zoomIdentity
                 .translate(width / 2, height / 2)
                 .scale(currentScale)
@@ -610,32 +611,29 @@ function App() {
   };
   const handleInputRange = (value) => {
     let scale = Number(value);
-    const transform = d3.select("#mini-map svg #minimapRect").attr("transform");
-    // const point = d3.zoomTransform(d3.select("#map svg").node());
-    // let center;
-    d3.select("#mini-map svg #minimapRect").remove();
-    let myTransform;
-    let x, y;
     const baseWidth = minimapWidth / scale;
     const baseHeight = minimapHeight / scale;
     const dx = (baseWidth - baseWidth / (scale / currentZoom)) / 2;
     const dy = (baseHeight - baseHeight / (scale / currentZoom)) / 2;
-
-    if (transform === null) {
-      myTransform = "";
-
-      [x, y] = [0, 0];
-    } else {
-      [x, y] = transform.substring(10, transform.length - 1).split(",");
-      x = Number(x);
-      y = Number(y);
-      myTransform = `translate(${Number(Math.max(x + dx, 0))}, ${Number(
-        Math.max(y + dy, 0)
-      )})`;
-    }
-    //
-    setCurrentZoom(scale);
-    d3.select("#map svg").attr("transform", "scale(" + scale + ")");
+    let myTransform;
+    let x, y;
+    
+    
+      const transform = d3.select("#mini-map svg #minimapRect").attr("transform");
+      d3.select("#mini-map svg #minimapRect").remove();
+      if (transform === null) {
+        myTransform = "";
+  
+        [x, y] = [0, 0];
+      } else {
+        [x, y] = transform.substring(10, transform.length - 1).split(",");
+        x = Number(x);
+        y = Number(y);
+        myTransform = `translate(${Number(Math.max(x + dx, 0))}, ${Number(
+          Math.max(y + dy, 0)
+        )})`;
+      }
+      d3.select("#map svg").attr("transform", "scale(" + scale + ")");
     let minimapRect = d3
       .select("#mini-map svg g")
       .append("rect")
@@ -649,6 +647,14 @@ function App() {
       .attr("fill", "none")
       .attr("transform", myTransform);
 
+   
+    
+    
+
+    
+    //
+    setCurrentZoom(scale);
+    
     d3.select("#map svg").call(
       zoom.transform,
       d3.zoomIdentity
@@ -659,6 +665,12 @@ function App() {
   const changeDisplayMinimap = () => {
     setDisplayMinimap(!displayMinimap);
     
+  }
+  const zoomInMobile = (value) => {
+    const scale = Number(value);
+    setCurrentZoom(value);
+
+    d3.select("svg g").attr("transform", `scale(${scale})`)
   }
   return (
     <div className="App">
@@ -758,7 +770,7 @@ function App() {
           <div className={cx("mobile-zoom")}>
             <div
               onClick={() => {
-                handleInputRange(Number(Math.min(currentZoom + 0.2, 3)));
+                zoomInMobile(Number(Math.min(currentZoom + 0.2, 3)));
               }}
             >
               +
@@ -766,7 +778,7 @@ function App() {
             <div className={cx("divider")}></div>
             <div
               onClick={() => {
-                handleInputRange(Number(Math.max(currentZoom - 0.2, 1)));
+                zoomInMobile(Number(Math.max(currentZoom - 0.2, 1)));
               }}
             >
               -

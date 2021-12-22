@@ -85,6 +85,9 @@
   &--active{
     left: 400px;
   }
+  @media(max-width: 800px){
+    visibility: hidden;
+  }
 }
 .minimap-action{
   position: absolute;

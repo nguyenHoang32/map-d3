@@ -55,11 +55,7 @@ body,html{
     /* left: 400px; */
     border: 2px solid white;
 }
-@media (max-width: 800px){
-    #mini-map{
-        display: none !important; 
-    }
-}
+
 #mini-map svg{
     
 }
