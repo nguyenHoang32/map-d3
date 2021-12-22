@@ -51,8 +51,7 @@ body,html{
 
 #mini-map{
     /* background: red; */
-    position: absolute;
-    top: 30px;
+   
     /* left: 400px; */
     transition:all 300ms ease;
     border: 2px solid white;

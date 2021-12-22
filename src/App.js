@@ -5,10 +5,15 @@ import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
 import Information from "./components/Information/index";
 import { data1 } from "./data1.js";
-import {MenuOutlined} from '@ant-design/icons';
+
 import styles from "./app.module.scss";
 import cn from "classnames/bind";
-
+import {
+  MenuOutlined,
+  LeftOutlined,
+  RightOutlined,
+  InfoCircleOutlined,
+} from "@ant-design/icons";
 const cx = cn.bind(styles);
 function App() {
   const [currentZoom, setCurrentZoom] = useState(1);
@@ -19,6 +24,8 @@ function App() {
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [visibleAction, setVisibleAction] = useState(false);
+  const [displayMinimap, setDisplayMinimap] = useState(true);
+
   const isMobile = window.screen.width < 800;
   const calSize = (width, height, row, col) => {
     let size;
@@ -673,31 +680,70 @@ function App() {
       <div className={cx("container")}>
         <div className={cx("menu")}>Menu</div>
 
-        <div id="map"></div>
+        <div id="map" ></div>
         <div
-          id="mini-map"
-          style={{
-            left: `${visibleAction ? "400px" : "200px"}`,
-            height: minimapHeight + 4,
-            width: minimapWidth + 30,
-          }}
+          className={cx("mini-map-wrapper")}
+          style={{ left: `${visibleAction ? "400px" : "200px"}` }}
         >
-          <div className={cx("inputrange-wrapper")}>
-            <button onClick={() => {handleInputRange(Number(Math.min(currentZoom + 0.2, 3)))}}>+</button>
-            <input
-              style={{width: 24}}
-              onChange={(e) => handleInputRange(e.target.value)}
-              type="range"
-              orient="vertical"
-              className={cx("input-range")}
-              value={currentZoom}
-              min={1}
-              max={3}
-              step={0.2}
-            />
-            <button onClick={() => {handleInputRange(Number(Math.max(currentZoom - 0.2, 1)))}}>-</button>
+          <div
+            id="mini-map"
+            style={{
+              height: minimapHeight + 4,
+              width: minimapWidth + 30,
+              visibility: `${displayMinimap ? "" : "hidden"}`,
+              pointerEvents: displayMinimap ? 'all' : "none"
+            }}
+            
+          >
+            <div className={cx("inputrange-wrapper")}>
+              <button
+                onClick={() => {
+                  handleInputRange(Number(Math.min(currentZoom + 0.2, 3)));
+                }}
+              >
+                +
+              </button>
+              <input
+                style={{ width: 24 }}
+                onChange={(e) => handleInputRange(e.target.value)}
+                type="range"
+                orient="vertical"
+                className={cx("input-range")}
+                value={currentZoom}
+                min={1}
+                max={3}
+                step={0.2}
+              />
+              <button
+                onClick={() => {
+                  handleInputRange(Number(Math.max(currentZoom - 0.2, 1)));
+                }}
+              >
+                -
+              </button>
+            </div>
           </div>
-          
+          <div
+            className={cx(
+              "mini-map-action",
+              displayMinimap
+                ? cx("mini-map-action--active")
+                : cx("mini-map-action--close")
+            )}
+          >
+            <div
+              className={cx("mini-map-action-close")}
+              onClick={() => setDisplayMinimap(!displayMinimap)}
+            >
+              {displayMinimap ? <LeftOutlined /> : <RightOutlined />}
+            </div>
+            <div className={cx("mini-map-action-info")}>
+              <InfoCircleOutlined />
+            </div>
+            <div className={cx("mini-map-action-info")}>
+              <MenuOutlined />
+            </div>
+          </div>
         </div>
         <div className={cx("mobile")}>
             <div className={cx("mobile-menu")}>
