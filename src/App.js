@@ -656,6 +656,10 @@ function App() {
         .translate(-Number(x + dx) * (1 / ratio), -Number(y + dy) * (1 / ratio))
     );
   };
+  const changeDisplayMinimap = () => {
+    setDisplayMinimap(!displayMinimap);
+    
+  }
   return (
     <div className="App">
       <Information
@@ -683,18 +687,19 @@ function App() {
         <div id="map"></div>
         <div
           className={cx("minimap-container")}
-          style={{ left: `${visibleAction ? "400px" : "200px"}` }}
+          style={{ left: `${visibleAction ? "400px" : "200px"}`,pointerEvents: displayMinimap ? "all" : "none", }}
         >
           <div
             id="mini-map"
             style={{
               height: minimapHeight + 4,
               width: minimapWidth + 30,
-              visibility: `${displayMinimap ? "" : "hidden"}`,
+              visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
+              transform: `translate(${!displayMinimap ? '-500px' : '0px'})`,
             }}
           >
-            <div className={cx("inputrange-wrapper")}>
+            <div className={cx("inputrange-wrapper")} id="input-range-minimap">
               <button
                 onClick={() => {
                   handleInputRange(Number(Math.min(currentZoom + 0.2, 3)));
@@ -729,10 +734,12 @@ function App() {
                 ? cx("minimap-action--active")
                 : cx("minimap-action--close")
             )}
+            style={{pointerEvents: 'all'}}
           >
             <div
               className={cx("minimap-action-closeBtn")}
-              onClick={() => setDisplayMinimap(!displayMinimap)}
+              onClick={changeDisplayMinimap}
+              
             >
               {displayMinimap ? <LeftOutlined /> : <RightOutlined />}
             </div>
