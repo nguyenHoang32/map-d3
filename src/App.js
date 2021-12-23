@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import "antd/dist/antd.css";
 import Action from "./components/Action/Action";
 import Information from "./components/Information/index";
+import Modal from "./components/Modal/index";
 import { data1 } from "./data1.js";
 
 import styles from "./app.module.scss";
@@ -25,14 +26,17 @@ function App() {
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [visibleAction, setVisibleAction] = useState(false);
   const [displayMinimap, setDisplayMinimap] = useState(true);
-
+  const [modal,setModal] = useState({
+    show: true,
+    text: "Creating map..."
+  })
   const isMobile = window.screen.width < 800;
   const calSize = (width, height, row, col) => {
     let size;
-    let colWidth = Math.floor(width / col);
-
-    let rowWidth = Math.floor(height / row);
+    let colWidth = Number(width / col).toFixed(2);
+    let rowWidth = Number(height / row).toFixed(2);
     size = Math.min(colWidth, rowWidth);
+    console.log(colWidth,rowWidth);
 
     return size;
   };
@@ -51,13 +55,13 @@ function App() {
     data1.nRow,
     data1.nCol
   );
-
   minimapWidth = minimapSize * data1.nCol;
   minimapHeight = minimapSize * data1.nRow;
   const size = calSize(width, height, data1.nRow, data1.nCol);
   let zoom = d3.zoom();
 
   useEffect(() => {
+    setModal({show: true, text: "Creating map..."})
     let data = data1;
     const map = d3
       .select("#map")
@@ -104,6 +108,7 @@ function App() {
 
     drawMap();
     drawMinimap();
+    setModal({show: false, text: ""})
     function handleZoom(e) {
       // if(e.sourceEvent === null) return;
 
@@ -131,7 +136,7 @@ function App() {
     }
 
     let transform = d3.zoomIdentity.translate(0, 0);
-    zoom.on("zoom", handleZoom).scaleExtent([1, 3]);
+    zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
 
     // .translateExtent([
     //   [-100, -100],
@@ -221,7 +226,8 @@ function App() {
         .attr("width", size)
         .attr("height", size)
         .style("fill", "#212137")
-        .style("stroke", "black");
+        .style("stroke", "black")
+        .style("stroke-width", "0.5px")
       let fields = row
         .select(".fields")
         .data(data.data)
@@ -249,6 +255,7 @@ function App() {
           }
           return `url(#${d.id})`;
         })
+        .style("stroke-width", "0.5px")
         .style("stroke", "black")
         .on("click", function (e, d) {
           let active = d3.select(this);
@@ -295,7 +302,7 @@ function App() {
 
               d3.select("svg")
                 .transition()
-                .duration(750)
+                .duration(1000)
                 .call(zoom.transform, transform);
             }
 
@@ -680,6 +687,8 @@ function App() {
   }
   return (
     <div className="App">
+      {modal.show && <Modal text={modal.text}/>}
+      
       <Information
         visible={visible}
         field={field}
@@ -720,7 +729,7 @@ function App() {
             <div className={cx("inputrange-wrapper")} id="input-range-minimap">
               <button
                 onClick={() => {
-                  handleInputRange(Number(Math.min(currentZoom + 0.2, 3)));
+                  handleInputRange(Number(Math.min(currentZoom + 0.5, 10)));
                 }}
               >
                 +
@@ -733,12 +742,12 @@ function App() {
                 className={cx("input-range")}
                 value={currentZoom}
                 min={1}
-                max={3}
-                step={0.2}
+                max={10}
+                step={0.5}
               />
               <button
                 onClick={() => {
-                  handleInputRange(Number(Math.max(currentZoom - 0.2, 1)));
+                  handleInputRange(Number(Math.max(currentZoom - 0.5, 1)));
                 }}
               >
                 -
