@@ -17,7 +17,7 @@ import {
 } from "@ant-design/icons";
 const cx = cn.bind(styles);
 function App() {
-  const [currentZoom, setCurrentZoom] = useState(1);
+  const [currentZoom, setCurrentZoom] = useState(3);
   const [visible, setVisible] = useState(false);
 
   const [field, setField] = useState({});
@@ -26,17 +26,17 @@ function App() {
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [visibleAction, setVisibleAction] = useState(false);
   const [displayMinimap, setDisplayMinimap] = useState(true);
-  const [modal,setModal] = useState({
+  const [modal, setModal] = useState({
     show: true,
-    text: "Creating map..."
-  })
+    text: "Creating map...",
+  });
+
   const isMobile = window.screen.width < 800;
   const calSize = (width, height, row, col) => {
     let size;
     let colWidth = Number(width / col).toFixed(2);
     let rowWidth = Number(height / row).toFixed(2);
     size = Math.min(colWidth, rowWidth);
-    console.log(colWidth,rowWidth);
 
     return size;
   };
@@ -61,8 +61,12 @@ function App() {
   let zoom = d3.zoom();
 
   useEffect(() => {
-    setModal({show: true, text: "Creating map..."})
     let data = data1;
+    const canvas = d3
+      .select("#canvas")
+      .attr("width", width)
+      .attr("height", height);
+    const context = canvas.node().getContext("2d");
     const map = d3
       .select("#map")
       .append("svg")
@@ -108,14 +112,24 @@ function App() {
 
     drawMap();
     drawMinimap();
-    setModal({show: false, text: ""})
+    setModal((prevState) => ({
+      show: false,
+      text: "",
+    }));
     function handleZoom(e) {
       // if(e.sourceEvent === null) return;
 
-      console.log("zoom");
       // const transform = d3.zoomTransform(d3.select("#map svg").node());
       const transform = e.transform;
-      d3.select("svg g").attr("transform", transform);
+      if (isMobile) {
+        d3.select("svg g").attr(
+          "transform",
+          `translate(${transform.x}, ${transform.y})`
+        );
+      } else {
+        d3.select("svg g").attr("transform", transform);
+      }
+
       setCurrentZoom(transform.k);
 
       let dx = -transform.x / transform.k;
@@ -133,9 +147,29 @@ function App() {
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
+      context.save();
+          context.clearRect(0,0,width,height);
+          context.translate(transform.x, transform.y);
+          context.scale(transform.k, transform.k)
+          for (let i = 0; i < data1.nRow; i++) {
+      for (let j = 0; j < data1.nCol; j++) {
+        context.beginPath();
+        let y = i * size;
+        let x = j * size;
+        //Drawing a rectangle
+        context.fillStyle = "#212137";
+        context.fillRect(x, y, size , size );
+        //Optional if you also sizeant to give the rectangle a stroke
+        context.strokeStyle = "black";
+        context.strokeRect(x, y, size , size );
+        context.fill();
+        context.closePath();
+      }
+    }
+          context.restore();
     }
 
-    let transform = d3.zoomIdentity.translate(0, 0);
+    let transform = d3.zoomIdentity.translate(0, 0).scale(3);
     zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
 
     // .translateExtent([
@@ -189,47 +223,35 @@ function App() {
         });
     }
     function drawMap() {
-      let gridRow = map.append("g").attr("class", "grid-square");
+      map.append("g").attr("class", "grid-square");
       let array = [];
-
+      
+      context.clearRect(0, 0, width, height);
       for (let i = 0; i < data.nCol; i++) {
         let row = [];
         for (let j = 0; j < data.nRow; j++) {
           let x = i * size;
           let y = j * size;
           row.push({ x, y });
+          context.beginPath();
+          
+          //Drawing a rectangle
+          context.fillStyle = "#212137";
+          context.fillRect(x, y, size , size );
+          //Optional if you also sizeant to give the rectangle a stroke
+          context.strokeStyle = "black";
+          context.lineWidth = 0.5;
+          context.strokeRect(x, y, size , size );
+          context.fill();
+          context.closePath();
+
+          
         }
         array.push(row);
       }
-
-      let row = gridRow
-        .selectAll(".row")
-        .data(array)
-        .enter()
-        .append("g")
-        .attr("class", "col");
-
-      let col = row
-        .selectAll(".col")
-        .data(function (d) {
-          return d;
-        })
-        .enter()
-        .append("rect")
-        .attr("class", "square")
-        .attr("x", function (d) {
-          return d.x;
-        })
-        .attr("y", function (d) {
-          return d.y;
-        })
-        .attr("width", size)
-        .attr("height", size)
-        .style("fill", "#212137")
-        .style("stroke", "black")
-        .style("stroke-width", "0.5px")
-      let fields = row
-        .select(".fields")
+      
+      let fields = d3.select("svg g")
+        .selectAll(".fields")
         .data(data.data)
         .enter()
         .append("rect")
@@ -272,7 +294,7 @@ function App() {
 
             active.style("opacity", 1);
             let currentScale, currentScaleString;
-            
+
             if (window.screen.width < 800) {
               d3.select("svg g").attr(
                 "transform",
@@ -302,7 +324,7 @@ function App() {
 
               d3.select("svg")
                 .transition()
-                .duration(1000)
+                .duration(2000)
                 .call(zoom.transform, transform);
             }
 
@@ -350,48 +372,11 @@ function App() {
         .attr("width", minimapWidth)
         .attr("height", minimapHeight);
 
-      let minimapGrid = minimap.append("g").attr("class", "minimap-grid");
+      minimap.append("g").attr("class", "minimap-grid");
 
-      let arrayMini = [];
-      for (let i = 0; i < data.nCol; i++) {
-        let row = [];
-        for (let j = 0; j < data.nRow; j++) {
-          let x = i * minimapSize;
-          let y = j * minimapSize;
-          row.push({ x, y });
-        }
-        arrayMini.push(row);
-      }
-      let rowMini = minimapGrid
-        .selectAll(".row-mini")
-        .data(arrayMini)
-        .enter()
-        .append("g")
-        .attr("class", "col-mini");
-
-      let colMini = rowMini
-        .selectAll(".col-mini")
-        .data(function (d) {
-          return d;
-        })
-        .enter()
-        .append("rect")
-        .attr("class", "square")
-        .attr("x", function (d) {
-          return d.x;
-        })
-        .attr("y", function (d) {
-          return d.y;
-        })
-        .attr("width", minimapSize)
-        .attr("height", minimapSize)
-        .style("fill", "#212137");
-      // .style("stroke", "black");
-      //
-
-      //
-      let fieldsMini = rowMini
-        .select(".fields-mini")
+      
+      let fieldsMini = d3.select("#mini-map svg g")
+        .selectAll(".fields-mini")
         .data(data.data)
         .enter()
         .append("rect")
@@ -415,7 +400,6 @@ function App() {
           if (!d.img) return "green";
           return `url(#${d.id})`;
         });
-      // .style("stroke", "black");
 
       d3.select("#mini-map svg g")
         .selectAll(".blur-field")
@@ -478,12 +462,16 @@ function App() {
       );
     }
   }, []);
-  const handleFilter = (e) => {
+  const handleFilter = async (e) => {
+    let state = { show: true, text: "Applying filter..." };
+    setModal({ ...state });
     if (checkSize.includes(Number(e.target.value))) {
-      let fields = d3.selectAll(".field");
-      let newCheck = checkSize.filter((a) => a !== Number(e.target.value));
+      let fields = await d3.selectAll(".field");
+      let newCheck = await checkSize.filter(
+        (a) => a !== Number(e.target.value)
+      );
       setCheckSize(newCheck);
-      fields
+      await fields
         .filter(function (d, i) {
           let area = d.position.rowEnd - d.position.rowStart;
           if (area + 1 === Number(e.target.value)) {
@@ -508,18 +496,16 @@ function App() {
         }
       });
 
-      //  d3.selectAll(".blur-field").filter(function(d){
-      //   return this;
-      // }).style("fill-opacity", 0)
-
-      d3.selectAll(".blur-field")
+      await d3
+        .selectAll(".blur-field")
         .filter(function (d) {
           if (activeArray.includes(d)) {
             return d;
           }
         })
         .style("fill-opacity", 0);
-      d3.selectAll(".blur-field")
+      await d3
+        .selectAll(".blur-field")
         .filter(function (d) {
           if (disableArray.includes(d)) {
             return d;
@@ -547,14 +533,16 @@ function App() {
       });
       // .style("fill", "orange");
 
-      d3.selectAll(".blur-field")
+      await d3
+        .selectAll(".blur-field")
         .filter(function (d) {
           if (activeArray.includes(d)) {
             return this;
           }
         })
         .style("fill-opacity", 0);
-      d3.selectAll(".blur-field")
+      await d3
+        .selectAll(".blur-field")
         .filter(function (d) {
           if (disableArray.includes(d)) {
             return this;
@@ -566,6 +554,11 @@ function App() {
       newCheck.push(Number(e.target.value));
       setCheckSize(newCheck);
     }
+
+    setModal((prevState) => ({
+      show: false,
+      text: "",
+    }));
   };
   const showDrawer = () => {
     setVisible(true);
@@ -624,23 +617,22 @@ function App() {
     const dy = (baseHeight - baseHeight / (scale / currentZoom)) / 2;
     let myTransform;
     let x, y;
-    
-    
-      const transform = d3.select("#mini-map svg #minimapRect").attr("transform");
-      d3.select("#mini-map svg #minimapRect").remove();
-      if (transform === null) {
-        myTransform = "";
-  
-        [x, y] = [0, 0];
-      } else {
-        [x, y] = transform.substring(10, transform.length - 1).split(",");
-        x = Number(x);
-        y = Number(y);
-        myTransform = `translate(${Number(Math.max(x + dx, 0))}, ${Number(
-          Math.max(y + dy, 0)
-        )})`;
-      }
-      d3.select("#map svg").attr("transform", "scale(" + scale + ")");
+
+    const transform = d3.select("#mini-map svg #minimapRect").attr("transform");
+    d3.select("#mini-map svg #minimapRect").remove();
+    if (transform === null) {
+      myTransform = "";
+
+      [x, y] = [0, 0];
+    } else {
+      [x, y] = transform.substring(10, transform.length - 1).split(",");
+      x = Number(x);
+      y = Number(y);
+      myTransform = `translate(${Number(Math.max(x + dx, 0))}, ${Number(
+        Math.max(y + dy, 0)
+      )})`;
+    }
+    d3.select("#map svg").attr("transform", "scale(" + scale + ")");
     let minimapRect = d3
       .select("#mini-map svg g")
       .append("rect")
@@ -653,15 +645,8 @@ function App() {
       .attr("stroke-width", 2)
       .attr("fill", "none")
       .attr("transform", myTransform);
-
-   
-    
-    
-
-    
-    //
     setCurrentZoom(scale);
-    
+
     d3.select("#map svg").call(
       zoom.transform,
       d3.zoomIdentity
@@ -671,24 +656,21 @@ function App() {
   };
   const changeDisplayMinimap = () => {
     setDisplayMinimap(!displayMinimap);
-    
-  }
+  };
   const zoomInMobile = (value) => {
     const scale = Number(value);
     setCurrentZoom(value);
 
     d3.select("#map svg").call(
       zoom.transform,
-      d3.zoomIdentity
-        .scale(scale)
-        .translate(width/2, height/2)
+      d3.zoomIdentity.scale(scale).translate(width / 2, height / 2)
     );
     d3.select("#map svg").attr("transform", "scale(" + scale + ")");
-  }
+  };
   return (
     <div className="App">
-      {modal.show && <Modal text={modal.text}/>}
-      
+      {modal.show && <Modal text={modal.text} />}
+
       <Information
         visible={visible}
         field={field}
@@ -710,11 +692,17 @@ function App() {
 
       <div className={cx("container")}>
         <div className={cx("menu")}>Menu</div>
+        <div id="map-container">
+          <canvas id="canvas"></canvas>
+          <div id="map"></div>
+        </div>
 
-        <div id="map"></div>
         <div
           className={cx("minimap-container")}
-          style={{ left: `${visibleAction ? "400px" : "200px"}`,pointerEvents: displayMinimap ? "all" : "none", }}
+          style={{
+            left: `${visibleAction ? "400px" : "200px"}`,
+            pointerEvents: displayMinimap ? "all" : "none",
+          }}
         >
           <div
             id="mini-map"
@@ -723,7 +711,7 @@ function App() {
               width: minimapWidth + 30,
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? '-500px' : '0px'})`,
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
             }}
           >
             <div className={cx("inputrange-wrapper")} id="input-range-minimap">
@@ -747,7 +735,7 @@ function App() {
               />
               <button
                 onClick={() => {
-                  handleInputRange(Number(Math.max(currentZoom - 0.5, 1)));
+                  handleInputRange(Number(Math.max(currentZoom - 0.5, 3)));
                 }}
               >
                 -
@@ -761,12 +749,11 @@ function App() {
                 ? cx("minimap-action--active")
                 : cx("minimap-action--close")
             )}
-            style={{pointerEvents: 'all'}}
+            style={{ pointerEvents: "all" }}
           >
             <div
               className={cx("minimap-action-closeBtn")}
               onClick={changeDisplayMinimap}
-              
             >
               {displayMinimap ? <LeftOutlined /> : <RightOutlined />}
             </div>
@@ -785,7 +772,7 @@ function App() {
           <div className={cx("mobile-zoom")}>
             <div
               onClick={() => {
-                zoomInMobile(Number(Math.min(currentZoom + 0.2, 3)));
+                zoomInMobile(Number(Math.min(currentZoom + 0.5, 10)));
               }}
             >
               +
@@ -793,7 +780,7 @@ function App() {
             <div className={cx("divider")}></div>
             <div
               onClick={() => {
-                zoomInMobile(Number(Math.max(currentZoom - 0.2, 1)));
+                zoomInMobile(Number(Math.max(currentZoom - 0.5, 1)));
               }}
             >
               -
