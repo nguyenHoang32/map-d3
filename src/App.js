@@ -31,7 +31,7 @@ function App() {
     text: "Creating map...",
   });
 
-  const isMobile = window.screen.width < 800;
+  const isMobile = window.innerWidth < 800;
   const calSize = (width, height, row, col) => {
     let size;
     let colWidth = Number(width / col).toFixed(2);
@@ -121,15 +121,15 @@ function App() {
 
       // const transform = d3.zoomTransform(d3.select("#map svg").node());
       const transform = e.transform;
-      if (isMobile) {
-        d3.select("svg g").attr(
-          "transform",
-          `translate(${transform.x}, ${transform.y})`
-        );
-      } else {
-        d3.select("svg g").attr("transform", transform);
-      }
-
+      // if (isMobile) {
+      //   d3.select("svg g").attr(
+      //     "transform",
+      //     `translate(${transform.x}, ${transform.y})`
+      //   );
+      // } else {
+      //   d3.select("svg g").attr("transform", transform);
+      // }
+      d3.select("svg g").attr("transform", transform);
       setCurrentZoom(transform.k);
 
       let dx = -transform.x / transform.k;
@@ -147,25 +147,11 @@ function App() {
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
-      context.save();
+          context.save();
           context.clearRect(0,0,width,height);
           context.translate(transform.x, transform.y);
           context.scale(transform.k, transform.k)
-          for (let i = 0; i < data1.nRow; i++) {
-      for (let j = 0; j < data1.nCol; j++) {
-        context.beginPath();
-        let y = i * size;
-        let x = j * size;
-        //Drawing a rectangle
-        context.fillStyle = "#212137";
-        context.fillRect(x, y, size , size );
-        //Optional if you also sizeant to give the rectangle a stroke
-        context.strokeStyle = "black";
-        context.strokeRect(x, y, size , size );
-        context.fill();
-        context.closePath();
-      }
-    }
+          drawCanvas();
           context.restore();
     }
 
@@ -178,8 +164,6 @@ function App() {
     // ]);
     d3.select("svg")
       .call(zoom)
-      .on("touchstart.zoom", null)
-      .on("touchend.zoom", null)
       .call(zoom.transform, transform)
       .on("dblclick.zoom", null);
 
@@ -222,17 +206,12 @@ function App() {
           return "";
         });
     }
-    function drawMap() {
-      map.append("g").attr("class", "grid-square");
-      let array = [];
-      
+    function drawCanvas(){
       context.clearRect(0, 0, width, height);
       for (let i = 0; i < data.nCol; i++) {
-        let row = [];
         for (let j = 0; j < data.nRow; j++) {
           let x = i * size;
           let y = j * size;
-          row.push({ x, y });
           context.beginPath();
           
           //Drawing a rectangle
@@ -247,8 +226,14 @@ function App() {
 
           
         }
-        array.push(row);
+       
       }
+    }
+    function drawMap() {
+      map.append("g").attr("class", "grid-square");
+      drawCanvas();
+      
+     
       
       let fields = d3.select("svg g")
         .selectAll(".fields")
@@ -295,7 +280,7 @@ function App() {
             active.style("opacity", 1);
             let currentScale, currentScaleString;
 
-            if (window.screen.width < 800) {
+            if (window.innerWidth < 800) {
               d3.select("svg g").attr(
                 "transform",
                 `translate(${-x + window.innerWidth / 2}, ${
