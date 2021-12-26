@@ -13,6 +13,9 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
     
     setVisibleAction(!visibleAction)
   }
+  function onChange(checkedValues) {
+    handleFilter(checkedValues);
+  }
   return (
     <div className={cx("container")}>
       <button 
@@ -67,11 +70,14 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
         <hr />
         <div className={cx("size")}>
           <div className={cx("size-title")}>Size</div>
+          
+
+          <Checkbox.Group onChange={onChange}>
           <div className={cx("size-item")}>
             <Checkbox
               className={cx("check-box")}
               value={4}
-              onChange={(value) => handleFilter(value)}
+              
             />
             <div className={cx("size-name")}>4x4</div>
           </div>
@@ -79,7 +85,7 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
             <Checkbox
               className={cx("check-box")}
               value={3}
-              onChange={(value) => handleFilter(value)}
+              
             />
             <div className={cx("size-name")}>3x3</div>
           </div>
@@ -87,7 +93,7 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
             <Checkbox
               className={cx("check-box")}
               value={2}
-              onChange={(value) => handleFilter(value)}
+              
             />
             <div className={cx("size-name")}>2x2</div>
           </div>
@@ -95,10 +101,11 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
             <Checkbox
               className={cx("check-box")}
               value={1}
-              onChange={(value) => handleFilter(value)}
+              
             />
             <div className={cx("size-name")}>1x1</div>
           </div>
+          </Checkbox.Group>
         </div>
 
         <hr />

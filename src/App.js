@@ -15,6 +15,7 @@ import {
   RightOutlined,
   InfoCircleOutlined,
 } from "@ant-design/icons";
+import update from 'immutability-helper';
 const cx = cn.bind(styles);
 function App() {
   const [currentZoom, setCurrentZoom] = useState(3);
@@ -28,7 +29,7 @@ function App() {
   const [displayMinimap, setDisplayMinimap] = useState(true);
   const [modal, setModal] = useState({
     show: true,
-    text: "Creating map...",
+    text: "Creating minimap...",
   });
 
   const isMobile = window.innerWidth < 800;
@@ -59,8 +60,8 @@ function App() {
   minimapHeight = minimapSize * data1.nRow;
   const size = calSize(width, height, data1.nRow, data1.nCol);
   let zoom = d3.zoom();
-
   useEffect(() => {
+    
     let data = data1;
     const canvas = d3
       .select("#canvas")
@@ -107,31 +108,28 @@ function App() {
       }
       return item;
     });
+    var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
 
     // ======================
-
-    drawMap();
     drawMinimap();
-    setModal((prevState) => ({
-      show: false,
-      text: "",
-    }));
+    
+    setModal(update(modal, {text: {$set: "Creating map..."}}))
+    drawMap();
+    
+
     function handleZoom(e) {
-      // if(e.sourceEvent === null) return;
-
-      // const transform = d3.zoomTransform(d3.select("#map svg").node());
       const transform = e.transform;
-      // if (isMobile) {
-      //   d3.select("svg g").attr(
-      //     "transform",
-      //     `translate(${transform.x}, ${transform.y})`
-      //   );
-      // } else {
-      //   d3.select("svg g").attr("transform", transform);
-      // }
       d3.select("svg g").attr("transform", transform);
+      console.log(e)
+      if(e.sourceEvent !== null){
+        div.transition()
+        .duration(100)
+        .style("opacity", 0)
+      }
       setCurrentZoom(transform.k);
-
+     
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
       if (!isMobile) {
@@ -147,12 +145,12 @@ function App() {
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
-          context.save();
-          context.clearRect(0,0,width,height);
-          context.translate(transform.x, transform.y);
-          context.scale(transform.k, transform.k)
-          drawCanvas();
-          context.restore();
+      context.save();
+      context.clearRect(0, 0, width, height);
+      context.translate(transform.x, transform.y);
+      context.scale(transform.k, transform.k);
+      drawCanvas();
+      context.restore();
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
@@ -206,35 +204,53 @@ function App() {
           return "";
         });
     }
-    function drawCanvas(){
+    function drawCanvas() {
       context.clearRect(0, 0, width, height);
       for (let i = 0; i < data.nCol; i++) {
         for (let j = 0; j < data.nRow; j++) {
           let x = i * size;
           let y = j * size;
           context.beginPath();
-          
+
           //Drawing a rectangle
           context.fillStyle = "#212137";
-          context.fillRect(x, y, size , size );
+          context.fillRect(x, y, size, size);
           //Optional if you also sizeant to give the rectangle a stroke
           context.strokeStyle = "black";
           context.lineWidth = 0.5;
-          context.strokeRect(x, y, size , size );
+          context.strokeRect(x, y, size, size);
+
           context.fill();
           context.closePath();
-
-          
         }
-       
       }
+      // for (let i = 0; i < data.data.length; i++) {
+      //   for (let j = 0; j < data.data[i].length; j++) {
+      //     context.beginPath();
+      //     const top = data.data[i][j].position.rowStart * size;
+      //     const left = data.data[i][j].position.colStart * size;
+      //     const width =
+      //       (data.data[i][j].position.colEnd - data.data[i][j].position.colStart) * size;
+      //     const height =
+      //       (data.data[i][j].position.rowEnd - data.data[i][j].position.rowStart) * size;
+      //     //Drawing a rectangle
+      //     console.log(top,left,width,height)
+      //     context.fillStyle = "green";
+      //     context.fillRect(left, top, width, height);
+      //     //Optional if you also sizeant to give the rectangle a stroke
+      //     context.strokeStyle = "black";
+      //     context.lineWidth = 0.5;
+      //     context.strokeRect(left, top, width, height);
+
+      //     context.fill();
+      //     context.closePath();
+      //   }
+      // }
     }
     function drawMap() {
       map.append("g").attr("class", "grid-square");
       drawCanvas();
-      
-     
-      
+
       let fields = d3.select("svg g")
         .selectAll(".fields")
         .data(data.data)
@@ -255,7 +271,7 @@ function App() {
           let area = d.position.rowEnd - d.position.rowStart;
           return (area + 1) * size;
         })
-        .style("cursor", "pointer")
+        // .style("cursor", "pointer")
         .style("fill", function (d) {
           if (!d.img) {
             return "green";
@@ -265,6 +281,7 @@ function App() {
         .style("stroke-width", "0.5px")
         .style("stroke", "black")
         .on("click", function (e, d) {
+          div.style("opacity", 0);
           let active = d3.select(this);
           if (active.attr("class").includes("active")) {
             // reset();
@@ -306,13 +323,23 @@ function App() {
                 .translate(width / 2, height / 2)
                 .scale(currentScale)
                 .translate(-x, -y);
-
+              console.log(transform)
               d3.select("svg")
                 .transition()
-                .duration(2000)
+                .duration(300)
                 .call(zoom.transform, transform);
+                div.transition()
+                .duration(500)
+                .style("opacity", .9);
+              div.html(`<div class="tooltip-img"></div>
+              <div class="tooltip-content">
+                <div>Name: ...</div>
+                <div>Estate: ... </div>
+              </div>`)
+              .style("left", (width/2 + 90) + "px")
+              .style("top", (height/2 + 60) + "px");
             }
-
+           
             // d3.select("svg g").transition()
             //   .duration(750).attr("transform", `translate(${width / 2 - x }, ${height / 2 - y})scale(${currentScale})`)
 
@@ -348,7 +375,7 @@ function App() {
           return "grey";
         })
         .style("fill-opacity", 0);
-      //
+      
     }
     function drawMinimap() {
       let minimap = d3
@@ -359,8 +386,8 @@ function App() {
 
       minimap.append("g").attr("class", "minimap-grid");
 
-      
-      let fieldsMini = d3.select("#mini-map svg g")
+      let fieldsMini = d3
+        .select("#mini-map svg g")
         .selectAll(".fields-mini")
         .data(data.data)
         .enter()
@@ -446,20 +473,17 @@ function App() {
           .scale(transform.k)
       );
     }
+    setModal(update(modal, {show:{$set: false},text: {$set: ""}}))
   }, []);
   const handleFilter = async (e) => {
     let state = { show: true, text: "Applying filter..." };
     setModal({ ...state });
-    if (checkSize.includes(Number(e.target.value))) {
-      let fields = await d3.selectAll(".field");
-      let newCheck = await checkSize.filter(
-        (a) => a !== Number(e.target.value)
-      );
-      setCheckSize(newCheck);
-      await fields
+    let fields = await d3.selectAll(".field");
+    fields
         .filter(function (d, i) {
-          let area = d.position.rowEnd - d.position.rowStart;
-          if (area + 1 === Number(e.target.value)) {
+          let area = Number(d.position.rowEnd - d.position.rowStart);
+          
+          if (e.includes(area + 1)) {
             return this;
           }
         })
@@ -469,81 +493,31 @@ function App() {
           }
           return `url(#${d.id})`;
         });
-      // ---------
-      let disableArray = [];
-      let activeArray = [];
-      let disableField = fields.filter(function (d, i) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        if (newCheck.includes(area + 1)) {
-          activeArray.push(d);
-        } else {
-          disableArray.push(d);
-        }
-      });
-
-      await d3
+       
+        d3
         .selectAll(".blur-field")
         .filter(function (d) {
-          if (activeArray.includes(d)) {
-            return d;
+          let area = d.position.rowEnd - d.position.rowStart;
+          if (!e.includes(area + 1)) {
+            return this
           }
-        })
-        .style("fill-opacity", 0);
-      await d3
+        }).style("fill-opacity", 0.5);
+        
+        d3
         .selectAll(".blur-field")
         .filter(function (d) {
-          if (disableArray.includes(d)) {
-            return d;
+          let area = d.position.rowEnd - d.position.rowStart;
+          if (e.includes(area + 1)) {
+            return this
           }
-        })
-        .style("fill-opacity", 0.5);
-      if (newCheck.length === 0) {
-        d3.selectAll(".blur-field").style("fill-opacity", 0);
-      }
-    } else {
-      let fields = d3.selectAll(".field");
-      let activeArray = [];
-      let disableArray = [];
-      let activeField = fields.filter(function (d, i) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        if (
-          area + 1 === Number(e.target.value) ||
-          checkSize.includes(area + 1)
-        ) {
-          activeArray.push(d);
-          return this;
-        } else {
-          disableArray.push(d);
-        }
-      });
-      // .style("fill", "orange");
-
-      await d3
-        .selectAll(".blur-field")
-        .filter(function (d) {
-          if (activeArray.includes(d)) {
-            return this;
-          }
-        })
-        .style("fill-opacity", 0);
-      await d3
-        .selectAll(".blur-field")
-        .filter(function (d) {
-          if (disableArray.includes(d)) {
-            return this;
-          }
-        })
-        .style("fill-opacity", 0.6);
-
-      let newCheck = [...checkSize];
-      newCheck.push(Number(e.target.value));
-      setCheckSize(newCheck);
-    }
-
-    setModal((prevState) => ({
-      show: false,
-      text: "",
-    }));
+        }).style("fill-opacity", 0);
+        setTimeout(() => {
+          setModal({
+            show: false,
+            text: "",
+          });
+        }, 2000)
+    
   };
   const showDrawer = () => {
     setVisible(true);
