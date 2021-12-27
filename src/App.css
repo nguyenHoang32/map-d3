@@ -12,7 +12,7 @@ div.tooltip {
     justify-content: space-evenly;
     position: absolute;
     text-align: center;
-    width: 140px;
+    min-width: 140px;
     height: 60px;
     padding: 2px;
     font: 14px;
@@ -57,13 +57,16 @@ div.tooltip {
     position: absolute;
     top: 0;
     left: 0;
-    
-   
+}
+#blur{
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 9;
 }
 #map{
-    /* width: calc(100vw - 95px - 130px);
-    height: calc(100vh); */
-    /* padding-top: 100px; */
+    
     position: absolute;
     top: 0;
     left: 0;
@@ -83,8 +86,8 @@ div.tooltip {
     fill: pink !important;
     opacity: 0.8;
 }
-/* Important */
-  .field-image {
+
+.field-image {
     pointer-events: none;
   }
 
@@ -107,19 +110,7 @@ div.tooltip {
 #mini-map svg g{
     pointer-events: none;
 }
-/* #mini-map:before{
-    content: " ";
-  position: absolute;
-  z-index: 10;
-  top: -5px;
-  left: -5px;
-  right: -5px;
-  bottom: -5px;
-  border: 1px solid white;
-  pointer-events: none;
-} */
 
-/* ------------------------ */
 .blur-field{
     z-index: 21 !important;
     pointer-events: none;
@@ -130,7 +121,7 @@ div.tooltip {
     cursor: default;
 }
 .overlay{
-    /* pointer-events: none; */
+    
 }
 #minimapRect{
     pointer-events: all;

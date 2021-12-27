@@ -6,7 +6,7 @@ import { Checkbox, Drawer } from "antd";
 
 const cx = cn.bind(styles);
 
-const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
+const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
   const [checked, setChecked] = useState(false);
   
   const clickClose = () => {
@@ -29,7 +29,7 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
         visible={visibleAction}
         className={cx("action")}
         style={{ visibility: !visibleAction &&'hidden' }}
-        destroyOnClose={true}
+        destroyOnClose={false}
       >
         <div className={cx("title-wraper")}>
           <div className={cx("title")}>Map</div>
@@ -72,7 +72,7 @@ const Action = ({ resetCoordinate,handleFilter, setMin, setMax, min, max, submit
           <div className={cx("size-title")}>Size</div>
           
 
-          <Checkbox.Group onChange={onChange}>
+          <Checkbox.Group onChange={onChange} value={checkSize}>
           <div className={cx("size-item")}>
             <Checkbox
               className={cx("check-box")}
