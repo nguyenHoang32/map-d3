@@ -96,7 +96,9 @@ div.tooltip {
     /* background: red; */
    
     /* left: 400px; */
-    border: 2px solid white;
+    border: 2px solid grey;
+    border-radius: 4px;
+    overflow: hidden;
 }
 @media(max-width: 800){
     

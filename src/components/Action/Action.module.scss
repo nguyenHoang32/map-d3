@@ -39,6 +39,7 @@ $bg: #1d232a;
 }
 
 .action {
+  margin-bottom: 40px;
   opacity: 1;
   overflow: hidden !important;
   background: none !important;
@@ -71,6 +72,7 @@ $bg: #1d232a;
     }
     .ant-drawer-content-wrapper {
       transition: all 300ms ease;
+      padding-bottom: 60px;
     }
   }
 
@@ -239,5 +241,12 @@ $bg: #1d232a;
     background-color: #14181d;
     color: #14181d;
     border-color: #14181d;
+  }
+  .title {
+    color:  $txt-color;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 8px;
   }
 }

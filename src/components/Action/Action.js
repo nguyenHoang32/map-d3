@@ -141,6 +141,20 @@ const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, m
             Reset 
           </button>
         </div>
+        <hr />
+        <div className={cx("wallet")}>
+          <div className={cx("title")}>Wallet</div>
+          <form>
+            <input name="wallet" />
+          </form>
+        </div>
+        <hr />
+        <div>
+        <div className={cx("title")}>Partners</div>
+        <form>
+            <input name="partners" />
+          </form>
+        </div>
       </Drawer>
     </div>
   );

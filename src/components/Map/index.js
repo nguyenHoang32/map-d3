@@ -565,7 +565,7 @@ const Map = () => {
   const resetCoordinate = () => {
     d3.selectAll(".blur-field").style("fill-opacity", 0);
   };
-  const handleInputRange = (value) => {
+  const handleInputRange2 = (value) => {
     // const transform = d3.zoomTransform(d3.select("#map svg").node());
     // console.log(d3.zoomTransform(d3.select("#map svg").node()));
 
@@ -599,6 +599,7 @@ const Map = () => {
     zoom.scaleTo(d3.select("svg"), scale);
     zoom.translateTo(d3.select("svg"), -Number(preX + dx) * (1 / ratio),-Number(preY + dy) * (1 / ratio));
     d3.select("#map svg").attr("transform", "scale(" + scale + ")");
+    d3.select("#mini-map svg #minimapRect").remove();
     let minimapRect = d3
       .select("#mini-map svg g")
       .append("rect")
@@ -645,6 +646,98 @@ const Map = () => {
     }
     context.restore();
   };
+
+
+  const handleInputRange = (e) => {
+    let data = data1;
+    let 
+        direction = 1,
+        factor = 0.5,
+        target_zoom = 1,
+        center = [width / 2, height / 2],
+        
+        translate0 = [],
+        l = [],
+        view = {};
+        const preZoom = Number(searchParams.get("zoom"));
+    const preX = Number(searchParams.get("currentX"));
+    const preY = Number(searchParams.get("currentY"));
+    if(e.target.id === "zoom_range"){
+      target_zoom = Number(e.target.value);
+    }else{
+      direction = (e.target.id === 'zoom_in') ? 1 : -1;
+      target_zoom = preZoom + (factor * direction);
+    }
+    
+    
+    view = {x: preX, y: preY, k: preZoom};
+    
+    if (target_zoom < 1 || target_zoom > 10) { return false; }
+    translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+    view.k = target_zoom;
+    
+    l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+    view.x += center[0] - l[0];
+    view.y += center[1] - l[1];
+    let transform = d3.zoomIdentity
+    .translate(view.x, view.y)
+    .scale(view.k)
+    d3.select("#mini-map svg #minimapRect").remove();
+    let dx = -view.x / view.k;
+    let dy = -view.y / view.k;
+      
+        d3.select("#minimapRect").remove();
+        let minimapRect = d3
+          .select("#mini-map svg g")
+          .append("rect")
+          .attr("id", "minimapRect")
+          .attr("width", minimapWidth / view.k - 4)
+          .attr("height", minimapHeight / view.k - 4)
+          .attr("stroke", "red")
+          .attr("stroke-width", 2)
+          .attr("fill", "none")
+          .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
+      
+  d3.select("svg")
+    .transition()
+    .duration(300)
+    .call(zoom.transform, transform);
+    d3.select("svg g").attr("transform", `translate(${view.x}, ${view.y})scale(${view.k})`)
+
+    let context = d3.select("#canvas").node().getContext("2d");
+    // context.resetTransform();
+    // context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.save();
+    context.clearRect(0, 0, width, height);
+      context.translate(view.x, view.y);
+      context.scale(view.k, view.k);
+      
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < data.nCol; i++) {
+        for (let j = 0; j < data.nRow; j++) {
+          let x = i * size;
+          let y = j * size;
+          context.beginPath();
+
+          //Drawing a rectangle
+          context.fillStyle = "#212137";
+          context.fillRect(x, y, size, size);
+          //Optional if you also sizeant to give the rectangle a stroke
+          context.strokeStyle = "black";
+          context.lineWidth = 0.5;
+          context.strokeRect(x, y, size, size);
+
+          context.fill();
+          context.closePath();
+        }
+      }
+      context.restore();
+     
+    setSearchParams({ zoom: view.k, currentX: view.x, currentY: view.y });
+  
+
+}
   const changeDisplayMinimap = () => {
     setDisplayMinimap(!displayMinimap);
   };
@@ -708,27 +801,25 @@ const Map = () => {
           >
             <div className={cx("inputrange-wrapper")} id="input-range-minimap">
               <button
-                onClick={() => {
-                  handleInputRange(Number(Math.min(currentZoom + 0.1, 10)));
-                }}
+                id="zoom_in"
+                onClick={(e) => handleInputRange(e)}
               >
                 +
               </button>
               <input
-                disabled
+                id="zoom_range"
                 style={{ width: minimapHeight - 42 }}
-                onChange={(e) => handleInputRange(e.target.value)}
+                onChange={(e) => handleInputRange(e)}
                 type="range"
                 className={cx("input-range")}
-                value={currentZoom}
+                value={Number(searchParams.get("zoom"))}
                 min={1}
                 max={10}
-                step={0.1}
+                step={0.5}
               />
               <button
-                onClick={() => {
-                  handleInputRange(Number(Math.max(currentZoom - 0.1, 3)));
-                }}
+              id="zoom_out"
+              onClick={(e) => handleInputRange(e)}
               >
                 -
               </button>
