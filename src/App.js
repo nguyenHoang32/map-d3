@@ -46,9 +46,9 @@ function App() {
   if (window.innerWidth < 800) {
     width = Number(window.innerWidth);
   }
-  const ratio = 1 / 6;
-  let minimapWidth = width * ratio;
-  let minimapHeight = height * ratio;
+  const ratio = 1 / 4.5;
+  let minimapWidth = (width * ratio).toFixed(2);
+  let minimapHeight = (height * ratio).toFixed(2);
 
   const minimapSize = calSize(
     minimapWidth,
@@ -682,10 +682,9 @@ function App() {
                 +
               </button>
               <input
-                style={{ width: 24 }}
+                style={{width: minimapHeight-42}}
                 onChange={(e) => handleInputRange(e.target.value)}
                 type="range"
-                orient="vertical"
                 className={cx("input-range")}
                 value={currentZoom}
                 min={1}
