@@ -386,8 +386,27 @@ const Map = () => {
         .attr("width", minimapWidth)
         .attr("height", minimapHeight);
 
-      minimap.append("g").attr("class", "minimap-grid");
+        const canvas = d3
+        .select("#canvas")
+        .attr("width", width)
+        .attr("height", height);
+      const context = canvas.node().getContext("2d");
 
+      minimap.append("g").attr("class", "minimap-grid");
+      const canvasMini = d3.select("#canvas-mini").attr("width", minimapWidth).attr("height", minimapHeight);
+      const contextMini = canvasMini.node().getContext("2d");
+      contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
+          //Drawing a rectangle
+          contextMini.fillStyle = "#212137";
+          contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
+          //Optional if you also sizeant to give the rectangle a stroke
+          // contextMini.strokeStyle = "black";
+          // contextMini.lineWidth = 0.5;
+          // contextMini.strokeRect(x, y, size, size);
+
+          contextMini.fill();
+          contextMini.closePath();
+      
       let fieldsMini = d3
         .select("#mini-map svg g")
         .selectAll(".fields-mini")
@@ -788,7 +807,7 @@ const Map = () => {
             left: `${visibleAction ? "400px" : "200px"}`,
             pointerEvents: displayMinimap ? "all" : "none",
           }}
-        >
+        ><canvas id="canvas-mini"></canvas>
           <div
             id="mini-map"
             style={{
@@ -799,6 +818,7 @@ const Map = () => {
               transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
             }}
           >
+            
             <div className={cx("inputrange-wrapper")} id="input-range-minimap">
               <button
                 id="zoom_in"
