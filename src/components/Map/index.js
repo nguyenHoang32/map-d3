@@ -29,7 +29,7 @@ const Map = ({props}) => {
   const [displayMinimap, setDisplayMinimap] = useState(true);
   const [modal, setModal] = useState({
     show: true,
-    text: "Creating minimap...",
+    text: "Creating map...",
   });
   const location = useLocation()
   const [actionFilter, setActionFilter] = useState({
