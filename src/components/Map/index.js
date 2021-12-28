@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import Action from "../Action/Action";
 import Information from "../Information/index";
 import Modal from "../Modal/index";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams,useLocation  } from "react-router-dom";
 import {
   MenuOutlined,
   LeftOutlined,
@@ -16,7 +16,7 @@ import cn from "classnames/bind";
 import update from "immutability-helper";
 const cx = cn.bind(styles);
 
-const Map = () => {
+const Map = ({props}) => {
   const navigate = useNavigate();
   const [currentZoom, setCurrentZoom] = useState(3);
   const [visible, setVisible] = useState(false);
@@ -31,6 +31,14 @@ const Map = () => {
     show: true,
     text: "Creating minimap...",
   });
+  const location = useLocation()
+  const [actionFilter, setActionFilter] = useState({
+    sale: [],
+    size: [],
+    coordinates: [],
+    wallet: "",
+    partners: ""
+  })
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
   const calSize = (width, height, row, col) => {
@@ -123,9 +131,11 @@ const Map = () => {
     function handleZoom(e) {
       console.log("zoom");
       const transform = e.transform;
-      navigate(
-        `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
-      );
+      // navigate(
+      //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
+      // );
+      setSearchParams({ zoom: transform.k, currentX: transform.x, currentY: transform.y });
+
       d3.select("svg g").attr("transform", transform);
       if (e.sourceEvent !== null) {
         div.transition().duration(100).style("opacity", 0);
@@ -296,13 +306,19 @@ const Map = () => {
 
             const x = Number(active.attr("x")) + size / 2;
             const y = Number(active.attr("y")) + size / 2;
-
+            console.log(x,y)
             active.style("opacity", 1);
             let currentScale, currentScaleString;
+            const preZoom = Number(searchParams.get("zoom"));
+            
+    const preX = Number(searchParams.get("currentX"));
+    const preY = Number(searchParams.get("currentY"));
+    const myTransform = d3.zoomTransform(d3.select("#map svg").node());
               if (d3.select("#map svg g").attr("transform") === null) {
                 currentScale = 1;
               }
               //case where we have transformed the circle
+
               else {
                 currentScaleString = d3
                   .select("#map svg g")
@@ -313,6 +329,8 @@ const Map = () => {
                   currentScaleString.length - 1
                 );
               }
+              console.log(currentScale)
+ 
               var isMobile = {
                 Android: function() {
                   return navigator.userAgent.match(/Android/i);
@@ -336,21 +354,25 @@ const Map = () => {
               if (isMobile.any()) {
                 let transform = d3.zoomIdentity
                 .translate(-x/2, -y/2)
-                .scale(currentScale)
+                .scale(myTransform.k)
               d3.select("svg")
                 .transition()
                 .duration(300)
                 .call(zoom.transform, transform);
-              } 
-              let transform = d3.zoomIdentity
+                setSearchParams({ zoom: currentScale, currentX: Number(-x/2), currentY: Number(-y/2) });
+
+              } else{
+                let transform = d3.zoomIdentity
                 .translate(width / 2, height / 2)
-                .scale(currentScale)
-                .translate(-x, -y);
+                .scale(myTransform.k)
+                .translate(Number(-x), Number(-y));
               d3.select("svg")
                 .transition()
                 .duration(300)
                 .call(zoom.transform, transform);
-                
+                setSearchParams({ zoom: currentScale, currentX: Number(width / 2 - x), currentY: Number(height / 2 - y) });
+              }
+              
                 if (!isMobile.any()) { 
                   div.transition().duration(500).style("opacity", 0.9);
                   div
@@ -722,7 +744,7 @@ const Map = () => {
     .transition()
     .duration(300)
     .call(zoom.transform, transform);
-    d3.select("svg g").attr("transform", `translate(${view.x}, ${view.y})scale(${view.k})`)
+    d3.select("svg g").attr("transform", `translate(${view.x},${view.y})scale(${view.k})`)
 
     let context = d3.select("#canvas").node().getContext("2d");
     // context.resetTransform();
