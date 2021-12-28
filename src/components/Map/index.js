@@ -289,6 +289,9 @@ const Map = () => {
           if (active.attr("class").includes("active")) {
             // reset();
           } else {
+            const preZoom = Number(searchParams.get("zoom"));
+              const preX = Number(searchParams.get("currentX"));
+              const preY = Number(searchParams.get("currentY"));
             let allField = document.querySelectorAll(".field");
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
@@ -301,30 +304,19 @@ const Map = () => {
             let currentScale, currentScaleString;
 
             if (window.innerWidth < 800) {
-              d3.select("svg g").attr(
-                "transform",
-                `translate(${-x + window.innerWidth / 2}, ${
-                  -y + window.innerHeight / 2
-                })`
-              );
-            } else {
-              if (d3.select("#map svg g").attr("transform") === null) {
-                currentScale = 1;
-              }
-              //case where we have transformed the circle
-              else {
-                currentScaleString = d3
-                  .select("#map svg g")
-                  .attr("transform")
-                  .split(" ")[1];
-                currentScale = +currentScaleString.substring(
-                  6,
-                  currentScaleString.length - 1
-                );
-              }
               let transform = d3.zoomIdentity
                 .translate(width / 2, height / 2)
-                .scale(currentScale)
+                .scale(preZoom)
+                .translate(-x, -y);
+              d3.select("svg")
+                .transition()
+                .duration(300)
+                .call(zoom.transform, transform);
+            } else {
+              
+              let transform = d3.zoomIdentity
+                .translate(width / 2, height / 2)
+                .scale(preZoom)
                 .translate(-x, -y);
               d3.select("svg")
                 .transition()
@@ -681,15 +673,64 @@ const Map = () => {
         const preZoom = Number(searchParams.get("zoom"));
     const preX = Number(searchParams.get("currentX"));
     const preY = Number(searchParams.get("currentY"));
-    if(e.target.id === "zoom_range"){
-      target_zoom = Number(e.target.value);
-    }else{
-      direction = (e.target.id === 'zoom_in') ? 1 : -1;
+    if(e.target.id === "mobi_zoom_in" || e.target.id === "mobi_zoom_out"){
+      direction = (e.target.id === 'mobi_zoom_in') ? 1 : -1;
       target_zoom = preZoom + (factor * direction);
-    }
-    
-    
-    view = {x: preX, y: preY, k: preZoom};
+      view = {x: preX, y: preY, k: preZoom};
+      if (target_zoom < 1 || target_zoom > 10) { return false; }
+      translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
+      view.k = target_zoom;
+      l = [translate0[0] * view.k + view.x, translate0[1] * view.k + view.y];
+    view.x += center[0] - l[0];
+    view.y += center[1] - l[1];
+    let transform = d3.zoomIdentity
+    .translate(view.x, view.y)
+    .scale(view.k)
+    d3.select("svg")
+    .transition()
+    .duration(300)
+    .call(zoom.transform, transform);
+    d3.select("svg g").attr("transform", `translate(${view.x}, ${view.y})scale(${view.k})`)
+
+    let context = d3.select("#canvas").node().getContext("2d");
+    // context.resetTransform();
+    // context.setTransform(1, 0, 0, 1, 0, 0);
+    context.clearRect(0, 0, width, height);
+    context.save();
+    context.clearRect(0, 0, width, height);
+      context.translate(view.x, view.y);
+      context.scale(view.k, view.k);
+      
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < data.nCol; i++) {
+        for (let j = 0; j < data.nRow; j++) {
+          let x = i * size;
+          let y = j * size;
+          context.beginPath();
+
+          //Drawing a rectangle
+          context.fillStyle = "#212137";
+          context.fillRect(x, y, size, size);
+          //Optional if you also sizeant to give the rectangle a stroke
+          context.strokeStyle = "black";
+          context.lineWidth = 0.5;
+          context.strokeRect(x, y, size, size);
+
+          context.fill();
+          context.closePath();
+        }
+      }
+      context.restore();
+     
+    setSearchParams({ zoom: view.k, currentX: view.x, currentY: view.y });
+    }else{
+      if(e.target.id === "zoom_range"){
+        target_zoom = Number(e.target.value);
+      }else{
+        direction = (e.target.id === 'zoom_in') ? 1 : -1;
+        target_zoom = preZoom + (factor * direction);
+      }
+      view = {x: preX, y: preY, k: preZoom};
     
     if (target_zoom < 1 || target_zoom > 10) { return false; }
     translate0 = [(center[0] - view.x) / view.k, (center[1] - view.y) / view.k];
@@ -754,6 +795,11 @@ const Map = () => {
       context.restore();
      
     setSearchParams({ zoom: view.k, currentX: view.x, currentY: view.y });
+    }
+    
+    
+    
+    
   
 
 }
@@ -761,6 +807,7 @@ const Map = () => {
     setDisplayMinimap(!displayMinimap);
   };
   const zoomInMobile = (value) => {
+    let data = data1;
     const scale = Number(value);
     setCurrentZoom(value);
 
@@ -768,7 +815,34 @@ const Map = () => {
       zoom.transform,
       d3.zoomIdentity.scale(scale).translate(width / 2, height / 2)
     );
-    d3.select("#map svg").attr("transform", "scale(" + scale + ")");
+    d3.select("#map svg g").attr("transform", `translate(${width/2}, ${height/2})scale(${scale})`);
+    let context = d3.select("#canvas").node().getContext("2d");
+    context.clearRect(0, 0, width, height);
+    context.save();
+    context.clearRect(0, 0, width, height);
+      context.translate(width / 2, height / 2);
+      context.scale(scale, scale);
+      
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < data.nCol; i++) {
+        for (let j = 0; j < data.nRow; j++) {
+          let x = i * size;
+          let y = j * size;
+          context.beginPath();
+
+          //Drawing a rectangle
+          context.fillStyle = "#212137";
+          context.fillRect(x, y, size, size);
+          //Optional if you also sizeant to give the rectangle a stroke
+          context.strokeStyle = "black";
+          context.lineWidth = 0.5;
+          context.strokeRect(x, y, size, size);
+
+          context.fill();
+          context.closePath();
+        }
+      }
+      context.restore();
   };
 
   return (
@@ -874,17 +948,15 @@ const Map = () => {
           </div>
           <div className={cx("mobile-zoom")}>
             <div
-              onClick={() => {
-                zoomInMobile(Number(Math.min(currentZoom + 0.5, 10)));
-              }}
+              id="mobi_zoom_in"
+              onClick={(e) => handleInputRange(e)}
             >
               +
             </div>
             <div className={cx("divider")}></div>
             <div
-              onClick={() => {
-                zoomInMobile(Number(Math.max(currentZoom - 0.5, 1)));
-              }}
+            id="mobi_zoom_out"
+            onClick={(e) => handleInputRange(e)}
             >
               -
             </div>

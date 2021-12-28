@@ -23,6 +23,11 @@ div.tooltip {
     pointer-events: none;
     color: black;
   }
+  @media(max-width: 800px){
+      .tooltip{
+          display: none;
+      }
+  }
 .tooltip-img{
     width: 30px; 
     height: 30px;
