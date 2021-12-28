@@ -289,9 +289,6 @@ const Map = () => {
           if (active.attr("class").includes("active")) {
             // reset();
           } else {
-            const preZoom = Number(searchParams.get("zoom"));
-              const preX = Number(searchParams.get("currentX"));
-              const preY = Number(searchParams.get("currentY"));
             let allField = document.querySelectorAll(".field");
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
@@ -302,38 +299,73 @@ const Map = () => {
 
             active.style("opacity", 1);
             let currentScale, currentScaleString;
-
-            if (window.innerWidth < 800) {
+              if (d3.select("#map svg g").attr("transform") === null) {
+                currentScale = 1;
+              }
+              //case where we have transformed the circle
+              else {
+                currentScaleString = d3
+                  .select("#map svg g")
+                  .attr("transform")
+                  .split(" ")[1];
+                currentScale = +currentScaleString.substring(
+                  6,
+                  currentScaleString.length - 1
+                );
+              }
+              var isMobile = {
+                Android: function() {
+                  return navigator.userAgent.match(/Android/i);
+              },
+              BlackBerry: function() {
+                  return navigator.userAgent.match(/BlackBerry/i);
+              },
+              iOS: function() {
+                  return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+              },
+              Opera: function() {
+                  return navigator.userAgent.match(/Opera Mini/i);
+              },
+              Windows: function() {
+                  return navigator.userAgent.match(/IEMobile/i) || navigator.userAgent.match(/WPDesktop/i);
+              },
+                any: function() {
+                  return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+              }
+              }
+              if (isMobile.any()) {
+                let transform = d3.zoomIdentity
+                .translate(-x/2, -y/2)
+                .scale(currentScale)
+              d3.select("svg")
+                .transition()
+                .duration(300)
+                .call(zoom.transform, transform);
+              } 
               let transform = d3.zoomIdentity
                 .translate(width / 2, height / 2)
-                .scale(preZoom)
+                .scale(currentScale)
                 .translate(-x, -y);
               d3.select("svg")
                 .transition()
                 .duration(300)
                 .call(zoom.transform, transform);
-            } else {
-              
-              let transform = d3.zoomIdentity
-                .translate(width / 2, height / 2)
-                .scale(preZoom)
-                .translate(-x, -y);
-              d3.select("svg")
-                .transition()
-                .duration(300)
-                .call(zoom.transform, transform);
-              div.transition().duration(500).style("opacity", 0.9);
-              div
-                .html(
-                  `<div class="tooltip-img"></div>
-              <div class="tooltip-content">
-                <div>Name: ${d.id}</div>
-                <div>Estate: ... </div>
-              </div>`
-                )
-                .style("left", width / 2 + 90 + "px")
-                .style("top", height / 2 + 60 + "px");
-            }
+                
+                if (!isMobile.any()) { 
+                  div.transition().duration(500).style("opacity", 0.9);
+                  div
+                    .html(
+                      `<div class="tooltip-img"></div>
+                  <div class="tooltip-content">
+                    <div>Name: ${d.id}</div>
+                    <div>Estate: ... </div>
+                  </div>`
+                    )
+                    .style("left", width / 2 + 90 + "px")
+                    .style("top", height / 2 + 60 + "px");
+                 }
+             
+            
 
             // d3.select("svg g").transition()
             //   .duration(750).attr("transform", `translate(${width / 2 - x }, ${height / 2 - y})scale(${currentScale})`)
