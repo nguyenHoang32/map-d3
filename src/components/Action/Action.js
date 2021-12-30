@@ -4,31 +4,53 @@ import styles from "./Action.module.scss";
 import Switch from "react-ios-switch";
 import { Checkbox, Drawer } from "antd";
 
+import update from "immutability-helper";
 const cx = cn.bind(styles);
 
-const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, max, submit,visibleAction,setVisibleAction }) => {
+const Action = ({
+  handleChangeCheckbox,
+  filterCheckbox,
+  handleChangeFilter,
+  checkSize,
+  resetCoordinate,
+  handleFilterSize,
+  setMin,
+  setMax,
+  min,
+  max,
+  submit,
+  visibleAction,
+  setVisibleAction,
+}) => {
   const [checked, setChecked] = useState(false);
-  
+
   const clickClose = () => {
-    
-    setVisibleAction(!visibleAction)
-  }
-  function onChange(checkedValues) {
-    handleFilter(checkedValues);
-  }
+    setVisibleAction(!visibleAction);
+  };
+  
+  const handleCheckboxLocal = (e) => {
+    handleChangeCheckbox(e)
+  };
+ 
   return (
     <div className={cx("container")}>
-      <button 
-      className={cx("close-btn", !visibleAction ? cx("close-btn--left") : cx("close-btn--right"))} 
-      onClick={clickClose}
-      > {!visibleAction ? ">" : "<" } </button>
+      <button
+        className={cx(
+          "close-btn",
+          !visibleAction ? cx("close-btn--left") : cx("close-btn--right")
+        )}
+        onClick={clickClose}
+      >
+        {" "}
+        {!visibleAction ? ">" : "<"}{" "}
+      </button>
       <Drawer
         mask={false}
         autoFocus={false}
         placement="left"
         visible={visibleAction}
         className={cx("action")}
-        style={{ visibility: !visibleAction &&'hidden' }}
+        style={{ visibility: !visibleAction && "hidden" }}
         destroyOnClose={false}
       >
         <div className={cx("title-wraper")}>
@@ -47,23 +69,26 @@ const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, m
           />
         </div>
         <hr />
+        <form onChange={handleCheckboxLocal}>
         <div className={cx("status")}>
+        <Checkbox.Group name="sale">
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} disabled/>
+            <Checkbox className={cx("check-box")} value={1}/>
 
             <div className={cx("square-color-1")}></div>
             <div className={cx("status-title")}>For Sale</div>
           </div>
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} disabled/>
+            <Checkbox className={cx("check-box")} value={2}/>
             <div className={cx("square-color-2")}></div>
-            <div className={cx("status-title")}>For Sale</div>
+            <div className={cx("status-title")}>Premium</div>
           </div>
           <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} disabled/>
+            <Checkbox className={cx("check-box")} value={3}/>
             <div className={cx("square-color-3")}></div>
-            <div className={cx("status-title")}>For Sale</div>
+            <div className={cx("status-title")}>On OpenSea</div>
           </div>
+          </ Checkbox.Group>
         </div>
         <hr />
         <div className={cx("find-land")}>Find LAND on OpenSea </div>
@@ -72,7 +97,7 @@ const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, m
           <div className={cx("size-title")}>Size</div>
           
 
-          <Checkbox.Group onChange={onChange} value={checkSize}>
+          <Checkbox.Group name="size">
           <div className={cx("size-item")}>
             <Checkbox
               className={cx("check-box")}
@@ -107,7 +132,7 @@ const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, m
           </div>
           </Checkbox.Group>
         </div>
-
+        </form>
         <hr />
 
         <div className={cx("coordinates")}>
@@ -137,24 +162,26 @@ const Action = ({ checkSize,resetCoordinate,handleFilter, setMin, setMax, min, m
           <button className={cx("btn")} onClick={submit}>
             Apply
           </button>
-          <button className={cx("btn")} onClick={resetCoordinate}>
+          {/* <button className={cx("btn")} onClick={resetCoordinate}>
             Reset 
-          </button>
+          </button> */}
         </div>
         <hr />
         <div className={cx("wallet")}>
           <div className={cx("title")}>Wallet</div>
-          <form>
-            <input name="wallet" />
-          </form>
+          
+          <input name="wallet" className={cx("wallet")}/>
+          
         </div>
         <hr />
-        <div>
+        <div className={cx("partners")}>
         <div className={cx("title")}>Partners</div>
-        <form>
-            <input name="partners" />
-          </form>
+        
+            <input name="partners" className={cx("partners")}/>
+          
         </div>
+      
+       
       </Drawer>
     </div>
   );
