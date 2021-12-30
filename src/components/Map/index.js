@@ -236,28 +236,7 @@ const Map = ({ props }) => {
         }
       }
 
-      // for (let i = 0; i < data.data.length; i++) {
-      //   for (let j = 0; j < data.data[i].length; j++) {
-      //     context.beginPath();
-      //     const top = data.data[i][j].position.rowStart * size;
-      //     const left = data.data[i][j].position.colStart * size;
-      //     const width =
-      //       (data.data[i][j].position.colEnd - data.data[i][j].position.colStart) * size;
-      //     const height =
-      //       (data.data[i][j].position.rowEnd - data.data[i][j].position.rowStart) * size;
-      //     //Drawing a rectangle
-      //     console.log(top,left,width,height)
-      //     context.fillStyle = "green";
-      //     context.fillRect(left, top, width, height);
-      //     //Optional if you also sizeant to give the rectangle a stroke
-      //     context.strokeStyle = "black";
-      //     context.lineWidth = 0.5;
-      //     context.strokeRect(left, top, width, height);
-
-      //     context.fill();
-      //     context.closePath();
-      //   }
-      // }
+      
     }
     function drawMap() {
       map.append("g").attr("class", "grid-square");
@@ -303,10 +282,11 @@ const Map = ({ props }) => {
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
             const size = Number(active.attr("height"));
-
+            const blurField = d3.select("#blur-field-" + d.id);
+            console.log(blurField)
+            blurField.style("fill-opacity", 0);
             const x = Number(active.attr("x")) + size / 2;
             const y = Number(active.attr("y")) + size / 2;
-            console.log(x, y);
             active.style("opacity", 1);
             let currentScale, currentScaleString;
             const preZoom = Number(searchParams.get("zoom"));
@@ -326,7 +306,6 @@ const Map = ({ props }) => {
                 currentScaleString.length - 1
               );
             }
-            console.log(currentScale);
 
             var isMobile = {
               Android: function () {
@@ -414,6 +393,9 @@ const Map = ({ props }) => {
         .enter()
         .append("rect")
         .attr("class", "blur-field")
+        .attr("id", function(d){
+          return "blur-field-"+ d.id;
+        })
         .attr("x", function (d) {
           return d.position.colStart * size;
         })
@@ -429,7 +411,7 @@ const Map = ({ props }) => {
           return (area + 1) * size;
         })
         .style("fill", function (d) {
-          return "grey";
+          return "#323950";
         })
         .style("fill-opacity", 0);
     }
@@ -571,7 +553,7 @@ const Map = ({ props }) => {
           return this;
         }
       })
-      .style("fill-opacity", 0.5);
+      .style("fill-opacity", 0.5)
       // 
     d3.selectAll(".blur-field")
       .filter(function (d) {
@@ -586,7 +568,7 @@ const Map = ({ props }) => {
           return this;
         }
       })
-      .style("fill-opacity", 0);
+      .style("fill-opacity", 0)
     if (filter["size"].length === 0 && filter["sale"].length === 0) {
       d3.selectAll(".blur-field").style("fill-opacity", 0);
     }
@@ -606,7 +588,11 @@ const Map = ({ props }) => {
     setVisible(false);
   };
 
-  const submit = () => {
+  const filterCoordinates = () => {
+    setModal({
+      show: true,
+      text: "Applying filter...",
+    });
     let rStart, cStart, rEnd, cEnd;
     let fields = d3.selectAll(".field");
     [rStart, cStart] = minCoordinates.split(",");
@@ -624,13 +610,25 @@ const Map = ({ props }) => {
         return this;
       }
     });
+    let text;
+    if(filterCheckbox["size"].length > 0 || filterCheckbox["sale"].length > 0){
+      // text = ".blur-field-active"
+      text = ".blur-field"
+    }else{
+      text = ".blur-field-active"
+      // text = ".blur-field"
+    }
     d3.selectAll(".blur-field")
       .filter(function (d) {
         if (!active.includes(d)) {
           return this;
         }
       })
-      .style("fill-opacity", 0.7);
+      .style("fill-opacity", 0.5);
+      setModal({
+        show: false,
+        text: "",
+      });
   };
   const resetCoordinate = () => {
     d3.selectAll(".blur-field").style("fill-opacity", 0);
@@ -819,7 +817,7 @@ const Map = ({ props }) => {
       />
       <div className={cx("nav")}>Nav</div>
       <Action
-        submit={submit}
+        submit={filterCoordinates}
         visibleAction={visibleAction}
         setVisibleAction={setVisibleAction}
         handleFilterSize={handleFilterSize}

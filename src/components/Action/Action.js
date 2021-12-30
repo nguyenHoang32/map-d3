@@ -9,11 +9,6 @@ const cx = cn.bind(styles);
 
 const Action = ({
   handleChangeCheckbox,
-  filterCheckbox,
-  handleChangeFilter,
-  checkSize,
-  resetCoordinate,
-  handleFilterSize,
   setMin,
   setMax,
   min,
