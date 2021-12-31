@@ -329,7 +329,6 @@ const Map = ({props}) => {
                   currentScaleString.length - 1
                 );
               }
-              console.log(currentScale)
  
               var isMobile = {
                 Android: function() {
@@ -359,7 +358,7 @@ const Map = ({props}) => {
                 .transition()
                 .duration(300)
                 .call(zoom.transform, transform);
-                setSearchParams({ zoom: currentScale, currentX: Number(-x/2), currentY: Number(-y/2) });
+                setSearchParams({ zoom: myTransform.k, currentX: Number(-x/2), currentY: Number(-y/2) });
 
               } else{
                 let transform = d3.zoomIdentity
@@ -370,7 +369,7 @@ const Map = ({props}) => {
                 .transition()
                 .duration(300)
                 .call(zoom.transform, transform);
-                setSearchParams({ zoom: currentScale, currentX: Number(width / 2 - x), currentY: Number(height / 2 - y) });
+                setSearchParams({ zoom: myTransform.k, currentX: Number(width / 2 - x), currentY: Number(height / 2 - y) });
               }
               
                 if (!isMobile.any()) { 
