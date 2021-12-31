@@ -5,7 +5,7 @@
   width: calc(100% - 90px);
   height: calc(100% - 60px);
   background-color: rgba(0,0,0,0.4);
-  pointer-events: none;
+  // pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,5 +20,15 @@
     color: white;
     font-size: 28px;
     font-weight: bold;
+  }
+  .btn{
+    width: 200px;
+    height: 100px;
+    padding: 20px;
+    color: white;
+    background: blue;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
   }
 }

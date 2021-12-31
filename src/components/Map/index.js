@@ -23,7 +23,6 @@ const Map = ({ props }) => {
   const [visible, setVisible] = useState(false);
 
   const [field, setField] = useState({});
-  const [checkSize, setCheckSize] = useState([]);
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [visibleAction, setVisibleAction] = useState(false);
@@ -283,7 +282,6 @@ const Map = ({ props }) => {
             active.classed("active", !active.classed("active"));
             const size = Number(active.attr("height"));
             const blurField = d3.select("#blur-field-" + d.id);
-            console.log(blurField)
             blurField.style("fill-opacity", 0);
             const x = Number(active.attr("x")) + size / 2;
             const y = Number(active.attr("y")) + size / 2;
@@ -388,13 +386,13 @@ const Map = ({ props }) => {
           return e.preventDefault();
         });
       d3.select("#map svg g")
-        .selectAll(".blur-field")
+        .selectAll(".blur-init")
         .data(data.data)
         .enter()
         .append("rect")
-        .attr("class", "blur-field")
+        .attr("class", "blur-init")
         .attr("id", function(d){
-          return "blur-field-"+ d.id;
+          return "blur-init-"+ d.id;
         })
         .attr("x", function (d) {
           return d.position.colStart * size;
@@ -468,11 +466,11 @@ const Map = ({ props }) => {
         });
 
       d3.select("#mini-map svg g")
-        .selectAll(".blur-field")
+        .selectAll(".blur-init")
         .data(data.data)
         .enter()
         .append("rect")
-        .attr("class", "blur-field")
+        .attr("class", "blur-init")
         .attr("x", function (d) {
           return d.position.colStart * minimapSize;
         })
@@ -524,7 +522,7 @@ const Map = ({ props }) => {
   const handleFilterSize = async (filter) => {
     let state = { show: true, text: "Applying filter..." };
     setModal({ ...state });
-    let fields = await d3.selectAll(".field");
+    // let fields = await d3.selectAll(".field");
     // fields
     //   .filter(function (d, i) {
     //     let area = Number(d.position.rowEnd - d.position.rowStart);
@@ -539,8 +537,13 @@ const Map = ({ props }) => {
     //     }
     //     return `url(#${d.id})`;
     //   });
-
-    d3.selectAll(".blur-field")
+    const initBlur = d3.selectAll(".blur-init");
+    const activeBlur = d3.selectAll(".blur")
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+   
+    
+    
+    d3.selectAll(query)
       .filter(function (d) {
         let area = d.position.rowEnd - d.position.rowStart + 1;
         let condition;
@@ -550,12 +553,19 @@ const Map = ({ props }) => {
           condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
         }
         if (!condition) {
+          
+          // d3.select(this).classed("blur-field-active", true)
+          
           return this;
+          
         }
       })
       .style("fill-opacity", 0.5)
+      .attr("class", "blur-blured")
+     
       // 
-    d3.selectAll(".blur-field")
+      
+    d3.selectAll(query)
       .filter(function (d) {
         let area = d.position.rowEnd - d.position.rowStart + 1;
         let condition;
@@ -565,12 +575,18 @@ const Map = ({ props }) => {
           condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
         }
         if (condition) {
+         
+          // d3.select(this).classed("blur-field-active", false)
+          // d3.select(this).attr("class", "blur-field")
           return this;
         }
+        return null;
       })
       .style("fill-opacity", 0)
+      .attr("class", "blur")
+    
     if (filter["size"].length === 0 && filter["sale"].length === 0) {
-      d3.selectAll(".blur-field").style("fill-opacity", 0);
+      d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
     }
     setTimeout(() => {
       setModal({
@@ -594,7 +610,13 @@ const Map = ({ props }) => {
       text: "Applying filter...",
     });
     let rStart, cStart, rEnd, cEnd;
-    let fields = d3.selectAll(".field");
+
+    
+    const initBlur = d3.selectAll(".blur-init");
+    const activeBlur = d3.selectAll(".blur")
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+
+    let fields = d3.selectAll(query);
     [rStart, cStart] = minCoordinates.split(",");
     [rEnd, cEnd] = maxCoordinates.split(",");
     let active = [];
@@ -610,29 +632,53 @@ const Map = ({ props }) => {
         return this;
       }
     });
-    let text;
-    if(filterCheckbox["size"].length > 0 || filterCheckbox["sale"].length > 0){
-      // text = ".blur-field-active"
-      text = ".blur-field"
-    }else{
-      text = ".blur-field-active"
-      // text = ".blur-field"
-    }
-    d3.selectAll(".blur-field")
+    d3.selectAll(query)
       .filter(function (d) {
         if (!active.includes(d)) {
+          // d3.select(this).classed("blur-field-active", true)
+          
           return this;
         }
       })
-      .style("fill-opacity", 0.5);
-      setModal({
-        show: false,
-        text: "",
-      });
+      .style("fill-opacity", 0.5)
+      .attr("class", "blur-blured")
+      const blur = d3.selectAll(query)
+      .filter(function (d) {
+        if (active.includes(d)) {
+          // d3.select(this).classed("blur-field-active", false)
+         
+          return this;
+        }
+      })
+      .style("fill-opacity", 0)
+      .attr("class", "blur")
+
+      if(blur.empty()){
+        setModal({
+          show: true,
+          text: "No results",
+        });
+      }else{
+        setModal({
+          show: false,
+          text: "",
+        });
+  
+      }
   };
   const resetCoordinate = () => {
-    d3.selectAll(".blur-field").style("fill-opacity", 0);
+    d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
   };
+  const resetFilter = () => {
+setFilterCheckbox({sale: [], size: []})
+  setMinCoordinates("");
+  setMaxCoordinates("");
+  setModal({
+    show: false,
+    text: "",
+  });
+  d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
+  }
   const handleInputRange = (e) => {
     let data = data1;
     let direction = 1,
@@ -808,7 +854,7 @@ const Map = ({ props }) => {
 
   return (
     <div className="App">
-      {modal.show && <Modal text={modal.text} />}
+      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter}/>}
       <Information
         visible={visible}
         field={field}
@@ -821,12 +867,10 @@ const Map = ({ props }) => {
         visibleAction={visibleAction}
         setVisibleAction={setVisibleAction}
         handleFilterSize={handleFilterSize}
-        checkSize={checkSize}
         setMin={setMinCoordinates}
         setMax={setMaxCoordinates}
         min={minCoordinates}
         max={maxCoordinates}
-        resetCoordinate={resetCoordinate}
         filterCheckbox={filterCheckbox}
         handleChangeCheckbox={handleChangeCheckbox}
       />

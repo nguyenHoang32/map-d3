@@ -8,6 +8,7 @@ import update from "immutability-helper";
 const cx = cn.bind(styles);
 
 const Action = ({
+  filterCheckbox,
   handleChangeCheckbox,
   setMin,
   setMax,
@@ -66,7 +67,7 @@ const Action = ({
         <hr />
         <form onChange={handleCheckboxLocal}>
         <div className={cx("status")}>
-        <Checkbox.Group name="sale">
+        <Checkbox.Group name="sale" value={filterCheckbox.sale}>
           <div className={cx("status-item")}>
             <Checkbox className={cx("check-box")} value={1}/>
 
@@ -92,7 +93,7 @@ const Action = ({
           <div className={cx("size-title")}>Size</div>
           
 
-          <Checkbox.Group name="size">
+          <Checkbox.Group name="size" value={filterCheckbox.size}>
           <div className={cx("size-item")}>
             <Checkbox
               className={cx("check-box")}
