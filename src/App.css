@@ -118,7 +118,7 @@ div.tooltip {
     pointer-events: none;
 }
 
-.blur-field{
+.blur-init, .blur, .blur-blured{
     z-index: 21 !important;
     pointer-events: none;
 }

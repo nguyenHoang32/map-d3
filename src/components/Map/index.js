@@ -23,19 +23,24 @@ const Map = ({ props }) => {
   const [visible, setVisible] = useState(false);
 
   const [field, setField] = useState({});
-  const [minCoordinates, setMinCoordinates] = useState("");
-  const [maxCoordinates, setMaxCoordinates] = useState("");
+  
   const [visibleAction, setVisibleAction] = useState(false);
   const [displayMinimap, setDisplayMinimap] = useState(true);
   const [modal, setModal] = useState({
     show: true,
     text: "Creating map...",
+    showButton: false,
   });
   const location = useLocation();
+// FIlter
+  const [minCoordinates, setMinCoordinates] = useState("");
+  const [maxCoordinates, setMaxCoordinates] = useState("");
   const [filterCheckbox, setFilterCheckbox] = useState({
     sale: [],
     size: [],
   });
+  const [wallet,setWallet] = useState("");
+  //------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
   const calSize = (width, height, row, col) => {
@@ -281,14 +286,12 @@ const Map = ({ props }) => {
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
             const size = Number(active.attr("height"));
-            const blurField = d3.select("#blur-field-" + d.id);
+            const blurField = d3.select("#blur-init-" + d.id);
             blurField.style("fill-opacity", 0);
             const x = Number(active.attr("x")) + size / 2;
             const y = Number(active.attr("y")) + size / 2;
             active.style("opacity", 1);
             let currentScale, currentScaleString;
-            const preZoom = Number(searchParams.get("zoom"));
-
             const myTransform = d3.zoomTransform(d3.select("#map svg").node());
             if (d3.select("#map svg g").attr("transform") === null) {
               currentScale = 1;
@@ -520,29 +523,11 @@ const Map = ({ props }) => {
     setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
   }, []);
   const handleFilterSize = async (filter) => {
-    let state = { show: true, text: "Applying filter..." };
-    setModal({ ...state });
-    // let fields = await d3.selectAll(".field");
-    // fields
-    //   .filter(function (d, i) {
-    //     let area = Number(d.position.rowEnd - d.position.rowStart);
-
-    //     if (filter["size"].includes(area + 1) || filter["sale"].includes(d?.sale)) {
-    //       return this;
-    //     }
-    //   })
-    //   .style("fill", function (d) {
-    //     if (!d.img) {
-    //       return color.green;
-    //     }
-    //     return `url(#${d.id})`;
-    //   });
+    setModal({ show: true, text: "Applying filter..." });
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur")
     const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
-   
-    
-    
+    let index = 0;
     d3.selectAll(query)
       .filter(function (d) {
         let area = d.position.rowEnd - d.position.rowStart + 1;
@@ -553,47 +538,34 @@ const Map = ({ props }) => {
           condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
         }
         if (!condition) {
-          
           // d3.select(this).classed("blur-field-active", true)
-          
-          return this;
-          
+          return d3.select(this).style("fill-opacity", 0.5)
+          .attr("class", "blur-blured")
         }
+        index++;
+        return d3.select(this).style("fill-opacity", 0)
+        .attr("class", "blur")
       })
-      .style("fill-opacity", 0.5)
-      .attr("class", "blur-blured")
-     
-      // 
       
-    d3.selectAll(query)
-      .filter(function (d) {
-        let area = d.position.rowEnd - d.position.rowStart + 1;
-        let condition;
-        if(filter["size"].length > 0 && filter["sale"].length > 0){
-          condition = filter["size"].includes(area) && filter["sale"].includes(d.sale)
-        }else{
-          condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
-        }
-        if (condition) {
-         
-          // d3.select(this).classed("blur-field-active", false)
-          // d3.select(this).attr("class", "blur-field")
-          return this;
-        }
-        return null;
-      })
-      .style("fill-opacity", 0)
-      .attr("class", "blur")
-    
     if (filter["size"].length === 0 && filter["sale"].length === 0) {
       d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
+      index = 1;
     }
-    setTimeout(() => {
+   
+    if(index === 0){
       setModal({
-        show: false,
-        text: "",
+        show: true,
+        text: "No results",
+        showButton: true
       });
-    }, 1000);
+    }else{
+      setTimeout(() => {
+        setModal({
+          show: false,
+          text: "",
+        });
+      }, 1000)
+    }
     
   };
   const showDrawer = () => {
@@ -632,31 +604,27 @@ const Map = ({ props }) => {
         return this;
       }
     });
+    let index = 0;
     d3.selectAll(query)
       .filter(function (d) {
         if (!active.includes(d)) {
           // d3.select(this).classed("blur-field-active", true)
           
-          return this;
+          return d3.select(this).style("fill-opacity", 0.5)
+          .attr("class", "blur-blured")
         }
+        index++;
+        return d3.select(this).style("fill-opacity", 0)
+        .attr("class", "blur")
       })
-      .style("fill-opacity", 0.5)
-      .attr("class", "blur-blured")
-      const blur = d3.selectAll(query)
-      .filter(function (d) {
-        if (active.includes(d)) {
-          // d3.select(this).classed("blur-field-active", false)
-         
-          return this;
-        }
-      })
-      .style("fill-opacity", 0)
-      .attr("class", "blur")
-
-      if(blur.empty()){
+      
+     
+      
+      if(index === 0){
         setModal({
           show: true,
           text: "No results",
+          showButton: true
         });
       }else{
         setModal({
@@ -666,16 +634,15 @@ const Map = ({ props }) => {
   
       }
   };
-  const resetCoordinate = () => {
-    d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
-  };
   const resetFilter = () => {
 setFilterCheckbox({sale: [], size: []})
   setMinCoordinates("");
   setMaxCoordinates("");
+  setWallet("");
   setModal({
     show: false,
     text: "",
+    showButton: false
   });
   d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
   }
@@ -851,10 +818,45 @@ setFilterCheckbox({sale: [], size: []})
     setFilterCheckbox(newFilter);
     handleFilterSize(newFilter);
   }
+  const filterWallet = () => {
+    setModal({
+      show: true,
+      text: "Applying filter...",
+    });
+    const initBlur = d3.selectAll(".blur-init");
+    const activeBlur = d3.selectAll(".blur");
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+    let index = 0;
+    d3.selectAll(query)
+    .filter(function (d) {
+     if(d.wallet === wallet){
+       index++;
+       return d3.select(this).style("fill-opacity", 0)
+       .attr("class", "blur")
+     }
+     return d3.select(this).style("fill-opacity", 0.5)
+     .attr("class", "blur-blured")
+    })
+    if(index === 0){
+      setModal({
+        show: true,
+        text: "No results",
+        showButton: true
+      });
+    }else{
+      setTimeout(() => {
+        setModal({
+          show: false,
+          text: "",
+        });
+      }, 1000)
 
+    }
+    
+  }
   return (
     <div className="App">
-      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter}/>}
+      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton}/>}
       <Information
         visible={visible}
         field={field}
@@ -873,6 +875,10 @@ setFilterCheckbox({sale: [], size: []})
         max={maxCoordinates}
         filterCheckbox={filterCheckbox}
         handleChangeCheckbox={handleChangeCheckbox}
+        setWallet={setWallet}
+        wallet={wallet}
+        filterWallet={filterWallet}
+        resetFilter={resetFilter}
       />
 
       <div className={cx("container")}>

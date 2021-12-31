@@ -17,17 +17,25 @@ const Action = ({
   submit,
   visibleAction,
   setVisibleAction,
+  setWallet,
+  wallet,
+  filterWallet,
+  resetFilter
 }) => {
   const [checked, setChecked] = useState(false);
 
   const clickClose = () => {
     setVisibleAction(!visibleAction);
   };
-  
+
   const handleCheckboxLocal = (e) => {
-    handleChangeCheckbox(e)
+    handleChangeCheckbox(e);
   };
- 
+  const walletSubmit = (e) => {
+    e.preventDefault();
+    filterWallet();
+    
+  }
   return (
     <div className={cx("container")}>
       <button
@@ -51,7 +59,7 @@ const Action = ({
       >
         <div className={cx("title-wraper")}>
           <div className={cx("title")}>Map</div>
-          <div className={cx("clear")}>Clear</div>
+          <div className={cx("clear")} onClick={resetFilter}>Clear</div>
         </div>
         <hr />
         <div className={cx("litemap")}>
@@ -66,68 +74,51 @@ const Action = ({
         </div>
         <hr />
         <form onChange={handleCheckboxLocal}>
-        <div className={cx("status")}>
-        <Checkbox.Group name="sale" value={filterCheckbox.sale}>
-          <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} value={1}/>
+          <div className={cx("status")}>
+            <Checkbox.Group name="sale" value={filterCheckbox.sale}>
+              <div className={cx("status-item")}>
+                <Checkbox className={cx("check-box")} value={1} />
 
-            <div className={cx("square-color-1")}></div>
-            <div className={cx("status-title")}>For Sale</div>
+                <div className={cx("square-color-1")}></div>
+                <div className={cx("status-title")}>For Sale</div>
+              </div>
+              <div className={cx("status-item")}>
+                <Checkbox className={cx("check-box")} value={2} />
+                <div className={cx("square-color-2")}></div>
+                <div className={cx("status-title")}>Premium</div>
+              </div>
+              <div className={cx("status-item")}>
+                <Checkbox className={cx("check-box")} value={3} />
+                <div className={cx("square-color-3")}></div>
+                <div className={cx("status-title")}>On OpenSea</div>
+              </div>
+            </Checkbox.Group>
           </div>
-          <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} value={2}/>
-            <div className={cx("square-color-2")}></div>
-            <div className={cx("status-title")}>Premium</div>
-          </div>
-          <div className={cx("status-item")}>
-            <Checkbox className={cx("check-box")} value={3}/>
-            <div className={cx("square-color-3")}></div>
-            <div className={cx("status-title")}>On OpenSea</div>
-          </div>
-          </ Checkbox.Group>
-        </div>
-        <hr />
-        <div className={cx("find-land")}>Find LAND on OpenSea </div>
-        <hr />
-        <div className={cx("size")}>
-          <div className={cx("size-title")}>Size</div>
-          
+          <hr />
+          <div className={cx("find-land")}>Find LAND on OpenSea </div>
+          <hr />
+          <div className={cx("size")}>
+            <div className={cx("size-title")}>Size</div>
 
-          <Checkbox.Group name="size" value={filterCheckbox.size}>
-          <div className={cx("size-item")}>
-            <Checkbox
-              className={cx("check-box")}
-              value={4}
-              
-            />
-            <div className={cx("size-name")}>4x4</div>
+            <Checkbox.Group name="size" value={filterCheckbox.size}>
+              <div className={cx("size-item")}>
+                <Checkbox className={cx("check-box")} value={4} />
+                <div className={cx("size-name")}>4x4</div>
+              </div>
+              <div className={cx("size-item")}>
+                <Checkbox className={cx("check-box")} value={3} />
+                <div className={cx("size-name")}>3x3</div>
+              </div>
+              <div className={cx("size-item")}>
+                <Checkbox className={cx("check-box")} value={2} />
+                <div className={cx("size-name")}>2x2</div>
+              </div>
+              <div className={cx("size-item")}>
+                <Checkbox className={cx("check-box")} value={1} />
+                <div className={cx("size-name")}>1x1</div>
+              </div>
+            </Checkbox.Group>
           </div>
-          <div className={cx("size-item")}>
-            <Checkbox
-              className={cx("check-box")}
-              value={3}
-              
-            />
-            <div className={cx("size-name")}>3x3</div>
-          </div>
-          <div className={cx("size-item")}>
-            <Checkbox
-              className={cx("check-box")}
-              value={2}
-              
-            />
-            <div className={cx("size-name")}>2x2</div>
-          </div>
-          <div className={cx("size-item")}>
-            <Checkbox
-              className={cx("check-box")}
-              value={1}
-              
-            />
-            <div className={cx("size-name")}>1x1</div>
-          </div>
-          </Checkbox.Group>
-        </div>
         </form>
         <hr />
 
@@ -155,29 +146,34 @@ const Action = ({
           </div>
         </div>
         <div className={cx("btn-wrapper")}>
-          <button className={cx("btn")} onClick={submit}>
+          <button className={cx("btn")} onClick={submit} disabled={(min === "" || min === "") ? true: false}>
             Apply
           </button>
-          {/* <button className={cx("btn")} onClick={resetCoordinate}>
-            Reset 
-          </button> */}
         </div>
         <hr />
         <div className={cx("wallet")}>
+
           <div className={cx("title")}>Wallet</div>
-          
-          <input name="wallet" className={cx("wallet")}/>
-          
+<form onSubmit={walletSubmit}>
+          <input name="wallet" value={wallet} onChange={(e) => setWallet(e.target.value) }/>
+          </form>
         </div>
         <hr />
         <div className={cx("partners")}>
-        <div className={cx("title")}>Partners</div>
-        
-            <input name="partners" className={cx("partners")}/>
+          <div className={cx("title")}>Partners</div>
           
-        </div>
+            <input name="partners" />
+
       
-       
+          <div className={cx("list")}>
+            <div className={cx("list-item")}>Care Bears</div>
+            <div className={cx("list-item")}>Binance</div>
+            <div className={cx("list-item")}>CoinMarketCap</div>
+            <div className={cx("list-item")}>Gemini</div>
+            <div className={cx("list-item")}>Gemini</div>
+            <div className={cx("list-item")}>Gemini</div>
+          </div>
+        </div>
       </Drawer>
     </div>
   );
