@@ -935,7 +935,9 @@ setFilterCheckbox({sale: [], size: []})
             pointerEvents: displayMinimap ? "all" : "none",
           }}
         >
-          <canvas id="canvas-mini"></canvas>
+          <canvas id="canvas-mini" style={{visibility: `${displayMinimap ? "visible" : "hidden"}`,
+              pointerEvents: displayMinimap ? "all" : "none",
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,}}></canvas>
           <div
             id="mini-map"
             style={{
