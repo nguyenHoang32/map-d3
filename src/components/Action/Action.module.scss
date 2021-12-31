@@ -221,7 +221,7 @@ $bg: #1d232a;
     }
   }
   .btn-wrapper {
-    padding-bottom: 40px;
+    padding-bottom: 10px;
   }
   .btn {
     width: 100%;
@@ -248,5 +248,48 @@ $bg: #1d232a;
     font-weight: bold;
     text-transform: uppercase;
     margin-bottom: 8px;
+  }
+  .wallet,.partners{
+    margin-bottom: 20px;
+    input{
+      margin-top: 4px;
+        width: 100%;
+        height: 40px;
+        padding: 4px 8px;
+        background: $bg;
+        border: 2px solid $txt-color;
+        border-radius: 4px;
+        color: white;
+        
+    }
+    .list{
+      margin-top: 20px;
+      font-size: 18px;
+      color: $txt-color;
+      text-align: center;
+      height: 120px;
+      overflow-y: scroll;
+      &::-webkit-scrollbar {
+        width: 3px;
+        height: 2px;
+      }
+      &::-webkit-scrollbar-track {
+        box-shadow: inset 0 0 5px black;
+        border-radius: 2px;
+      }
+
+      /* Handle */
+      &::-webkit-scrollbar-thumb {
+        background: $txt-color;
+        border-radius: 2px;
+      }
+      &-item{
+        cursor: pointer;
+        &-active{
+          color: white;
+          font-size: 19px;
+        }
+      }
+    }
   }
 }
