@@ -85,7 +85,9 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height)
       .attr("transform", "translate(0,0)");
-
+    const g = d3.select("#map svg").append("g")
+    .attr("width", width)
+    .attr("height", height)
     // --------------------------
     image(map, data);
     let center = {
@@ -129,7 +131,7 @@ const Map = ({ props }) => {
     drawMinimap();
 
     setModal(update(modal, { text: { $set: "Creating map..." } }));
-    drawMap();
+    // drawMap();
     const zoomFactor = 0.5;
     function handleZoom(e) {
       console.log("zoom");
@@ -243,10 +245,174 @@ const Map = ({ props }) => {
 
       
     }
+    function chunkArray(ar,chunksize) {
+      var R = [];
+      if (chunksize <= 0) return ar;
+      for (var i = 0; i < ar.length; i+=chunksize) {
+          R.push(ar.slice(i,i+chunksize));
+      }
+      return R;
+  }
+  var dataPool = chunkArray(data.data,100);
+  var poolPosition = 0;
+  var iterator;
+  var groups = [];
+  function updateVisualization() {
+    groups =  g.selectAll(".fields")
+      .data(dataPool[poolPosition])
+      .enter()
+      .append("rect")
+      .attr("class", "field")
+      .attr("x", function (d) {
+        return d.position.colStart * size;
+      })
+      .attr("y", function (d) {
+        return d.position.rowStart * size;
+      })
+      .attr("width", function (d) {
+        let area = d.position.colEnd - d.position.colStart;
+        return (area + 1) * size;
+      })
+      .attr("height", function (d) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        return (area + 1) * size;
+      })
+      // .style("cursor", "pointer")
+      .style("fill", function (d) {
+        if (!d.img) {
+          return color.green;
+        }
+        return `url(#${d.id})`;
+      })
+      .style("stroke-width", "0.5px")
+      .style("stroke", color.stroke)
+      .on("click", function (e, d) {
+        div.style("opacity", 0);
+        let active = d3.select(this);
+        if (active.attr("class").includes("active")) {
+          // reset();
+        } else {
+          let allField = document.querySelectorAll(".field");
+          allField.forEach((a) => a.classList.remove("active"));
+          active.classed("active", !active.classed("active"));
+          const size = Number(active.attr("height"));
+          const blurField = d3.select("#blur-init-" + d.id);
+          blurField.style("fill-opacity", 0);
+          const x = Number(active.attr("x")) + size / 2;
+          const y = Number(active.attr("y")) + size / 2;
+          active.style("opacity", 1);
+          let currentScale, currentScaleString;
+          const myTransform = d3.zoomTransform(d3.select("#map svg").node());
+          if (d3.select("#map svg g").attr("transform") === null) {
+            currentScale = 1;
+          }
+          //case where we have transformed the circle
+          else {
+            currentScaleString = d3
+              .select("#map svg g")
+              .attr("transform")
+              .split(" ")[1];
+            currentScale = +currentScaleString.substring(
+              6,
+              currentScaleString.length - 1
+            );
+          }
+
+          var isMobile = {
+            Android: function () {
+              return navigator.userAgent.match(/Android/i);
+            },
+            BlackBerry: function () {
+              return navigator.userAgent.match(/BlackBerry/i);
+            },
+            iOS: function () {
+              return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+            },
+            Opera: function () {
+              return navigator.userAgent.match(/Opera Mini/i);
+            },
+            Windows: function () {
+              return (
+                navigator.userAgent.match(/IEMobile/i) ||
+                navigator.userAgent.match(/WPDesktop/i)
+              );
+            },
+            any: function () {
+              return (
+                isMobile.Android() ||
+                isMobile.BlackBerry() ||
+                isMobile.iOS() ||
+                isMobile.Opera() ||
+                isMobile.Windows()
+              );
+            },
+          };
+          if (isMobile.any()) {
+            let transform = d3.zoomIdentity
+              .translate(-x / 2, -y / 2)
+              .scale(myTransform.k);
+            d3.select("svg")
+              .transition()
+              .duration(300)
+              .call(zoom.transform, transform);
+            setSearchParams({
+              zoom: myTransform.k,
+              currentX: Number(-x / 2),
+              currentY: Number(-y / 2),
+            });
+          } else {
+            let transform = d3.zoomIdentity
+              .translate(width / 2, height / 2)
+              .scale(myTransform.k)
+              .translate(Number(-x), Number(-y));
+            d3.select("svg")
+              .transition()
+              .duration(300)
+              .call(zoom.transform, transform);
+            setSearchParams({
+              zoom: myTransform.k,
+              currentX: Number(width / 2 - x),
+              currentY: Number(height / 2 - y),
+            });
+          }
+
+          if (!isMobile.any()) {
+            div.transition().duration(500).style("opacity", 0.9);
+            div
+              .html(
+                `<div class="tooltip-img"></div>
+                <div class="tooltip-content">
+                  <div>Name: ${d.id}</div>
+                  <div>Estate: ... </div>
+                </div>`
+              )
+              .style("left", width / 2 + 90 + "px")
+              .style("top", height / 2 + 60 + "px");
+          }
+
+          setField(d);
+          showDrawer();
+        }
+        // Blur
+      })
+      .on("dblclick", function (e) {
+        return e.preventDefault();
+      });
+    poolPosition += 1;
+    if (poolPosition >= dataPool.length) {
+      clearInterval(iterator);
+    }
+  }
+
+  iterator = setInterval(updateVisualization, 100);
+
+
+
+
     function drawMap() {
       map.append("g").attr("class", "grid-square");
       drawCanvas();
-
+     
       let fields = d3
         .select("svg g")
         .selectAll(".fields")
