@@ -128,8 +128,7 @@ const Map = ({ props }) => {
       .style("opacity", 0);
 
     // ======================
-    drawMinimap();
-
+    
     setModal(update(modal, { text: { $set: "Creating map..." } }));
     // drawMap();
     const zoomFactor = 0.5;
@@ -245,6 +244,29 @@ const Map = ({ props }) => {
 
       
     }
+
+// ====================================
+let minimap = d3
+        .select("#mini-map")
+        .append("svg")
+        .attr("width", minimapWidth)
+        .attr("height", minimapHeight);
+
+      const gMinimap = minimap.append("g").attr("class", "minimap-grid");
+      const canvasMini = d3
+        .select("#canvas-mini")
+        .attr("width", minimapWidth)
+        .attr("height", minimapHeight);
+      const contextMini = canvasMini.node().getContext("2d");
+      contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
+      contextMini.fillStyle = "#212137";
+      contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
+
+      contextMini.fill();
+      contextMini.closePath();
+
+
+    // ===================
     function chunkArray(ar,chunksize) {
       var R = [];
       if (chunksize <= 0) return ar;
@@ -398,15 +420,97 @@ const Map = ({ props }) => {
       .on("dblclick", function (e) {
         return e.preventDefault();
       });
+
+      d3.select("#map svg g")
+  .selectAll(".blur-init")
+  .data(dataPool[poolPosition])
+  // .data(data.data)
+  .enter()
+  .append("rect")
+  .attr("class", "blur-init")
+  .attr("id", function(d){
+    return "blur-init-"+ d.id;
+  })
+  .attr("x", function (d) {
+    return d.position.colStart * size;
+  })
+  .attr("y", function (d) {
+    return d.position.rowStart * size;
+  })
+  .attr("width", function (d) {
+    let area = d.position.colEnd - d.position.colStart;
+    return (area + 1) * size;
+  })
+  .attr("height", function (d) {
+    let area = d.position.rowEnd - d.position.rowStart;
+    return (area + 1) * size;
+  })
+  .style("fill", function (d) {
+    return "#323950";
+  })
+  .style("fill-opacity", 0);
+
+        let fieldsMini = d3
+        .select("#mini-map svg g")
+        .selectAll(".fields-mini")
+        .data(dataPool[poolPosition])
+        .enter()
+        .append("rect")
+        .attr("class", "field")
+        .attr("x", function (d) {
+          return d.position.colStart * minimapSize;
+        })
+        .attr("y", function (d) {
+          return d.position.rowStart * minimapSize;
+        })
+        .attr("width", function (d) {
+          let area = d.position.colEnd - d.position.colStart;
+
+          return (area + 1) * minimapSize;
+        })
+        .attr("height", function (d) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          return (area + 1) * minimapSize;
+        })
+        .style("fill", function (d) {
+          if (!d.img) return color.green;
+          return `url(#${d.id})`;
+        });
+
+      d3.select("#mini-map svg g")
+        .selectAll(".blur-init")
+        .data(dataPool[poolPosition])
+        .enter()
+        .append("rect")
+        .attr("class", "blur-init")
+        .attr("x", function (d) {
+          return d.position.colStart * minimapSize;
+        })
+        .attr("y", function (d) {
+          return d.position.rowStart * minimapSize;
+        })
+        .attr("width", function (d) {
+          let area = d.position.colEnd - d.position.colStart;
+          return (area + 1) * minimapSize;
+        })
+        .attr("height", function (d) {
+          let area = d.position.rowEnd - d.position.rowStart;
+          return (area + 1) * minimapSize;
+        })
+        .style("fill", function (d) {
+          return "grey";
+        })
+        .style("fill-opacity", 0);
     poolPosition += 1;
     if (poolPosition >= dataPool.length) {
       clearInterval(iterator);
+      console.log('done')
     }
   }
 
   iterator = setInterval(updateVisualization, 100);
 
-
+  
 
 
     function drawMap() {
@@ -584,81 +688,8 @@ const Map = ({ props }) => {
         .style("fill-opacity", 0);
     }
     function drawMinimap() {
-      let minimap = d3
-        .select("#mini-map")
-        .append("svg")
-        .attr("width", minimapWidth)
-        .attr("height", minimapHeight);
-
-      const canvas = d3
-        .select("#canvas")
-        .attr("width", width)
-        .attr("height", height);
-
-      minimap.append("g").attr("class", "minimap-grid");
-      const canvasMini = d3
-        .select("#canvas-mini")
-        .attr("width", minimapWidth)
-        .attr("height", minimapHeight);
-      const contextMini = canvasMini.node().getContext("2d");
-      contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
-      contextMini.fillStyle = "#212137";
-      contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
-
-      contextMini.fill();
-      contextMini.closePath();
-
-      let fieldsMini = d3
-        .select("#mini-map svg g")
-        .selectAll(".fields-mini")
-        .data(data.data)
-        .enter()
-        .append("rect")
-        .attr("class", "field")
-        .attr("x", function (d) {
-          return d.position.colStart * minimapSize;
-        })
-        .attr("y", function (d) {
-          return d.position.rowStart * minimapSize;
-        })
-        .attr("width", function (d) {
-          let area = d.position.colEnd - d.position.colStart;
-
-          return (area + 1) * minimapSize;
-        })
-        .attr("height", function (d) {
-          let area = d.position.rowEnd - d.position.rowStart;
-          return (area + 1) * minimapSize;
-        })
-        .style("fill", function (d) {
-          if (!d.img) return color.green;
-          return `url(#${d.id})`;
-        });
-
-      d3.select("#mini-map svg g")
-        .selectAll(".blur-init")
-        .data(data.data)
-        .enter()
-        .append("rect")
-        .attr("class", "blur-init")
-        .attr("x", function (d) {
-          return d.position.colStart * minimapSize;
-        })
-        .attr("y", function (d) {
-          return d.position.rowStart * minimapSize;
-        })
-        .attr("width", function (d) {
-          let area = d.position.colEnd - d.position.colStart;
-          return (area + 1) * minimapSize;
-        })
-        .attr("height", function (d) {
-          let area = d.position.rowEnd - d.position.rowStart;
-          return (area + 1) * minimapSize;
-        })
-        .style("fill", function (d) {
-          return "grey";
-        })
-        .style("fill-opacity", 0);
+      
+      
     }
 
     d3.select("#mini-map svg g").call(d3.drag().on("drag", dragged));
@@ -781,12 +812,13 @@ const Map = ({ props }) => {
           .attr("class", "blur-blured")
         }
         index++;
+        
         return d3.select(this).style("fill-opacity", 0)
         .attr("class", "blur")
       })
       
      
-      
+      console.log(index)
       if(index === 0){
         setModal({
           show: true,
