@@ -40,6 +40,7 @@ const Map = ({ props }) => {
     size: [],
   });
   const [wallet,setWallet] = useState("");
+  const [partners, setPartners] = useState(null);
   //------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
@@ -639,6 +640,7 @@ setFilterCheckbox({sale: [], size: []})
   setMinCoordinates("");
   setMaxCoordinates("");
   setWallet("");
+  setPartners(null);
   setModal({
     show: false,
     text: "",
@@ -854,6 +856,42 @@ setFilterCheckbox({sale: [], size: []})
     }
     
   }
+  const filterPartners = (value) => {
+    setPartners(value);
+    setModal({
+      show: true,
+      text: "Applying filter...",
+    });
+    const initBlur = d3.selectAll(".blur-init");
+    const activeBlur = d3.selectAll(".blur");
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+    let index = 0;
+    d3.selectAll(query).filter(function(d){
+      if(d.partners === Number(value)){
+        index++;
+        return d3.select(this).style("fill-opacity", 0)
+        .attr("class", "blur")
+      }
+      return d3.select(this).style("fill-opacity", 0.5)
+      .attr("class", "blur-blured")
+    })
+    if(index === 0){
+      setModal({
+        show: true,
+        text: "No results",
+        showButton: true
+      });
+    }else{
+      setTimeout(() => {
+        setModal({
+          show: false,
+          text: "",
+        });
+      }, 1000)
+
+    }
+  }
+  
   return (
     <div className="App">
       {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton}/>}
@@ -878,7 +916,9 @@ setFilterCheckbox({sale: [], size: []})
         setWallet={setWallet}
         wallet={wallet}
         filterWallet={filterWallet}
+        filterPartners={filterPartners}
         resetFilter={resetFilter}
+        partners={partners}
       />
 
       <div className={cx("container")}>

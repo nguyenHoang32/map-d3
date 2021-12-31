@@ -7,6 +7,7 @@ import { Checkbox, Drawer } from "antd";
 import update from "immutability-helper";
 const cx = cn.bind(styles);
 
+const listData = [{name: "Care Bears", value: 1},{name: "Binance", value: 2}, {name: "CoinMarketCap", value: 3},{name: "Gemini", value: 4}]
 const Action = ({
   filterCheckbox,
   handleChangeCheckbox,
@@ -20,10 +21,12 @@ const Action = ({
   setWallet,
   wallet,
   filterWallet,
-  resetFilter
+  filterPartners,
+  resetFilter,
+  partners
 }) => {
   const [checked, setChecked] = useState(false);
-
+  const [partnersSearch, setPartnersSearch] = useState("")
   const clickClose = () => {
     setVisibleAction(!visibleAction);
   };
@@ -35,6 +38,9 @@ const Action = ({
     e.preventDefault();
     filterWallet();
     
+  }
+  function onClick(value){
+    filterPartners(value)
   }
   return (
     <div className={cx("container")}>
@@ -162,16 +168,20 @@ const Action = ({
         <div className={cx("partners")}>
           <div className={cx("title")}>Partners</div>
           
-            <input name="partners" />
+            <input 
+            required
+            name="partners" 
+            value={partnersSearch} onChange={(e) => setPartnersSearch(e.target.value)}/>
 
-      
+
           <div className={cx("list")}>
-            <div className={cx("list-item")}>Care Bears</div>
-            <div className={cx("list-item")}>Binance</div>
-            <div className={cx("list-item")}>CoinMarketCap</div>
-            <div className={cx("list-item")}>Gemini</div>
-            <div className={cx("list-item")}>Gemini</div>
-            <div className={cx("list-item")}>Gemini</div>
+            {listData.filter((item) => item.name.toLocaleLowerCase().includes(partnersSearch.toLocaleLowerCase())).map((item,index) => (
+              <div 
+              onClick={()=>onClick(item.value)}
+              className={cx("list-item", partners === item.value && cx("list-item-active"))} 
+              key={item.name+index} 
+              >{item.name}</div>
+            ))}
           </div>
         </div>
       </Drawer>

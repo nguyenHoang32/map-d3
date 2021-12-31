@@ -38,7 +38,8 @@ export const data1 = {
   },
 {
     id: 14,
-    position: { rowStart: 6, rowEnd: 6, colStart: 3, colEnd: 3 }
+    position: { rowStart: 6, rowEnd: 6, colStart: 3, colEnd: 3 },
+    partners: 1
   },
 {
     id: 15,

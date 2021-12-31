@@ -285,7 +285,10 @@ $bg: #1d232a;
       }
       &-item{
         cursor: pointer;
-
+        &-active{
+          color: white;
+          font-size: 19px;
+        }
       }
     }
   }
