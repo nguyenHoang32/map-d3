@@ -133,7 +133,6 @@ const Map = ({ props }) => {
     // drawMap();
     const zoomFactor = 0.5;
     function handleZoom(e) {
-      console.log("zoom");
       const transform = e.transform;
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
@@ -244,6 +243,7 @@ const Map = ({ props }) => {
 
       
     }
+// -----------------------------------
 
 // ====================================
 let minimap = d3
@@ -280,7 +280,9 @@ let minimap = d3
   var iterator;
   var groups = [];
   function updateVisualization() {
-    groups =  g.selectAll(".fields")
+
+  
+    groups =  g.selectAll("abc")
       .data(dataPool[poolPosition])
       .enter()
       .append("rect")
@@ -306,7 +308,7 @@ let minimap = d3
         }
         return `url(#${d.id})`;
       })
-      .style("stroke-width", "0.5px")
+      .style("stroke-width", "0.1px")
       .style("stroke", color.stroke)
       .on("click", function (e, d) {
         div.style("opacity", 0);
@@ -421,38 +423,42 @@ let minimap = d3
         return e.preventDefault();
       });
 
-      d3.select("#map svg g")
-  .selectAll(".blur-init")
-  .data(dataPool[poolPosition])
-  // .data(data.data)
-  .enter()
-  .append("rect")
-  .attr("class", "blur-init")
-  .attr("id", function(d){
-    return "blur-init-"+ d.id;
-  })
-  .attr("x", function (d) {
-    return d.position.colStart * size;
-  })
-  .attr("y", function (d) {
-    return d.position.rowStart * size;
-  })
-  .attr("width", function (d) {
-    let area = d.position.colEnd - d.position.colStart;
-    return (area + 1) * size;
-  })
-  .attr("height", function (d) {
-    let area = d.position.rowEnd - d.position.rowStart;
-    return (area + 1) * size;
-  })
-  .style("fill", function (d) {
-    return "#323950";
-  })
-  .style("fill-opacity", 0);
+      
 
+      // 
+      d3.select("#map svg g")
+      .selectAll("abc")
+      .data(dataPool[poolPosition])
+      // .data(data.data)
+      .enter()
+      .append("rect")
+      .attr("class", "blur-init")
+      .attr("id", function(d){
+        return "blur-init-"+ d.id;
+      })
+      .attr("x", function (d) {
+        return d.position.colStart * size;
+      })
+      .attr("y", function (d) {
+        return d.position.rowStart * size;
+      })
+      .attr("width", function (d) {
+        let area = d.position.colEnd - d.position.colStart;
+        return (area + 1) * size;
+      })
+      .attr("height", function (d) {
+        let area = d.position.rowEnd - d.position.rowStart;
+        return (area + 1) * size;
+      })
+      .style("fill", function (d) {
+        return "black";
+      })
+      .style("fill-opacity", 0);
+    
+      // 
         let fieldsMini = d3
         .select("#mini-map svg g")
-        .selectAll(".fields-mini")
+        .selectAll("abc")
         .data(dataPool[poolPosition])
         .enter()
         .append("rect")
@@ -476,13 +482,14 @@ let minimap = d3
           if (!d.img) return color.green;
           return `url(#${d.id})`;
         });
-
+        
+      
       d3.select("#mini-map svg g")
-        .selectAll(".blur-init")
+        .selectAll("abc")
         .data(dataPool[poolPosition])
         .enter()
         .append("rect")
-        .attr("class", "blur-init")
+        .attr("class", "blur-init-minimap")
         .attr("x", function (d) {
           return d.position.colStart * minimapSize;
         })
@@ -504,12 +511,152 @@ let minimap = d3
     poolPosition += 1;
     if (poolPosition >= dataPool.length) {
       clearInterval(iterator);
-      console.log('done')
     }
   }
 
   iterator = setInterval(updateVisualization, 100);
+  // groups =  g.selectAll(".fields")
+  // // .data(dataPool[poolPosition])
+  // .data(data.data)
+  // .enter()
+  // .append("rect")
+  // .attr("class", "field")
+  // .attr("x", function (d) {
+  //   return d.position.colStart * size;
+  // })
+  // .attr("y", function (d) {
+  //   return d.position.rowStart * size;
+  // })
+  // .attr("width", function (d) {
+  //   let area = d.position.colEnd - d.position.colStart;
+  //   return (area + 1) * size;
+  // })
+  // .attr("height", function (d) {
+  //   let area = d.position.rowEnd - d.position.rowStart;
+  //   return (area + 1) * size;
+  // })
+  // // .style("cursor", "pointer")
+  // .style("fill", function (d) {
+  //   if (!d.img) {
+  //     return color.green;
+  //   }
+  //   return `url(#${d.id})`;
+  // })
+  // .style("stroke-width", "0.1px")
+  // .style("stroke", color.stroke)
+  // .on("click", function (e, d) {
+  //   div.style("opacity", 0);
+  //   let active = d3.select(this);
+  //   if (active.attr("class").includes("active")) {
+  //     // reset();
+  //   } else {
+  //     let allField = document.querySelectorAll(".field");
+  //     allField.forEach((a) => a.classList.remove("active"));
+  //     active.classed("active", !active.classed("active"));
+  //     const size = Number(active.attr("height"));
+  //     const blurField = d3.select("#blur-init-" + d.id);
+  //     // blurField.style("fill-opacity", 0);
+  //     const x = Number(active.attr("x")) + size / 2;
+  //     const y = Number(active.attr("y")) + size / 2;
+  //     active.style("opacity", 1);
+  //     let currentScale, currentScaleString;
+  //     const myTransform = d3.zoomTransform(d3.select("#map svg").node());
+  //     if (d3.select("#map svg g").attr("transform") === null) {
+  //       currentScale = 1;
+  //     }
+  //     //case where we have transformed the circle
+  //     else {
+  //       currentScaleString = d3
+  //         .select("#map svg g")
+  //         .attr("transform")
+  //         .split(" ")[1];
+  //       currentScale = +currentScaleString.substring(
+  //         6,
+  //         currentScaleString.length - 1
+  //       );
+  //     }
 
+  //     var isMobile = {
+  //       Android: function () {
+  //         return navigator.userAgent.match(/Android/i);
+  //       },
+  //       BlackBerry: function () {
+  //         return navigator.userAgent.match(/BlackBerry/i);
+  //       },
+  //       iOS: function () {
+  //         return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+  //       },
+  //       Opera: function () {
+  //         return navigator.userAgent.match(/Opera Mini/i);
+  //       },
+  //       Windows: function () {
+  //         return (
+  //           navigator.userAgent.match(/IEMobile/i) ||
+  //           navigator.userAgent.match(/WPDesktop/i)
+  //         );
+  //       },
+  //       any: function () {
+  //         return (
+  //           isMobile.Android() ||
+  //           isMobile.BlackBerry() ||
+  //           isMobile.iOS() ||
+  //           isMobile.Opera() ||
+  //           isMobile.Windows()
+  //         );
+  //       },
+  //     };
+  //     if (isMobile.any()) {
+  //       let transform = d3.zoomIdentity
+  //         .translate(-x / 2, -y / 2)
+  //         .scale(myTransform.k);
+  //       d3.select("svg")
+  //         .transition()
+  //         .duration(300)
+  //         .call(zoom.transform, transform);
+  //       setSearchParams({
+  //         zoom: myTransform.k,
+  //         currentX: Number(-x / 2),
+  //         currentY: Number(-y / 2),
+  //       });
+  //     } else {
+  //       let transform = d3.zoomIdentity
+  //         .translate(width / 2, height / 2)
+  //         .scale(myTransform.k)
+  //         .translate(Number(-x), Number(-y));
+  //       d3.select("svg")
+  //         .transition()
+  //         .duration(300)
+  //         .call(zoom.transform, transform);
+  //       setSearchParams({
+  //         zoom: myTransform.k,
+  //         currentX: Number(width / 2 - x),
+  //         currentY: Number(height / 2 - y),
+  //       });
+  //     }
+
+  //     if (!isMobile.any()) {
+  //       div.transition().duration(500).style("opacity", 0.9);
+  //       div
+  //         .html(
+  //           `<div class="tooltip-img"></div>
+  //           <div class="tooltip-content">
+  //             <div>Name: ${d.id}</div>
+  //             <div>Estate: ... </div>
+  //           </div>`
+  //         )
+  //         .style("left", width / 2 + 90 + "px")
+  //         .style("top", height / 2 + 60 + "px");
+  //     }
+
+  //     setField(d);
+  //     showDrawer();
+  //   }
+  //   // Blur
+  // })
+  // .on("dblclick", function (e) {
+  //   return e.preventDefault();
+  // });
+  
   
 
 
@@ -721,11 +868,14 @@ let minimap = d3
     setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
   }, []);
   const handleFilterSize = async (filter) => {
+    console.log(filter)
     setModal({ show: true, text: "Applying filter..." });
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur")
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+    // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
+    const query = initBlur.empty() ? ".blur-family" : ".blur-init";
     let index = 0;
+    console.log(query)
     d3.selectAll(query)
       .filter(function (d) {
         let area = d.position.rowEnd - d.position.rowStart + 1;
@@ -733,23 +883,25 @@ let minimap = d3
         if(filter["size"].length > 0 && filter["sale"].length > 0){
           condition = filter["size"].includes(area) && filter["sale"].includes(d.sale)
         }else{
+
           condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
         }
         if (!condition) {
+          
           // d3.select(this).classed("blur-field-active", true)
           return d3.select(this).style("fill-opacity", 0.5)
-          .attr("class", "blur-blured")
+          .attr("class", "blur-family blur-blured")
         }
         index++;
+        console.log(this)
         return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur")
+        .attr("class", "blur-family blur")
       })
       
     if (filter["size"].length === 0 && filter["sale"].length === 0) {
-      d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
+      d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
       index = 1;
     }
-   
     if(index === 0){
       setModal({
         show: true,
@@ -809,16 +961,15 @@ let minimap = d3
           // d3.select(this).classed("blur-field-active", true)
           
           return d3.select(this).style("fill-opacity", 0.5)
-          .attr("class", "blur-blured")
+          .attr("class", "blur-family blur-blured")
         }
         index++;
         
         return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur")
+        .attr("class", "blur-family blur")
       })
       
      
-      console.log(index)
       if(index === 0){
         setModal({
           show: true,
@@ -844,7 +995,7 @@ setFilterCheckbox({sale: [], size: []})
     text: "",
     showButton: false
   });
-  d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur");
+  d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
   }
   const handleInputRange = (e) => {
     let data = data1;
@@ -1032,10 +1183,10 @@ setFilterCheckbox({sale: [], size: []})
      if(d.wallet === wallet){
        index++;
        return d3.select(this).style("fill-opacity", 0)
-       .attr("class", "blur")
+       .attr("class", "blur-family blur")
      }
      return d3.select(this).style("fill-opacity", 0.5)
-     .attr("class", "blur-blured")
+     .attr("class", "blur-family blur-blured")
     })
     if(index === 0){
       setModal({
@@ -1068,10 +1219,10 @@ setFilterCheckbox({sale: [], size: []})
       if(d.partners === Number(value)){
         index++;
         return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur")
+        .attr("class", "blur-family blur")
       }
       return d3.select(this).style("fill-opacity", 0.5)
-      .attr("class", "blur-blured")
+      .attr("class", "blur-family blur-blured")
     })
     if(index === 0){
       setModal({
