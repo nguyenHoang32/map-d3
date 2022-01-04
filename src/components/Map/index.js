@@ -52,7 +52,7 @@ const Map = ({ props }) => {
 
     return size;
   };
-  let width = Number(window.screen.availWidth - 90 - 235);
+  let width = Number(window.screen.availWidth - 90);
   let height = Number(window.screen.availHeight - 60);
   if (window.innerWidth < 800) {
     width = Number(window.innerWidth);
@@ -82,6 +82,7 @@ const Map = ({ props }) => {
     const map = d3
       .select("#map")
       .append("svg")
+      // .attr("width", width)
       .attr("width", width)
       .attr("height", height)
       .attr("transform", "translate(0,0)");
