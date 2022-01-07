@@ -178,3 +178,20 @@
 #minimapRect {
   pointer-events: none;
 }
+.select-filter-container{
+  margin-top: 20px;
+  .select-filter{
+    width: 160px;
+    :global{
+      .ant-select-selector{
+        background: #212137;
+        color: white;
+        border: 1px solid grey;
+        text-align: center;
+      }
+      .ant-select-arrow{
+        color: grey;
+      }
+    }
+  }
+}

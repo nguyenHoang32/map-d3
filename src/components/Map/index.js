@@ -14,9 +14,10 @@ import styles from "./app.module.scss";
 import { data1 } from "../../data1";
 import cn from "classnames/bind";
 import update from "immutability-helper";
+import { Select } from 'antd';
 import { color, inRange, isEmpty } from "../../ultis.js";
 const cx = cn.bind(styles);
-
+const { Option } = Select;
 const Map = ({ props }) => {
   const navigate = useNavigate();
   const [currentZoom, setCurrentZoom] = useState(3);
@@ -1236,7 +1237,78 @@ setFilterCheckbox({sale: [], size: []})
 
     }
   }
-  
+  const handleChangeSelect = (value) => {
+    let data = data1;
+    const field = d3.selectAll("#map .field");
+    const preZoom = Number(searchParams.get("zoom"));
+    const context = d3.select("#canvas").node().getContext("2d");
+   field.filter(function(d){
+     if(d.company === Number(value)){
+       const active = d3.select(this)
+       console.log(this)
+      const size = Number(active.attr("height"));
+      const x = Number(active.attr("x")) + size / 2;
+      const y = Number(active.attr("y")) + size / 2;
+      let transform = d3.zoomIdentity
+              // .translate(width / 2, height / 2)
+              .scale(preZoom)
+              .translate(Number(-x+width/(2*preZoom)), Number(-y+height/(2*preZoom)));
+            d3.select("svg")
+              .transition()
+              .duration(500) 
+              .call(zoom.transform, transform);
+            setSearchParams({
+              zoom: preZoom,
+              currentX: Number(-x+width/(2*preZoom)),
+              currentY: Number(-y+height/(2*preZoom)),
+            });
+      d3.select("svg g").attr("transform", transform)
+      context.clearRect(0, 0, width, height);
+      context.save();
+      context.scale(preZoom, preZoom);
+      context.translate(Number(-x+width/(2*preZoom)), Number(-y+height/(2*preZoom)));
+      
+
+      context.clearRect(0, 0, width, height);
+      for (let i = 0; i < data.nCol; i++) {
+        for (let j = 0; j < data.nRow; j++) {
+          let x = i * size;
+          let y = j * size;
+          context.beginPath();
+
+          //Drawing a rectangle
+          // context.fillStyle = color.black;
+          context.fillStyle = color.dark;
+          context.fillRect(x, y, size, size);
+          //Optional if you also sizeant to give the rectangle a stroke
+          context.strokeStyle = color.stroke;
+          context.lineWidth = 0.5;
+          context.strokeRect(x, y, size, size);
+
+          context.fill();
+          context.closePath();
+        }
+      }
+      context.restore();
+
+      let dx = -transform.x / transform.k;
+      let dy = -transform.y / transform.k;
+      
+        d3.select("#minimapRect").remove();
+        let minimapRect = d3
+          .select("#mini-map svg g")
+          .append("rect")
+          .attr("id", "minimapRect")
+          .attr("width", minimapWidth / transform.k - 4)
+          .attr("height", minimapHeight / transform.k - 4)
+          .attr("stroke", "red")
+          .attr("stroke-width", 2)
+          .attr("fill", "none")
+          .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
+      
+     }
+   })
+  }
   return (
     <div className="App">
       {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton}/>}
@@ -1334,6 +1406,21 @@ setFilterCheckbox({sale: [], size: []})
             <div className={cx("minimap-action-info")}>
               <MenuOutlined />
             </div>
+            
+          </div>
+          <div
+            className={cx("select-filter-container")}
+           style={{
+            visibility: `${displayMinimap ? "visible" : "hidden"}`,
+            pointerEvents: displayMinimap ? "all" : "none",
+            transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+          }}
+          >
+          <Select defaultValue="Choose select" className={cx("select-filter")} onChange={handleChangeSelect}>>
+      <Option value="1">binance</Option>
+      <Option value="2">Lucy</Option>
+      
+    </Select>
           </div>
         </div>
         <div className={cx("mobile")}>

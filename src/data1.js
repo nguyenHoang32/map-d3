@@ -19,10 +19,15 @@ export const data1 = {
     wallet: "abc"
   },
 { id: 9, position: { rowStart: 4, rowEnd: 4, colStart: 4, colEnd: 4 } },
-{ id: 100, position: { rowStart: 10, rowEnd: 10, colStart: 10, colEnd: 10 }, name: 'Australia', img: 'australia.png' },
+{ id: 100, position: { rowStart: 10, rowEnd: 10, colStart: 10, colEnd: 10 }, name: 'Australia', img: 'australia.png', company: 1 },
 {
     id: 10,
     position: { rowStart: 4, rowEnd: 4, colStart: 5, colEnd: 5 }
+  },
+  {
+    id: 9999,
+    company: 2,
+    position: { rowStart: 195, rowEnd: 195, colStart: 195, colEnd:195 }
   },
 {
     id: 11,
