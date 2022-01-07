@@ -869,14 +869,13 @@ let minimap = d3
     setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
   }, []);
   const handleFilterSize = async (filter) => {
-    console.log(filter)
-    setModal({ show: true, text: "Applying filter..." });
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur")
     // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
     const query = initBlur.empty() ? ".blur-family" : ".blur-init";
     let index = 0;
-    console.log(query)
     d3.selectAll(query)
       .filter(function (d) {
         let area = d.position.rowEnd - d.position.rowStart + 1;
@@ -928,10 +927,8 @@ let minimap = d3
   };
 
   const filterCoordinates = () => {
-    setModal({
-      show: true,
-      text: "Applying filter...",
-    });
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
     let rStart, cStart, rEnd, cEnd;
 
     
@@ -1150,6 +1147,8 @@ setFilterCheckbox({sale: [], size: []})
     setDisplayMinimap(!displayMinimap);
   };
   const handleChangeCheckbox = (e) => {
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
     const name = e.target.name;
     const value = Number(e.target.value);
     const newFilter = filterCheckbox;
@@ -1171,10 +1170,8 @@ setFilterCheckbox({sale: [], size: []})
     handleFilterSize(newFilter);
   }
   const filterWallet = () => {
-    setModal({
-      show: true,
-      text: "Applying filter...",
-    });
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
@@ -1208,10 +1205,8 @@ setFilterCheckbox({sale: [], size: []})
   }
   const filterPartners = (value) => {
     setPartners(value);
-    setModal({
-      show: true,
-      text: "Applying filter...",
-    });
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
