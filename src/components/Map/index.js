@@ -91,7 +91,7 @@ const Map = ({ props }) => {
     .attr("width", width)
     .attr("height", height)
     // --------------------------
-    image(map, data);
+    // image(map, data);
     let center = {
       rowStart: Math.floor(data.nRow / 2),
       colStart: Math.floor(data.nCol / 2),
@@ -135,6 +135,10 @@ const Map = ({ props }) => {
     // drawMap();
     const zoomFactor = 0.5;
     function handleZoom(e) {
+      console.log("zoom");
+      // d3.selectAll("rect.field").style("display", "none");
+      //   let all = document.querySelectorAll("rect.field")
+      //   all.forEach((a) => a.style.display = "none");
       const transform = e.transform;
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
@@ -171,11 +175,34 @@ const Map = ({ props }) => {
       context.translate(transform.x, transform.y);
       context.scale(transform.k, transform.k);
       drawCanvas();
+
+
+
+      drawField();
       context.restore();
     }
 
+    function zoomInitialized(e){
+      console.log("start")
+      // d3.selectAll("rect.field").style("display", "none");
+      d3.selectAll("rect.field").style("display", "none");
+        let all = document.querySelectorAll("rect.field")
+        all.forEach((a) => a.style.display = "none");
+    }
+    function zoomFinished(e){
+      console.log("end")
+      d3.selectAll("rect.field").style("display", "block");
+      let all = document.querySelectorAll("rect.field")
+      all.forEach((a) => a.style.display = "block");
+    }
+
+
+
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
-    zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
+    zoom.scaleExtent([1, 10])
+    .on("zoom", handleZoom)
+    .on("start", zoomInitialized)
+    .on("end", zoomFinished);
     // .translateExtent([
     //   [-100, -100],
     //   [width * 1.5, height * 1.5],
@@ -186,42 +213,62 @@ const Map = ({ props }) => {
       .on("dblclick.zoom", null);
 
     d3.select("svg").on("dblclick.zoom", null);
-    function image() {
-      let defs = map.append("defs");
-      defs
-        .append("pattern")
-        .attr("id", "pattern-image")
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .attr("patternContentUnits", "objectBoundingBox")
-        .append("image")
-        .attr("height", 1)
-        .attr("width", 1)
-        .attr("preserveAspectRatio", "none")
-        .attr("xmlns:xlink", "http://w3.org/1999/xlink")
-        .attr("xlink:href", "usa.png");
+    // function image() {
+    //   let defs = map.append("defs");
+    //   defs
+    //     .append("pattern")
+    //     .attr("id", "pattern-image")
+    //     .attr("width", "100%")
+    //     .attr("height", "100%")
+    //     .attr("patternContentUnits", "objectBoundingBox")
+    //     .append("image")
+    //     .attr("height", 1)
+    //     .attr("width", 1)
+    //     .attr("preserveAspectRatio", "none")
+    //     .attr("xmlns:xlink", "http://w3.org/1999/xlink")
+    //     .attr("xlink:href", "usa.png");
 
-      defs
-        .selectAll(".image-pattern")
-        .data(data.data)
-        .enter()
-        .append("pattern")
-        .attr("class", "pattern-image")
-        .attr("id", function (d) {
-          return d.id;
-        })
-        .attr("width", "100%")
-        .attr("height", "100%")
-        .attr("patternContentUnits", "objectBoundingBox")
-        .append("image")
-        .attr("height", 1)
-        .attr("width", 1)
-        .attr("preserveAspectRatio", "none")
-        .attr("xmlns:xlink", "http://w3.org/1999/xlink")
-        .attr("xlink:href", function (d) {
-          if (d.img) return d.img;
-          return "";
-        });
+    //   defs
+    //     .selectAll(".image-pattern")
+    //     .data(data.data)
+    //     .enter()
+    //     .append("pattern")
+    //     .attr("class", "pattern-image")
+    //     .attr("id", function (d) {
+    //       return d.id;
+    //     })
+    //     .attr("width", "100%")
+    //     .attr("height", "100%")
+    //     .attr("patternContentUnits", "objectBoundingBox")
+    //     .append("image")
+    //     .attr("height", 1)
+    //     .attr("width", 1)
+    //     .attr("preserveAspectRatio", "none")
+    //     .attr("xmlns:xlink", "http://w3.org/1999/xlink")
+    //     .attr("xlink:href", function (d) {
+    //       if (d.img) return d.img;
+    //       return "";
+    //     });
+    // }
+    function drawField() {
+      for (let i = 0; i < data.data.length; i++) {
+        let x = data.data[i].position.colStart * size;
+        let y = data.data[i].position.rowStart * size;
+        let square =
+          data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+        context.beginPath();
+        //Drawing a rectangle
+        context.fillStyle = color.green;
+        //   context.fillStyle = "yellow";
+        context.fillRect(x, y, square * size, square * size);
+        //Optional if you also sizeant to give the rectangle a stroke
+        context.strokeStyle = color.stroke;
+        // context.strokeStyle = "black";
+        context.lineWidth = "0.5px";
+        context.strokeRect(x, y, square * size, square * size);
+        context.fill();
+        context.closePath();
+      }
     }
     function drawCanvas() {
       for (let i = 0; i < data.nCol; i++) {

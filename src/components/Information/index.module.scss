@@ -3,11 +3,10 @@ $bg-2: #282e36;
 $pd: 10px 16px;
 
 .info {
-  
   z-index: 20 !important;
   padding: $pd;
   @media (max-width: 800px) {
-    width: calc(100%-95px) !important;
+    width: calc(100% - 95px) !important;
   }
   .header {
     position: relative;
@@ -68,20 +67,20 @@ $pd: 10px 16px;
       font-weight: 700;
       background: #1d232a;
       @media (max-width: 768px) {
-        width: calc(100%-95px) !important;
+        width: calc(100% - 95px) !important;
       }
     }
     .ant-drawer-body {
       padding: 0;
       background: #14181d;
       @media (max-width: 768px) {
-        width: calc(100%-95px) !important;
+        width: calc(100% - 95px) !important;
       }
     }
     .ant-drawer-content-wrapper {
       transition: all 600ms ease;
       @media (max-width: 768px) {
-        width: calc(100%-95px) !important;
+        width: calc(100% - 95px) !important;
       }
     }
   }
