@@ -58,10 +58,13 @@ div.tooltip {
     height: 100vh;
     background: #1b2026;
 }
-#canvas,#canvas-mini{
+#canvas,#canvas-img,#canvas-mini{
     position: absolute;
     top: 0;
     left: 0;
+}
+#canvas-img{
+    pointer-events: none;
 }
 #blur{
     pointer-events: none;
