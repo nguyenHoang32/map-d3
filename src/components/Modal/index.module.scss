@@ -4,7 +4,8 @@
   left: 90px;
   width: calc(100% - 90px);
   height: calc(100% - 60px);
-  background-color: rgba(0,0,0,0.4);
+  // background-color: rgba(0,0,0,0.4);
+  background-color: rgba(0,0,0,1);
   // pointer-events: none;
   display: flex;
   align-items: center;
@@ -20,6 +21,13 @@
     color: white;
     font-size: 28px;
     font-weight: bold;
+  }
+  .loading{
+    text-align: center;
+    pointer-events: none;
+  }
+  .hide{
+    display: none;
   }
   .btn{
 

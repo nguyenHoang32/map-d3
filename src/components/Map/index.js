@@ -61,7 +61,6 @@ const Map = ({ props }) => {
   const ratio = 1 / 4.5;
   let minimapWidth = (width * ratio).toFixed(2);
   let minimapHeight = (height * ratio).toFixed(2);
-
   const minimapSize = calSize(
     minimapWidth,
     minimapHeight,
@@ -70,7 +69,7 @@ const Map = ({ props }) => {
   );
   minimapWidth = minimapSize * data1.nCol;
   minimapHeight = minimapSize * data1.nRow;
-  const size = calSize(width, height, data1.nRow, data1.nCol);
+  const size = calSize(width, height, data1.nRow, data1.nCol) * 2;
   let zoom = d3.zoom();
   useEffect(() => {
     navigate("/map?zoom=3");
@@ -512,11 +511,12 @@ let minimap = d3
         .style("fill-opacity", 0);
     poolPosition += 1;
     if (poolPosition >= dataPool.length) {
+      setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
       clearInterval(iterator);
     }
   }
 
-  iterator = setInterval(updateVisualization, 100);
+  iterator = setInterval(updateVisualization, 10);
   // groups =  g.selectAll(".fields")
   // // .data(dataPool[poolPosition])
   // .data(data.data)
@@ -867,7 +867,7 @@ let minimap = d3
           .scale(transform.k)
       );
     }
-    setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
+    
   }, []);
   const handleFilterSize = async (filter) => {
     const newModal = {show: true, text: "Applying filter ...."}
@@ -1311,7 +1311,7 @@ setFilterCheckbox({sale: [], size: []})
   }
   return (
     <div className="App">
-      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton}/>}
+      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton} show={modal.show}/>}
       <Information
         visible={visible}
         field={field}
