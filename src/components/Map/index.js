@@ -14,7 +14,7 @@ import styles from "./app.module.scss";
 import { data1 } from "../../data1";
 import cn from "classnames/bind";
 import update from "immutability-helper";
-import { Select } from 'antd';
+import { Select } from "antd";
 import { color, inRange, isEmpty } from "../../ultis.js";
 const cx = cn.bind(styles);
 const { Option } = Select;
@@ -24,7 +24,7 @@ const Map = ({ props }) => {
   const [visible, setVisible] = useState(false);
 
   const [field, setField] = useState({});
-  
+
   const [visibleAction, setVisibleAction] = useState(false);
   const [displayMinimap, setDisplayMinimap] = useState(true);
   const [modal, setModal] = useState({
@@ -33,15 +33,18 @@ const Map = ({ props }) => {
     showButton: false,
   });
   const location = useLocation();
-// FIlter
+  // FIlter
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
   const [filterCheckbox, setFilterCheckbox] = useState({
     sale: [],
     size: [],
   });
-  const [wallet,setWallet] = useState("");
+  const [wallet, setWallet] = useState("");
   const [partners, setPartners] = useState(null);
+
+  // ---------------------------
+  const [filterArray, setFilterArray] = useState([]);
   //------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
@@ -71,6 +74,7 @@ const Map = ({ props }) => {
   minimapHeight = minimapSize * data1.nRow;
   const size = calSize(width, height, data1.nRow, data1.nCol) * 2;
   let zoom = d3.zoom();
+
   useEffect(() => {
     navigate("/map?zoom=3");
     let data = data1;
@@ -79,6 +83,12 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height);
     const context = canvas.node().getContext("2d");
+
+    const canvasFilter = d3
+      .select("#canvas-filter")
+      .attr("width", width)
+      .attr("height", height);
+    const contextFilter = canvasFilter.node().getContext("2d");
     const map = d3
       .select("#map")
       .append("svg")
@@ -86,9 +96,11 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height)
       .attr("transform", "translate(0,0)");
-    const g = d3.select("#map svg").append("g")
-    .attr("width", width)
-    .attr("height", height)
+    const g = d3
+      .select("#map svg")
+      .append("g")
+      .attr("width", width)
+      .attr("height", height);
     // --------------------------
     image(map, data);
     let center = {
@@ -129,7 +141,7 @@ const Map = ({ props }) => {
       .style("opacity", 0);
 
     // ======================
-    
+
     setModal(update(modal, { text: { $set: "Creating map..." } }));
     // drawMap();
     const zoomFactor = 0.5;
@@ -171,6 +183,13 @@ const Map = ({ props }) => {
       context.scale(transform.k, transform.k);
       drawCanvas();
       context.restore();
+
+      // contextFilter.save();
+      // contextFilter.clearRect(0, 0, width, height);
+      // contextFilter.translate(transform.x, transform.y)
+      // contextFilter.scale(transform.k, transform.k);
+      filterCombine();
+      // contextFilter.restore();
     }
 
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
@@ -241,431 +260,452 @@ const Map = ({ props }) => {
           context.closePath();
         }
       }
-
-      
     }
-// -----------------------------------
+    // -----------------------------------
 
-// ====================================
-let minimap = d3
-        .select("#mini-map")
-        .append("svg")
-        .attr("width", minimapWidth)
-        .attr("height", minimapHeight);
+    // ====================================
+    let minimap = d3
+      .select("#mini-map")
+      .append("svg")
+      .attr("width", minimapWidth)
+      .attr("height", minimapHeight);
 
-      const gMinimap = minimap.append("g").attr("class", "minimap-grid");
-      const canvasMini = d3
-        .select("#canvas-mini")
-        .attr("width", minimapWidth)
-        .attr("height", minimapHeight);
-      const contextMini = canvasMini.node().getContext("2d");
-      contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
-      contextMini.fillStyle = "#212137";
-      contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
+    const gMinimap = minimap.append("g").attr("class", "minimap-grid");
+    const canvasMini = d3
+      .select("#canvas-mini")
+      .attr("width", minimapWidth)
+      .attr("height", minimapHeight);
 
-      contextMini.fill();
-      contextMini.closePath();
+    const canvasMiniField = d3
+      .select("#canvas-mini-field")
+      .attr("width", minimapWidth)
+      .attr("height", minimapHeight);
+    const contextMini = canvasMini.node().getContext("2d");
+    const contextMiniField = canvasMini.node().getContext("2d");
+    contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
+    contextMini.fillStyle = "#212137";
+    contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
 
-
+    contextMini.fill();
+    contextMini.closePath();
+    function drawMiniField() {
+      for (let i = 0; i < data.data.length; i++) {
+        let x = data.data[i].position.colStart * minimapSize;
+        let y = data.data[i].position.rowStart * minimapSize;
+        let square =
+          data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+        contextMiniField.beginPath();
+        //Drawing a rectangle
+        contextMiniField.fillStyle = color.green;
+        //   context.fillStyle = "yellow";
+        contextMiniField.fillRect(
+          x,
+          y,
+          square * minimapSize,
+          square * minimapSize
+        );
+        //Optional if you also sizeant to give the rectangle a stroke
+        contextMiniField.strokeStyle = color.stroke;
+        // context.strokeStyle = "black";
+        // contextMiniField.lineWidth = 0.5;
+        // contextMiniField.strokeRect(x, y, square * minimapSize, square * minimapSize);
+        contextMiniField.fill();
+        contextMiniField.closePath();
+      }
+    }
+    drawMiniField();
     // ===================
-    function chunkArray(ar,chunksize) {
+    function chunkArray(ar, chunksize) {
       var R = [];
       if (chunksize <= 0) return ar;
-      for (var i = 0; i < ar.length; i+=chunksize) {
-          R.push(ar.slice(i,i+chunksize));
+      for (var i = 0; i < ar.length; i += chunksize) {
+        R.push(ar.slice(i, i + chunksize));
       }
       return R;
-  }
-  var dataPool = chunkArray(data.data,100);
-  var poolPosition = 0;
-  var iterator;
-  var groups = [];
-  function updateVisualization() {
-
-  
-    groups =  g.selectAll("abc")
-      .data(dataPool[poolPosition])
-      .enter()
-      .append("rect")
-      .attr("class", "field")
-      .attr("x", function (d) {
-        return d.position.colStart * size;
-      })
-      .attr("y", function (d) {
-        return d.position.rowStart * size;
-      })
-      .attr("width", function (d) {
-        let area = d.position.colEnd - d.position.colStart;
-        return (area + 1) * size;
-      })
-      .attr("height", function (d) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        return (area + 1) * size;
-      })
-      // .style("cursor", "pointer")
-      .style("fill", function (d) {
-        if (!d.img) {
-          return color.green;
-        }
-        return `url(#${d.id})`;
-      })
-      .style("stroke-width", "0.1px")
-      .style("stroke", color.stroke)
-      .on("click", function (e, d) {
-        div.style("opacity", 0);
-        let active = d3.select(this);
-        if (active.attr("class").includes("active")) {
-          // reset();
-        } else {
-          let allField = document.querySelectorAll(".field");
-          allField.forEach((a) => a.classList.remove("active"));
-          active.classed("active", !active.classed("active"));
-          const size = Number(active.attr("height"));
-          const blurField = d3.select("#blur-init-" + d.id);
-          blurField.style("fill-opacity", 0);
-          const x = Number(active.attr("x")) + size / 2;
-          const y = Number(active.attr("y")) + size / 2;
-          active.style("opacity", 1);
-          let currentScale, currentScaleString;
-          const myTransform = d3.zoomTransform(d3.select("#map svg").node());
-          if (d3.select("#map svg g").attr("transform") === null) {
-            currentScale = 1;
-          }
-          //case where we have transformed the circle
-          else {
-            currentScaleString = d3
-              .select("#map svg g")
-              .attr("transform")
-              .split(" ")[1];
-            currentScale = +currentScaleString.substring(
-              6,
-              currentScaleString.length - 1
-            );
-          }
-
-          var isMobile = {
-            Android: function () {
-              return navigator.userAgent.match(/Android/i);
-            },
-            BlackBerry: function () {
-              return navigator.userAgent.match(/BlackBerry/i);
-            },
-            iOS: function () {
-              return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-            },
-            Opera: function () {
-              return navigator.userAgent.match(/Opera Mini/i);
-            },
-            Windows: function () {
-              return (
-                navigator.userAgent.match(/IEMobile/i) ||
-                navigator.userAgent.match(/WPDesktop/i)
-              );
-            },
-            any: function () {
-              return (
-                isMobile.Android() ||
-                isMobile.BlackBerry() ||
-                isMobile.iOS() ||
-                isMobile.Opera() ||
-                isMobile.Windows()
-              );
-            },
-          };
-          if (isMobile.any()) {
-            let transform = d3.zoomIdentity
-              .translate(-x / 2, -y / 2)
-              .scale(myTransform.k);
-            d3.select("svg")
-              .transition()
-              .duration(300)
-              .call(zoom.transform, transform);
-            setSearchParams({
-              zoom: myTransform.k,
-              currentX: Number(-x / 2),
-              currentY: Number(-y / 2),
-            });
-          } else {
-            let transform = d3.zoomIdentity
-              .translate(width / 2, height / 2)
-              .scale(myTransform.k)
-              .translate(Number(-x), Number(-y));
-            d3.select("svg")
-              .transition()
-              .duration(300)
-              .call(zoom.transform, transform);
-            setSearchParams({
-              zoom: myTransform.k,
-              currentX: Number(width / 2 - x),
-              currentY: Number(height / 2 - y),
-            });
-          }
-
-          if (!isMobile.any()) {
-            div.transition().duration(500).style("opacity", 0.9);
-            div
-              .html(
-                `<div class="tooltip-img"></div>
-                <div class="tooltip-content">
-                  <div>Name: ${d.id}</div>
-                  <div>Estate: ... </div>
-                </div>`
-              )
-              .style("left", width / 2 + 90 + "px")
-              .style("top", height / 2 + 60 + "px");
-          }
-
-          setField(d);
-          showDrawer();
-        }
-        // Blur
-      })
-      .on("dblclick", function (e) {
-        return e.preventDefault();
-      });
-
-      
-
-      // 
-      d3.select("#map svg g")
-      .selectAll("abc")
-      .data(dataPool[poolPosition])
-      // .data(data.data)
-      .enter()
-      .append("rect")
-      .attr("class", "blur-init")
-      .attr("id", function(d){
-        return "blur-init-"+ d.id;
-      })
-      .attr("x", function (d) {
-        return d.position.colStart * size;
-      })
-      .attr("y", function (d) {
-        return d.position.rowStart * size;
-      })
-      .attr("width", function (d) {
-        let area = d.position.colEnd - d.position.colStart;
-        return (area + 1) * size;
-      })
-      .attr("height", function (d) {
-        let area = d.position.rowEnd - d.position.rowStart;
-        return (area + 1) * size;
-      })
-      .style("fill", function (d) {
-        return "black";
-      })
-      .style("fill-opacity", 0);
-    
-      // 
-        let fieldsMini = d3
-        .select("#mini-map svg g")
+    }
+    var dataPool = chunkArray(data.data, 100);
+    var poolPosition = 0;
+    var iterator;
+    var groups = [];
+    function updateVisualization() {
+      groups = g
         .selectAll("abc")
         .data(dataPool[poolPosition])
         .enter()
         .append("rect")
         .attr("class", "field")
         .attr("x", function (d) {
-          return d.position.colStart * minimapSize;
+          return d.position.colStart * size;
         })
         .attr("y", function (d) {
-          return d.position.rowStart * minimapSize;
+          return d.position.rowStart * size;
         })
         .attr("width", function (d) {
           let area = d.position.colEnd - d.position.colStart;
-
-          return (area + 1) * minimapSize;
+          return (area + 1) * size;
         })
         .attr("height", function (d) {
           let area = d.position.rowEnd - d.position.rowStart;
-          return (area + 1) * minimapSize;
+          return (area + 1) * size;
         })
+        // .style("cursor", "pointer")
         .style("fill", function (d) {
-          if (!d.img) return color.green;
+          if (!d.img) {
+            return color.green;
+          }
           return `url(#${d.id})`;
+        })
+        .style("stroke-width", "0.1px")
+        .style("stroke", color.stroke)
+        .on("click", function (e, d) {
+          div.style("opacity", 0);
+          let active = d3.select(this);
+          if (active.attr("class").includes("active")) {
+            // reset();
+          } else {
+            let allField = document.querySelectorAll(".field");
+            allField.forEach((a) => a.classList.remove("active"));
+            active.classed("active", !active.classed("active"));
+            const size = Number(active.attr("height"));
+            const blurField = d3.select("#blur-init-" + d.id);
+            blurField.style("fill-opacity", 0);
+            const x = Number(active.attr("x")) + size / 2;
+            const y = Number(active.attr("y")) + size / 2;
+            active.style("opacity", 1);
+            let currentScale, currentScaleString;
+            const myTransform = d3.zoomTransform(d3.select("#map svg").node());
+            if (d3.select("#map svg g").attr("transform") === null) {
+              currentScale = 1;
+            }
+            //case where we have transformed the circle
+            else {
+              currentScaleString = d3
+                .select("#map svg g")
+                .attr("transform")
+                .split(" ")[1];
+              currentScale = +currentScaleString.substring(
+                6,
+                currentScaleString.length - 1
+              );
+            }
+
+            var isMobile = {
+              Android: function () {
+                return navigator.userAgent.match(/Android/i);
+              },
+              BlackBerry: function () {
+                return navigator.userAgent.match(/BlackBerry/i);
+              },
+              iOS: function () {
+                return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+              },
+              Opera: function () {
+                return navigator.userAgent.match(/Opera Mini/i);
+              },
+              Windows: function () {
+                return (
+                  navigator.userAgent.match(/IEMobile/i) ||
+                  navigator.userAgent.match(/WPDesktop/i)
+                );
+              },
+              any: function () {
+                return (
+                  isMobile.Android() ||
+                  isMobile.BlackBerry() ||
+                  isMobile.iOS() ||
+                  isMobile.Opera() ||
+                  isMobile.Windows()
+                );
+              },
+            };
+            if (isMobile.any()) {
+              let transform = d3.zoomIdentity
+                .translate(-x / 2, -y / 2)
+                .scale(myTransform.k);
+              d3.select("svg")
+                .transition()
+                .duration(300)
+                .call(zoom.transform, transform);
+              setSearchParams({
+                zoom: myTransform.k,
+                currentX: Number(-x / 2),
+                currentY: Number(-y / 2),
+              });
+            } else {
+              let transform = d3.zoomIdentity
+                .translate(width / 2, height / 2)
+                .scale(myTransform.k)
+                .translate(Number(-x), Number(-y));
+              d3.select("svg")
+                .transition()
+                .duration(300)
+                .call(zoom.transform, transform);
+              setSearchParams({
+                zoom: myTransform.k,
+                currentX: Number(width / 2 - x),
+                currentY: Number(height / 2 - y),
+              });
+            }
+
+            if (!isMobile.any()) {
+              div.transition().duration(500).style("opacity", 0.9);
+              div
+                .html(
+                  `<div class="tooltip-img"></div>
+                <div class="tooltip-content">
+                  <div>Name: ${d.id}</div>
+                  <div>Estate: ... </div>
+                </div>`
+                )
+                .style("left", width / 2 + 90 + "px")
+                .style("top", height / 2 + 60 + "px");
+            }
+
+            setField(d);
+            showDrawer();
+          }
+          // Blur
+        })
+        .on("dblclick", function (e) {
+          return e.preventDefault();
         });
-        
-      
-      d3.select("#mini-map svg g")
-        .selectAll("abc")
-        .data(dataPool[poolPosition])
-        .enter()
-        .append("rect")
-        .attr("class", "blur-init-minimap")
-        .attr("x", function (d) {
-          return d.position.colStart * minimapSize;
-        })
-        .attr("y", function (d) {
-          return d.position.rowStart * minimapSize;
-        })
-        .attr("width", function (d) {
-          let area = d.position.colEnd - d.position.colStart;
-          return (area + 1) * minimapSize;
-        })
-        .attr("height", function (d) {
-          let area = d.position.rowEnd - d.position.rowStart;
-          return (area + 1) * minimapSize;
-        })
-        .style("fill", function (d) {
-          return "grey";
-        })
-        .style("fill-opacity", 0);
-    poolPosition += 1;
-    if (poolPosition >= dataPool.length) {
-      setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
-      clearInterval(iterator);
+
+      //
+      // d3.select("#map svg g")
+      // .selectAll("abc")
+      // .data(dataPool[poolPosition])
+      // // .data(data.data)
+      // .enter()
+      // .append("rect")
+      // .attr("class", "blur-init")
+      // .attr("id", function(d){
+      //   return "blur-init-"+ d.id;
+      // })
+      // .attr("x", function (d) {
+      //   return d.position.colStart * size;
+      // })
+      // .attr("y", function (d) {
+      //   return d.position.rowStart * size;
+      // })
+      // .attr("width", function (d) {
+      //   let area = d.position.colEnd - d.position.colStart;
+      //   return (area + 1) * size;
+      // })
+      // .attr("height", function (d) {
+      //   let area = d.position.rowEnd - d.position.rowStart;
+      //   return (area + 1) * size;
+      // })
+      // .style("fill", function (d) {
+      //   return "black";
+      // })
+      // .style("fill-opacity", 0);
+
+      //
+      // let fieldsMini = d3
+      // .select("#mini-map svg g")
+      // .selectAll("abc")
+      // .data(dataPool[poolPosition])
+      // .enter()
+      // .append("rect")
+      // .attr("class", "field")
+      // .attr("x", function (d) {
+      //   return d.position.colStart * minimapSize;
+      // })
+      // .attr("y", function (d) {
+      //   return d.position.rowStart * minimapSize;
+      // })
+      // .attr("width", function (d) {
+      //   let area = d.position.colEnd - d.position.colStart;
+
+      //   return (area + 1) * minimapSize;
+      // })
+      // .attr("height", function (d) {
+      //   let area = d.position.rowEnd - d.position.rowStart;
+      //   return (area + 1) * minimapSize;
+      // })
+      // .style("fill", function (d) {
+      //   if (!d.img) return color.green;
+      //   return `url(#${d.id})`;
+      // });
+
+      // d3.select("#mini-map svg g")
+      //   .selectAll("abc")
+      //   .data(dataPool[poolPosition])
+      //   .enter()
+      //   .append("rect")
+      //   .attr("class", "blur-init-minimap")
+      //   .attr("x", function (d) {
+      //     return d.position.colStart * minimapSize;
+      //   })
+      //   .attr("y", function (d) {
+      //     return d.position.rowStart * minimapSize;
+      //   })
+      //   .attr("width", function (d) {
+      //     let area = d.position.colEnd - d.position.colStart;
+      //     return (area + 1) * minimapSize;
+      //   })
+      //   .attr("height", function (d) {
+      //     let area = d.position.rowEnd - d.position.rowStart;
+      //     return (area + 1) * minimapSize;
+      //   })
+      //   .style("fill", function (d) {
+      //     return "grey";
+      //   })
+      //   .style("fill-opacity", 0);
+      poolPosition += 1;
+      if (poolPosition >= dataPool.length) {
+        setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
+        clearInterval(iterator);
+      }
     }
-  }
 
-  iterator = setInterval(updateVisualization, 10);
-  // groups =  g.selectAll(".fields")
-  // // .data(dataPool[poolPosition])
-  // .data(data.data)
-  // .enter()
-  // .append("rect")
-  // .attr("class", "field")
-  // .attr("x", function (d) {
-  //   return d.position.colStart * size;
-  // })
-  // .attr("y", function (d) {
-  //   return d.position.rowStart * size;
-  // })
-  // .attr("width", function (d) {
-  //   let area = d.position.colEnd - d.position.colStart;
-  //   return (area + 1) * size;
-  // })
-  // .attr("height", function (d) {
-  //   let area = d.position.rowEnd - d.position.rowStart;
-  //   return (area + 1) * size;
-  // })
-  // // .style("cursor", "pointer")
-  // .style("fill", function (d) {
-  //   if (!d.img) {
-  //     return color.green;
-  //   }
-  //   return `url(#${d.id})`;
-  // })
-  // .style("stroke-width", "0.1px")
-  // .style("stroke", color.stroke)
-  // .on("click", function (e, d) {
-  //   div.style("opacity", 0);
-  //   let active = d3.select(this);
-  //   if (active.attr("class").includes("active")) {
-  //     // reset();
-  //   } else {
-  //     let allField = document.querySelectorAll(".field");
-  //     allField.forEach((a) => a.classList.remove("active"));
-  //     active.classed("active", !active.classed("active"));
-  //     const size = Number(active.attr("height"));
-  //     const blurField = d3.select("#blur-init-" + d.id);
-  //     // blurField.style("fill-opacity", 0);
-  //     const x = Number(active.attr("x")) + size / 2;
-  //     const y = Number(active.attr("y")) + size / 2;
-  //     active.style("opacity", 1);
-  //     let currentScale, currentScaleString;
-  //     const myTransform = d3.zoomTransform(d3.select("#map svg").node());
-  //     if (d3.select("#map svg g").attr("transform") === null) {
-  //       currentScale = 1;
-  //     }
-  //     //case where we have transformed the circle
-  //     else {
-  //       currentScaleString = d3
-  //         .select("#map svg g")
-  //         .attr("transform")
-  //         .split(" ")[1];
-  //       currentScale = +currentScaleString.substring(
-  //         6,
-  //         currentScaleString.length - 1
-  //       );
-  //     }
+    iterator = setInterval(updateVisualization, 10);
+    // groups =  g.selectAll(".fields")
+    // // .data(dataPool[poolPosition])
+    // .data(data.data)
+    // .enter()
+    // .append("rect")
+    // .attr("class", "field")
+    // .attr("x", function (d) {
+    //   return d.position.colStart * size;
+    // })
+    // .attr("y", function (d) {
+    //   return d.position.rowStart * size;
+    // })
+    // .attr("width", function (d) {
+    //   let area = d.position.colEnd - d.position.colStart;
+    //   return (area + 1) * size;
+    // })
+    // .attr("height", function (d) {
+    //   let area = d.position.rowEnd - d.position.rowStart;
+    //   return (area + 1) * size;
+    // })
+    // // .style("cursor", "pointer")
+    // .style("fill", function (d) {
+    //   if (!d.img) {
+    //     return color.green;
+    //   }
+    //   return `url(#${d.id})`;
+    // })
+    // .style("stroke-width", "0.1px")
+    // .style("stroke", color.stroke)
+    // .on("click", function (e, d) {
+    //   div.style("opacity", 0);
+    //   let active = d3.select(this);
+    //   if (active.attr("class").includes("active")) {
+    //     // reset();
+    //   } else {
+    //     let allField = document.querySelectorAll(".field");
+    //     allField.forEach((a) => a.classList.remove("active"));
+    //     active.classed("active", !active.classed("active"));
+    //     const size = Number(active.attr("height"));
+    //     const blurField = d3.select("#blur-init-" + d.id);
+    //     // blurField.style("fill-opacity", 0);
+    //     const x = Number(active.attr("x")) + size / 2;
+    //     const y = Number(active.attr("y")) + size / 2;
+    //     active.style("opacity", 1);
+    //     let currentScale, currentScaleString;
+    //     const myTransform = d3.zoomTransform(d3.select("#map svg").node());
+    //     if (d3.select("#map svg g").attr("transform") === null) {
+    //       currentScale = 1;
+    //     }
+    //     //case where we have transformed the circle
+    //     else {
+    //       currentScaleString = d3
+    //         .select("#map svg g")
+    //         .attr("transform")
+    //         .split(" ")[1];
+    //       currentScale = +currentScaleString.substring(
+    //         6,
+    //         currentScaleString.length - 1
+    //       );
+    //     }
 
-  //     var isMobile = {
-  //       Android: function () {
-  //         return navigator.userAgent.match(/Android/i);
-  //       },
-  //       BlackBerry: function () {
-  //         return navigator.userAgent.match(/BlackBerry/i);
-  //       },
-  //       iOS: function () {
-  //         return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-  //       },
-  //       Opera: function () {
-  //         return navigator.userAgent.match(/Opera Mini/i);
-  //       },
-  //       Windows: function () {
-  //         return (
-  //           navigator.userAgent.match(/IEMobile/i) ||
-  //           navigator.userAgent.match(/WPDesktop/i)
-  //         );
-  //       },
-  //       any: function () {
-  //         return (
-  //           isMobile.Android() ||
-  //           isMobile.BlackBerry() ||
-  //           isMobile.iOS() ||
-  //           isMobile.Opera() ||
-  //           isMobile.Windows()
-  //         );
-  //       },
-  //     };
-  //     if (isMobile.any()) {
-  //       let transform = d3.zoomIdentity
-  //         .translate(-x / 2, -y / 2)
-  //         .scale(myTransform.k);
-  //       d3.select("svg")
-  //         .transition()
-  //         .duration(300)
-  //         .call(zoom.transform, transform);
-  //       setSearchParams({
-  //         zoom: myTransform.k,
-  //         currentX: Number(-x / 2),
-  //         currentY: Number(-y / 2),
-  //       });
-  //     } else {
-  //       let transform = d3.zoomIdentity
-  //         .translate(width / 2, height / 2)
-  //         .scale(myTransform.k)
-  //         .translate(Number(-x), Number(-y));
-  //       d3.select("svg")
-  //         .transition()
-  //         .duration(300)
-  //         .call(zoom.transform, transform);
-  //       setSearchParams({
-  //         zoom: myTransform.k,
-  //         currentX: Number(width / 2 - x),
-  //         currentY: Number(height / 2 - y),
-  //       });
-  //     }
+    //     var isMobile = {
+    //       Android: function () {
+    //         return navigator.userAgent.match(/Android/i);
+    //       },
+    //       BlackBerry: function () {
+    //         return navigator.userAgent.match(/BlackBerry/i);
+    //       },
+    //       iOS: function () {
+    //         return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+    //       },
+    //       Opera: function () {
+    //         return navigator.userAgent.match(/Opera Mini/i);
+    //       },
+    //       Windows: function () {
+    //         return (
+    //           navigator.userAgent.match(/IEMobile/i) ||
+    //           navigator.userAgent.match(/WPDesktop/i)
+    //         );
+    //       },
+    //       any: function () {
+    //         return (
+    //           isMobile.Android() ||
+    //           isMobile.BlackBerry() ||
+    //           isMobile.iOS() ||
+    //           isMobile.Opera() ||
+    //           isMobile.Windows()
+    //         );
+    //       },
+    //     };
+    //     if (isMobile.any()) {
+    //       let transform = d3.zoomIdentity
+    //         .translate(-x / 2, -y / 2)
+    //         .scale(myTransform.k);
+    //       d3.select("svg")
+    //         .transition()
+    //         .duration(300)
+    //         .call(zoom.transform, transform);
+    //       setSearchParams({
+    //         zoom: myTransform.k,
+    //         currentX: Number(-x / 2),
+    //         currentY: Number(-y / 2),
+    //       });
+    //     } else {
+    //       let transform = d3.zoomIdentity
+    //         .translate(width / 2, height / 2)
+    //         .scale(myTransform.k)
+    //         .translate(Number(-x), Number(-y));
+    //       d3.select("svg")
+    //         .transition()
+    //         .duration(300)
+    //         .call(zoom.transform, transform);
+    //       setSearchParams({
+    //         zoom: myTransform.k,
+    //         currentX: Number(width / 2 - x),
+    //         currentY: Number(height / 2 - y),
+    //       });
+    //     }
 
-  //     if (!isMobile.any()) {
-  //       div.transition().duration(500).style("opacity", 0.9);
-  //       div
-  //         .html(
-  //           `<div class="tooltip-img"></div>
-  //           <div class="tooltip-content">
-  //             <div>Name: ${d.id}</div>
-  //             <div>Estate: ... </div>
-  //           </div>`
-  //         )
-  //         .style("left", width / 2 + 90 + "px")
-  //         .style("top", height / 2 + 60 + "px");
-  //     }
+    //     if (!isMobile.any()) {
+    //       div.transition().duration(500).style("opacity", 0.9);
+    //       div
+    //         .html(
+    //           `<div class="tooltip-img"></div>
+    //           <div class="tooltip-content">
+    //             <div>Name: ${d.id}</div>
+    //             <div>Estate: ... </div>
+    //           </div>`
+    //         )
+    //         .style("left", width / 2 + 90 + "px")
+    //         .style("top", height / 2 + 60 + "px");
+    //     }
 
-  //     setField(d);
-  //     showDrawer();
-  //   }
-  //   // Blur
-  // })
-  // .on("dblclick", function (e) {
-  //   return e.preventDefault();
-  // });
-  
-  
-
+    //     setField(d);
+    //     showDrawer();
+    //   }
+    //   // Blur
+    // })
+    // .on("dblclick", function (e) {
+    //   return e.preventDefault();
+    // });
 
     function drawMap() {
       map.append("g").attr("class", "grid-square");
       drawCanvas();
-     
+
       let fields = d3
         .select("svg g")
         .selectAll(".fields")
@@ -814,8 +854,8 @@ let minimap = d3
         .enter()
         .append("rect")
         .attr("class", "blur-init")
-        .attr("id", function(d){
-          return "blur-init-"+ d.id;
+        .attr("id", function (d) {
+          return "blur-init-" + d.id;
         })
         .attr("x", function (d) {
           return d.position.colStart * size;
@@ -836,10 +876,7 @@ let minimap = d3
         })
         .style("fill-opacity", 0);
     }
-    function drawMinimap() {
-      
-      
-    }
+    function drawMinimap() {}
 
     d3.select("#mini-map svg g").call(d3.drag().on("drag", dragged));
     function dragged(e) {
@@ -867,57 +904,117 @@ let minimap = d3
           .scale(transform.k)
       );
     }
-    
   }, []);
-  const handleFilterSize = async (filter) => {
-    const newModal = {show: true, text: "Applying filter ...."}
-    setModal(newModal);
-    const initBlur = d3.selectAll(".blur-init");
-    const activeBlur = d3.selectAll(".blur")
-    // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
-    const query = initBlur.empty() ? ".blur-family" : ".blur-init";
-    let index = 0;
-    d3.selectAll(query)
-      .filter(function (d) {
-        let area = d.position.rowEnd - d.position.rowStart + 1;
-        let condition;
-        if(filter["size"].length > 0 && filter["sale"].length > 0){
-          condition = filter["size"].includes(area) && filter["sale"].includes(d.sale)
-        }else{
+  // const handleFilterSize = async (filter) => {
+  //   const newModal = {show: true, text: "Applying filter ...."}
+  //   setModal(newModal);
+  //   const initBlur = d3.selectAll(".blur-init");
+  //   const activeBlur = d3.selectAll(".blur")
+  //   // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
+  //   const query = initBlur.empty() ? ".blur-family" : ".blur-init";
+  //   let index = 0;
+  //   d3.selectAll(query)
+  //     .filter(function (d) {
+  //       let area = d.position.rowEnd - d.position.rowStart + 1;
+  //       let condition;
+  //       if(filter["size"].length > 0 && filter["sale"].length > 0){
+  //         condition = filter["size"].includes(area) && filter["sale"].includes(d.sale)
+  //       }else{
 
-          condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
-        }
-        if (!condition) {
-          
-          // d3.select(this).classed("blur-field-active", true)
-          return d3.select(this).style("fill-opacity", 0.5)
-          .attr("class", "blur-family blur-blured")
-        }
-        index++;
-        console.log(this)
-        return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur-family blur")
-      })
-      
-    if (filter["size"].length === 0 && filter["sale"].length === 0) {
-      d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
-      index = 1;
-    }
-    if(index === 0){
-      setModal({
-        show: true,
-        text: "No results",
-        showButton: true
-      });
-    }else{
+  //         condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
+  //       }
+  //       if (!condition) {
+
+  //         // d3.select(this).classed("blur-field-active", true)
+  //         return d3.select(this).style("fill-opacity", 0.5)
+  //         .attr("class", "blur-family blur-blured")
+  //       }
+  //       index++;
+  //       console.log(this)
+  //       return d3.select(this).style("fill-opacity", 0)
+  //       .attr("class", "blur-family blur")
+  //     })
+
+  //   if (filter["size"].length === 0 && filter["sale"].length === 0) {
+  //     d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
+  //     index = 1;
+  //   }
+  //   if(index === 0){
+  //     setModal({
+  //       show: true,
+  //       text: "No results",
+  //       showButton: true
+  //     });
+  //   }else{
+  // setTimeout(() => {
+  //   setModal({
+  //     show: false,
+  //     text: "",
+  //   });
+  // }, 1000)
+  //   }
+
+  // };
+  const handleFilterSize = () => {
+    let canvasFilter = d3.select("#canvas-filter");
+    let contextFilter = canvasFilter.node().getContext("2d");
+
+    const transform = d3.zoomTransform(d3.select("#map svg").node());
+    if (
+      filterCheckbox["size"].length === 0 &&
+      filterCheckbox["sale"].length === 0
+    ) {
+      contextFilter.save();
+      contextFilter.clearRect(0, 0, width, height);
+      contextFilter.restore();
       setTimeout(() => {
         setModal({
           show: false,
           text: "",
         });
-      }, 1000)
+      }, 1000);
+      return;
     }
-    
+
+    contextFilter.save();
+    contextFilter.clearRect(0, 0, width, height);
+
+    contextFilter.translate(transform.x, transform.y);
+    contextFilter.scale(transform.k, transform.k);
+    // handleFilterSize(filterCheckbox);
+    let data = data1;
+
+    for (let i = 0; i < data.data.length; i++) {
+      let square =
+        data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+
+      let x = data.data[i].position.colStart * size;
+      let y = data.data[i].position.rowStart * size;
+      contextFilter.beginPath();
+      //Drawing a rectangle
+      if (filterCheckbox["size"].includes(square)) {
+        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+      } else {
+        contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+      }
+
+      contextFilter.fillRect(x, y, square * size, square * size);
+      //Optional if you also sizeant to give the rectangle a stroke
+      contextFilter.strokeStyle = color.stroke;
+      contextFilter.lineWidth = 0.5;
+      contextFilter.strokeRect(x, y, square * size, square * size);
+
+      contextFilter.fill();
+      contextFilter.closePath();
+    }
+    contextFilter.restore();
+
+    setTimeout(() => {
+      setModal({
+        show: false,
+        text: "",
+      });
+    }, 1000);
   };
   const showDrawer = () => {
     setVisible(true);
@@ -927,75 +1024,225 @@ let minimap = d3
     setVisible(false);
   };
 
+  // const filterCoordinates = () => {
+    // const newModal = { show: true, text: "Applying filter ...." };
+    // setModal(newModal);
+    // let rStart, cStart, rEnd, cEnd;
+
+    // const initBlur = d3.selectAll(".blur-init");
+    // const activeBlur = d3.selectAll(".blur");
+    // const query = initBlur.empty()
+    //   ? activeBlur.empty()
+    //     ? ".blur-blured"
+    //     : ".blur"
+    //   : ".blur-init";
+
+    // let fields = d3.selectAll(query);
+    // [rStart, cStart] = minCoordinates.split(",");
+    // [rEnd, cEnd] = maxCoordinates.split(",");
+    // let active = [];
+    // fields.filter(function (d) {
+    //   let condition1 =
+    //     inRange(d.rowStartNew, rStart, rEnd) ||
+    //     inRange(d.rowEndNew, rStart, rEnd);
+    //   let condition2 =
+    //     inRange(d.colStartNew, cStart, cEnd) ||
+    //     inRange(d.colEndNew, cStart, cEnd);
+    //   if (condition1 && condition2) {
+    //     active.push(d);
+    //     return this;
+    //   }
+    // });
+    // let index = 0;
+    // d3.selectAll(query).filter(function (d) {
+    //   if (!active.includes(d)) {
+    //     // d3.select(this).classed("blur-field-active", true)
+
+    //     return d3
+    //       .select(this)
+    //       .style("fill-opacity", 0.5)
+    //       .attr("class", "blur-family blur-blured");
+    //   }
+    //   index++;
+
+    //   return d3
+    //     .select(this)
+    //     .style("fill-opacity", 0)
+    //     .attr("class", "blur-family blur");
+    // });
+
+    // if (index === 0) {
+    //   setModal({
+    //     show: true,
+    //     text: "No results",
+    //     showButton: true,
+    //   });
+    // } else {
+    //   setModal({
+    //     show: false,
+    //     text: "",
+    //   });
+    // }
+  // };
   const filterCoordinates = () => {
-    const newModal = {show: true, text: "Applying filter ...."}
+    const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
     let rStart, cStart, rEnd, cEnd;
-
-    
-    const initBlur = d3.selectAll(".blur-init");
-    const activeBlur = d3.selectAll(".blur")
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
-
-    let fields = d3.selectAll(query);
     [rStart, cStart] = minCoordinates.split(",");
     [rEnd, cEnd] = maxCoordinates.split(",");
     let active = [];
-    fields.filter(function (d) {
-      let condition1 =
-        inRange(d.rowStartNew, rStart, rEnd) ||
-        inRange(d.rowEndNew, rStart, rEnd);
+    if(filterArray.length > 0){
+      for(let i = 0; i < filterArray.length; i++){
+        let condition1 =
+        inRange(filterArray[i].rowStartNew, rStart, rEnd) ||
+        inRange(filterArray[i].rowEndNew, rStart, rEnd);
       let condition2 =
-        inRange(d.colStartNew, cStart, cEnd) ||
-        inRange(d.colEndNew, cStart, cEnd);
-      if (condition1 && condition2) {
-        active.push(d);
-        return this;
-      }
-    });
-    let index = 0;
-    d3.selectAll(query)
-      .filter(function (d) {
-        if (!active.includes(d)) {
-          // d3.select(this).classed("blur-field-active", true)
-          
-          return d3.select(this).style("fill-opacity", 0.5)
-          .attr("class", "blur-family blur-blured")
+        inRange(filterArray[i].colStartNew, cStart, cEnd) ||
+        inRange(filterArray[i].colEndNew, cStart, cEnd);
+        if (condition1 && condition2) {
+          active.push(filterArray[i]);
+          setFilterArray(active);
         }
-        index++;
-        
-        return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur-family blur")
-      })
+        let canvasFilter = d3.select("#canvas-filter");
+    let contextFilter = canvasFilter.node().getContext("2d");
+    const transform = d3.zoomTransform(d3.select("#map svg").node());
+    contextFilter.save();
+    contextFilter.clearRect(0, 0, width, height);
+
+    contextFilter.translate(transform.x, transform.y);
+    contextFilter.scale(transform.k, transform.k);
+    // handleFilterSize(filterCheckbox);
+    for (let i = 0; i < active.length; i++) {
+      let square =
+        active[i].position.rowEnd - active[i].position.rowStart + 1;
+      let x = active[i].position.colStart * size;
+      let y = active[i].position.rowStart * size;
+      contextFilter.beginPath();
+      //Drawing a rectangle
+  
+        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+      contextFilter.fillRect(x, y, square * size, square * size);
+      //Optional if you also sizeant to give the rectangle a stroke
+      contextFilter.strokeStyle = color.stroke;
+      contextFilter.lineWidth = 0.5;
+      contextFilter.strokeRect(x, y, square * size, square * size);
+
+      contextFilter.fill();
+      contextFilter.closePath();
+    }
+    contextFilter.restore();
+      }
       
-     
-      if(index === 0){
-        setModal({
-          show: true,
-          text: "No results",
-          showButton: true
-        });
-      }else{
+    }
+    // if (index === 0) {
+    //   setModal({
+    //     show: true,
+    //     text: "No results",
+    //     showButton: true,
+    //   });
+    // } else {
+      // setModal({
+      //   show: false,
+      //   text: "",
+      // });
+    // }
+    setModal({
+      show: false,
+      text: "",
+    });
+  }
+  
+
+  
+  // const [minCoordinates, setMinCoordinates] = useState("");
+  // const [maxCoordinates, setMaxCoordinates] = useState("");
+  // const [filterCheckbox, setFilterCheckbox] = useState({
+  //   sale: [],
+  //   size: [],
+  // });
+  // const [wallet, setWallet] = useState("");
+  // const [partners, setPartners] = useState(null);
+  const filterCombine = (filter, type) => {
+    let canvasFilter = d3.select("#canvas-filter");
+    let contextFilter = canvasFilter.node().getContext("2d");
+    const transform = d3.zoomTransform(d3.select("#map svg").node());
+    if (
+      filterCheckbox["size"].length === 0 &&
+      filterCheckbox["sale"].length === 0 &&
+      minCoordinates === "" &&
+      maxCoordinates === ""
+    ) {
+      contextFilter.save();
+      contextFilter.clearRect(0, 0, width, height);
+      contextFilter.restore();
+      setTimeout(() => {
         setModal({
           show: false,
           text: "",
         });
+      }, 1000);
+      return;
+    }
+    contextFilter.save();
+    contextFilter.clearRect(0, 0, width, height);
+
+    contextFilter.translate(transform.x, transform.y);
+    contextFilter.scale(transform.k, transform.k);
+    // handleFilterSize(filterCheckbox);
+    let data = data1;
+    let filterArrayLocal = [];
+    for (let i = 0; i < data.data.length; i++) {
+      let square =
+        data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+      
   
+      let x = data.data[i].position.colStart * size;
+      let y = data.data[i].position.rowStart * size;
+      contextFilter.beginPath();
+      //Drawing a rectangle
+      if (filterCheckbox["size"].includes(square)) {
+        filterArrayLocal.push(data.data[i]);
+
+        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+      } else {
+        contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
       }
+
+      contextFilter.fillRect(x, y, square * size, square * size);
+      //Optional if you also sizeant to give the rectangle a stroke
+      contextFilter.strokeStyle = color.stroke;
+      contextFilter.lineWidth = 0.5;
+      contextFilter.strokeRect(x, y, square * size, square * size);
+
+      contextFilter.fill();
+      contextFilter.closePath();
+    }
+    contextFilter.restore();
+
+    setFilterArray(filterArrayLocal);
+
+    setTimeout(() => {
+      setModal({
+        show: false,
+        text: "",
+      });
+    }, 1000);
   };
   const resetFilter = () => {
-setFilterCheckbox({sale: [], size: []})
-  setMinCoordinates("");
-  setMaxCoordinates("");
-  setWallet("");
-  setPartners(null);
-  setModal({
-    show: false,
-    text: "",
-    showButton: false
-  });
-  d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
-  }
+    setFilterCheckbox({ sale: [], size: [] });
+    setMinCoordinates("");
+    setMaxCoordinates("");
+    setWallet("");
+    setPartners(null);
+    setModal({
+      show: false,
+      text: "",
+      showButton: false,
+    });
+    d3.selectAll(".blur-blured")
+      .style("fill-opacity", 0)
+      .attr("class", "blur-family blur");
+  };
   const handleInputRange = (e) => {
     let data = data1;
     let direction = 1,
@@ -1148,152 +1395,169 @@ setFilterCheckbox({sale: [], size: []})
     setDisplayMinimap(!displayMinimap);
   };
   const handleChangeCheckbox = (e) => {
-    const newModal = {show: true, text: "Applying filter ...."}
+    const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
     const name = e.target.name;
     const value = Number(e.target.value);
     const newFilter = filterCheckbox;
-    
-    const array = ["sale", "size"]
+
+    const array = ["sale", "size"];
     // sale: [],
     // size: [],
-    
-    if(array.includes(name)){
-      if(newFilter[name].includes(value)){
-        newFilter[name] = filterCheckbox[name].filter(item => item !== value);
-      }else{
+
+    if (array.includes(name)) {
+      if (newFilter[name].includes(value)) {
+        newFilter[name] = filterCheckbox[name].filter((item) => item !== value);
+      } else {
         newFilter[name].push(value);
       }
-    }else{
+    } else {
       newFilter[name] = value;
     }
     setFilterCheckbox(newFilter);
-    handleFilterSize(newFilter);
-  }
+    filterCombine();
+  };
   const filterWallet = () => {
-    const newModal = {show: true, text: "Applying filter ...."}
+    const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur");
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+    const query = initBlur.empty()
+      ? activeBlur.empty()
+        ? ".blur-blured"
+        : ".blur"
+      : ".blur-init";
     let index = 0;
-    d3.selectAll(query)
-    .filter(function (d) {
-     if(d.wallet === wallet){
-       index++;
-       return d3.select(this).style("fill-opacity", 0)
-       .attr("class", "blur-family blur")
-     }
-     return d3.select(this).style("fill-opacity", 0.5)
-     .attr("class", "blur-family blur-blured")
-    })
-    if(index === 0){
+    d3.selectAll(query).filter(function (d) {
+      if (d.wallet === wallet) {
+        index++;
+        return d3
+          .select(this)
+          .style("fill-opacity", 0)
+          .attr("class", "blur-family blur");
+      }
+      return d3
+        .select(this)
+        .style("fill-opacity", 0.5)
+        .attr("class", "blur-family blur-blured");
+    });
+    if (index === 0) {
       setModal({
         show: true,
         text: "No results",
-        showButton: true
+        showButton: true,
       });
-    }else{
+    } else {
       setTimeout(() => {
         setModal({
           show: false,
           text: "",
         });
-      }, 1000)
-
+      }, 1000);
     }
-    
-  }
+  };
   const filterPartners = (value) => {
     setPartners(value);
-    const newModal = {show: true, text: "Applying filter ...."}
+    const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
     const initBlur = d3.selectAll(".blur-init");
     const activeBlur = d3.selectAll(".blur");
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".blur-init";
+    const query = initBlur.empty()
+      ? activeBlur.empty()
+        ? ".blur-blured"
+        : ".blur"
+      : ".blur-init";
     let index = 0;
-    d3.selectAll(query).filter(function(d){
-      if(d.partners === Number(value)){
+    d3.selectAll(query).filter(function (d) {
+      if (d.partners === Number(value)) {
         index++;
-        return d3.select(this).style("fill-opacity", 0)
-        .attr("class", "blur-family blur")
+        return d3
+          .select(this)
+          .style("fill-opacity", 0)
+          .attr("class", "blur-family blur");
       }
-      return d3.select(this).style("fill-opacity", 0.5)
-      .attr("class", "blur-family blur-blured")
-    })
-    if(index === 0){
+      return d3
+        .select(this)
+        .style("fill-opacity", 0.5)
+        .attr("class", "blur-family blur-blured");
+    });
+    if (index === 0) {
       setModal({
         show: true,
         text: "No results",
-        showButton: true
+        showButton: true,
       });
-    }else{
+    } else {
       setTimeout(() => {
         setModal({
           show: false,
           text: "",
         });
-      }, 1000)
-
+      }, 1000);
     }
-  }
+  };
   const handleChangeSelect = (value) => {
     let data = data1;
     const field = d3.selectAll("#map .field");
     const preZoom = Number(searchParams.get("zoom"));
     const context = d3.select("#canvas").node().getContext("2d");
-   field.filter(function(d){
-     if(d.company === Number(value)){
-       const active = d3.select(this)
-       console.log(this)
-      const size = Number(active.attr("height"));
-      const x = Number(active.attr("x")) + size / 2;
-      const y = Number(active.attr("y")) + size / 2;
-      let transform = d3.zoomIdentity
-              // .translate(width / 2, height / 2)
-              .scale(preZoom)
-              .translate(Number(-x+width/(2*preZoom)), Number(-y+height/(2*preZoom)));
-            d3.select("svg")
-              .transition()
-              .duration(500) 
-              .call(zoom.transform, transform);
-            setSearchParams({
-              zoom: preZoom,
-              currentX: Number(-x+width/(2*preZoom)),
-              currentY: Number(-y+height/(2*preZoom)),
-            });
-      d3.select("svg g").attr("transform", transform)
-      context.clearRect(0, 0, width, height);
-      context.save();
-      context.scale(preZoom, preZoom);
-      context.translate(Number(-x+width/(2*preZoom)), Number(-y+height/(2*preZoom)));
-      
+    field.filter(function (d) {
+      if (d.company === Number(value)) {
+        const active = d3.select(this);
+        console.log(this);
+        const size = Number(active.attr("height"));
+        const x = Number(active.attr("x")) + size / 2;
+        const y = Number(active.attr("y")) + size / 2;
+        let transform = d3.zoomIdentity
+          // .translate(width / 2, height / 2)
+          .scale(preZoom)
+          .translate(
+            Number(-x + width / (2 * preZoom)),
+            Number(-y + height / (2 * preZoom))
+          );
+        d3.select("svg")
+          .transition()
+          .duration(500)
+          .call(zoom.transform, transform);
+        setSearchParams({
+          zoom: preZoom,
+          currentX: Number(-x + width / (2 * preZoom)),
+          currentY: Number(-y + height / (2 * preZoom)),
+        });
+        d3.select("svg g").attr("transform", transform);
+        context.clearRect(0, 0, width, height);
+        context.save();
+        context.scale(preZoom, preZoom);
+        context.translate(
+          Number(-x + width / (2 * preZoom)),
+          Number(-y + height / (2 * preZoom))
+        );
 
-      context.clearRect(0, 0, width, height);
-      for (let i = 0; i < data.nCol; i++) {
-        for (let j = 0; j < data.nRow; j++) {
-          let x = i * size;
-          let y = j * size;
-          context.beginPath();
+        context.clearRect(0, 0, width, height);
+        for (let i = 0; i < data.nCol; i++) {
+          for (let j = 0; j < data.nRow; j++) {
+            let x = i * size;
+            let y = j * size;
+            context.beginPath();
 
-          //Drawing a rectangle
-          // context.fillStyle = color.black;
-          context.fillStyle = color.dark;
-          context.fillRect(x, y, size, size);
-          //Optional if you also sizeant to give the rectangle a stroke
-          context.strokeStyle = color.stroke;
-          context.lineWidth = 0.5;
-          context.strokeRect(x, y, size, size);
+            //Drawing a rectangle
+            // context.fillStyle = color.black;
+            context.fillStyle = color.dark;
+            context.fillRect(x, y, size, size);
+            //Optional if you also sizeant to give the rectangle a stroke
+            context.strokeStyle = color.stroke;
+            context.lineWidth = 0.5;
+            context.strokeRect(x, y, size, size);
 
-          context.fill();
-          context.closePath();
+            context.fill();
+            context.closePath();
+          }
         }
-      }
-      context.restore();
+        context.restore();
 
-      let dx = -transform.x / transform.k;
-      let dy = -transform.y / transform.k;
-      
+        let dx = -transform.x / transform.k;
+        let dy = -transform.y / transform.k;
+
         d3.select("#minimapRect").remove();
         let minimapRect = d3
           .select("#mini-map svg g")
@@ -1305,13 +1569,19 @@ setFilterCheckbox({sale: [], size: []})
           .attr("stroke-width", 2)
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
-      
-     }
-   })
-  }
+      }
+    });
+  };
   return (
     <div className="App">
-      {modal.show && <Modal text={modal.text}  resetFilter={resetFilter} showButton={modal.showButton} show={modal.show}/>}
+      {modal.show && (
+        <Modal
+          text={modal.text}
+          resetFilter={resetFilter}
+          showButton={modal.showButton}
+          show={modal.show}
+        />
+      )}
       <Information
         visible={visible}
         field={field}
@@ -1343,6 +1613,7 @@ setFilterCheckbox({sale: [], size: []})
         <div id="map-container">
           <canvas id="canvas"></canvas>
           <div id="map"></div>
+          <canvas id="canvas-filter"></canvas>
         </div>
 
         <div
@@ -1352,9 +1623,22 @@ setFilterCheckbox({sale: [], size: []})
             pointerEvents: displayMinimap ? "all" : "none",
           }}
         >
-          <canvas id="canvas-mini" style={{visibility: `${displayMinimap ? "visible" : "hidden"}`,
+          <canvas
+            id="canvas-mini"
+            style={{
+              visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,}}></canvas>
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+            }}
+          ></canvas>
+          <canvas
+            id="canvas-mini-field"
+            style={{
+              visibility: `${displayMinimap ? "visible" : "hidden"}`,
+              pointerEvents: displayMinimap ? "all" : "none",
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+            }}
+          ></canvas>
           <div
             id="mini-map"
             style={{
@@ -1406,21 +1690,23 @@ setFilterCheckbox({sale: [], size: []})
             <div className={cx("minimap-action-info")}>
               <MenuOutlined />
             </div>
-            
           </div>
           <div
             className={cx("select-filter-container")}
-           style={{
-            visibility: `${displayMinimap ? "visible" : "hidden"}`,
-            pointerEvents: displayMinimap ? "all" : "none",
-            transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
-          }}
+            style={{
+              visibility: `${displayMinimap ? "visible" : "hidden"}`,
+              pointerEvents: displayMinimap ? "all" : "none",
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+            }}
           >
-          <Select defaultValue="Choose select" className={cx("select-filter")} onChange={handleChangeSelect}>>
-      <Option value="1">binance</Option>
-      <Option value="2">Lucy</Option>
-      
-    </Select>
+            <Select
+              defaultValue="Choose select"
+              className={cx("select-filter")}
+              onChange={handleChangeSelect}
+            >
+              ><Option value="1">binance</Option>
+              <Option value="2">Lucy</Option>
+            </Select>
           </div>
         </div>
         <div className={cx("mobile")}>
