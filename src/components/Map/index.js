@@ -45,6 +45,8 @@ const Map = ({ props }) => {
 
   // ---------------------------
   const [filterArray, setFilterArray] = useState([]);
+  const [array, setArray] = useState([]);
+  const [testa, setTesta] = useState("");
   //------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
@@ -54,14 +56,14 @@ const Map = ({ props }) => {
     let rowWidth = Number(height / row).toFixed(2);
     size = Math.min(colWidth, rowWidth);
 
-    return size;
+    return size * 2;
   };
   let width = Number(window.screen.availWidth - 90);
   let height = Number(window.screen.availHeight - 60);
   if (window.innerWidth < 800) {
     width = Number(window.innerWidth);
   }
-  const ratio = 1 / 4.5;
+  const ratio = 1 / 9;
   let minimapWidth = (width * ratio).toFixed(2);
   let minimapHeight = (height * ratio).toFixed(2);
   const minimapSize = calSize(
@@ -72,7 +74,7 @@ const Map = ({ props }) => {
   );
   minimapWidth = minimapSize * data1.nCol;
   minimapHeight = minimapSize * data1.nRow;
-  const size = calSize(width, height, data1.nRow, data1.nCol) * 2;
+  const size = calSize(width, height, data1.nRow, data1.nCol);
   let zoom = d3.zoom();
 
   useEffect(() => {
@@ -184,14 +186,15 @@ const Map = ({ props }) => {
       drawCanvas();
       context.restore();
 
-      // contextFilter.save();
-      // contextFilter.clearRect(0, 0, width, height);
-      // contextFilter.translate(transform.x, transform.y)
-      // contextFilter.scale(transform.k, transform.k);
-      filterCombine();
-      // contextFilter.restore();
+      // drawFilter(filterArray);
+      // filterCombine();
+      // drawFilter();
+      drawNew();
+      // console.log(testa)
     }
-
+    function start(e) {
+      console.log(e);
+    }
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
     zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
     // .translateExtent([
@@ -438,7 +441,7 @@ const Map = ({ props }) => {
                 .translate(Number(-x), Number(-y));
               d3.select("svg")
                 .transition()
-                .duration(300)
+                .duration(200)
                 .call(zoom.transform, transform);
               setSearchParams({
                 zoom: myTransform.k,
@@ -905,116 +908,114 @@ const Map = ({ props }) => {
       );
     }
   }, []);
-  // const handleFilterSize = async (filter) => {
-  //   const newModal = {show: true, text: "Applying filter ...."}
-  //   setModal(newModal);
-  //   const initBlur = d3.selectAll(".blur-init");
-  //   const activeBlur = d3.selectAll(".blur")
-  //   // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
-  //   const query = initBlur.empty() ? ".blur-family" : ".blur-init";
-  //   let index = 0;
-  //   d3.selectAll(query)
-  //     .filter(function (d) {
-  //       let area = d.position.rowEnd - d.position.rowStart + 1;
-  //       let condition;
-  //       if(filter["size"].length > 0 && filter["sale"].length > 0){
-  //         condition = filter["size"].includes(area) && filter["sale"].includes(d.sale)
-  //       }else{
 
-  //         condition = filter["size"].includes(area) || filter["sale"].includes(d.sale)
-  //       }
-  //       if (!condition) {
-
-  //         // d3.select(this).classed("blur-field-active", true)
-  //         return d3.select(this).style("fill-opacity", 0.5)
-  //         .attr("class", "blur-family blur-blured")
-  //       }
-  //       index++;
-  //       console.log(this)
-  //       return d3.select(this).style("fill-opacity", 0)
-  //       .attr("class", "blur-family blur")
-  //     })
-
-  //   if (filter["size"].length === 0 && filter["sale"].length === 0) {
-  //     d3.selectAll(".blur-blured").style("fill-opacity", 0).attr("class", "blur-family blur");
-  //     index = 1;
+  useEffect(() => {}, []);
+  // const handleFilterSize = () => {
+  // let canvasFilter = d3.select("#canvas-filter");
+  // let contextFilter = canvasFilter.node().getContext("2d");
+  // const transform = d3.zoomTransform(d3.select("#map svg").node());
+  //   if (
+  //     filterCheckbox["size"].length === 0 &&
+  //     filterCheckbox["sale"].length === 0
+  //   ) {
+  //     contextFilter.save();
+  //     contextFilter.clearRect(0, 0, width, height);
+  //     contextFilter.restore();
+  //     setTimeout(() => {
+  //       setModal({
+  //         show: false,
+  //         text: "",
+  //       });
+  //     }, 1000);
+  //     return;
   //   }
-  //   if(index === 0){
+
+  // contextFilter.save();
+  // contextFilter.clearRect(0, 0, width, height);
+
+  // contextFilter.translate(transform.x, transform.y);
+  // contextFilter.scale(transform.k, transform.k);
+  //   // handleFilterSize(filterCheckbox);
+  //   let data = data1;
+
+  //   for (let i = 0; i < data.data.length; i++) {
+  // let square =
+  //   data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+
+  // let x = data.data[i].position.colStart * size;
+  // let y = data.data[i].position.rowStart * size;
+  // contextFilter.beginPath();
+  // //Drawing a rectangle
+  // if (filterCheckbox["size"].includes(square)) {
+  //   contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+  // } else {
+  //   contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+  // }
+
+  // contextFilter.fillRect(x, y, square * size, square * size);
+  // //Optional if you also sizeant to give the rectangle a stroke
+  // contextFilter.strokeStyle = color.stroke;
+  // contextFilter.lineWidth = 0.5;
+  // contextFilter.strokeRect(x, y, square * size, square * size);
+
+  // contextFilter.fill();
+  // contextFilter.closePath();
+  //   }
+  //   contextFilter.restore();
+
+  //   setTimeout(() => {
   //     setModal({
-  //       show: true,
-  //       text: "No results",
-  //       showButton: true
+  //       show: false,
+  //       text: "",
   //     });
-  //   }else{
-  // setTimeout(() => {
-  //   setModal({
-  //     show: false,
-  //     text: "",
-  //   });
-  // }, 1000)
-  //   }
-
+  //   }, 1000);
   // };
-  const handleFilterSize = () => {
-    let canvasFilter = d3.select("#canvas-filter");
-    let contextFilter = canvasFilter.node().getContext("2d");
+  const handleFilterSize = async (filter) => {
+    const newModal = { show: true, text: "Applying filter ...." };
+    setModal(newModal);
+    const initBlur = d3.selectAll(".field");
+    const activeBlur = d3.selectAll(".blur");
+    // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
+    const query = initBlur.empty() ? ".blur-family" : ".field";
+    let index = 0;
+    d3.selectAll(query).filter(function (d) {
+      let area = d.position.rowEnd - d.position.rowStart + 1;
+      let condition;
+      if (filter["size"].length > 0 && filter["sale"].length > 0) {
+        condition =
+          filter["size"].includes(area) && filter["sale"].includes(d.sale);
+      } else {
+        condition =
+          filter["size"].includes(area) || filter["sale"].includes(d.sale);
+      }
+      if (!condition) {
+        // d3.select(this).classed("blur-field-active", true)
+        return d3.select(this).attr("class", "blur-family blur-blured field");
+      }
+      index++;
 
-    const transform = d3.zoomTransform(d3.select("#map svg").node());
-    if (
-      filterCheckbox["size"].length === 0 &&
-      filterCheckbox["sale"].length === 0
-    ) {
-      contextFilter.save();
-      contextFilter.clearRect(0, 0, width, height);
-      contextFilter.restore();
+      return d3.select(this).attr("class", "blur-family blur field");
+    });
+
+    if (filter["size"].length === 0 && filter["sale"].length === 0) {
+      d3.selectAll(".blur-blured").attr("class", "blur-family blur field");
+      index = 1;
+    }
+    drawNew();
+    if (index === 0) {
+      setModal({
+        show: true,
+        text: "No results",
+        showButton: true,
+      });
+    } else {
       setTimeout(() => {
         setModal({
           show: false,
           text: "",
         });
       }, 1000);
-      return;
     }
-
-    contextFilter.save();
-    contextFilter.clearRect(0, 0, width, height);
-
-    contextFilter.translate(transform.x, transform.y);
-    contextFilter.scale(transform.k, transform.k);
-    // handleFilterSize(filterCheckbox);
-    let data = data1;
-
-    for (let i = 0; i < data.data.length; i++) {
-      let square =
-        data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
-
-      let x = data.data[i].position.colStart * size;
-      let y = data.data[i].position.rowStart * size;
-      contextFilter.beginPath();
-      //Drawing a rectangle
-      if (filterCheckbox["size"].includes(square)) {
-        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
-      } else {
-        contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
-      }
-
-      contextFilter.fillRect(x, y, square * size, square * size);
-      //Optional if you also sizeant to give the rectangle a stroke
-      contextFilter.strokeStyle = color.stroke;
-      contextFilter.lineWidth = 0.5;
-      contextFilter.strokeRect(x, y, square * size, square * size);
-
-      contextFilter.fill();
-      contextFilter.closePath();
-    }
-    contextFilter.restore();
-
-    setTimeout(() => {
-      setModal({
-        show: false,
-        text: "",
-      });
-    }, 1000);
   };
   const showDrawer = () => {
     setVisible(true);
@@ -1023,104 +1024,100 @@ const Map = ({ props }) => {
   const onClose = () => {
     setVisible(false);
   };
+  // const drawFilter = (type) => {
+  //   // const [minCoordinates, setMinCoordinates] = useState("");
+  // // const [maxCoordinates, setMaxCoordinates] = useState("");
+  // // const [filterCheckbox, setFilterCheckbox] = useState({
+  // //   sale: [],
+  // //   size: [],
+  // // });
+  // // const [wallet, setWallet] = useState("");
+  // // const [partners, setPartners] = useState(null);
+  //   let data = data1;
+  //   let canvasFilter = d3.select("#canvas-filter");
+  //     let contextFilter = canvasFilter.node().getContext("2d");
+  //     const transform = d3.zoomTransform(d3.select("#map svg").node());
+  //     contextFilter.save();
+  //     contextFilter.clearRect(0, 0, width, height);
+  //     contextFilter.translate(transform.x, transform.y);
+  //     contextFilter.scale(transform.k, transform.k);
+  //     for (let i = 0; i < data.data.length; i++) {
+  //       let square =
+  //         data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+  //       let x = data.data[i].position.colStart * size;
+  //       let y = data.data[i].position.rowStart * size;
+  //       contextFilter.beginPath();
 
-  // const filterCoordinates = () => {
-    // const newModal = { show: true, text: "Applying filter ...." };
-    // setModal(newModal);
-    // let rStart, cStart, rEnd, cEnd;
+  //       // -------------------
+  //       let rStart, cStart, rEnd, cEnd;
+  //       [rStart, cStart] = minCoordinates.split(",");
+  //       [rEnd, cEnd] = maxCoordinates.split(",");
+  //       // let active = [];
+  //       // ---------------
+  //       if(filterCheckbox["size"].length > 0 && minCoordinates !== "" && maxCoordinates !== ""){
+  //         console.log(1)
+  //         let condition1 =
+  //         inRange(data.data[i].rowStartNew, rStart, rEnd) ||
+  //         inRange(data.data[i].rowEndNew, rStart, rEnd);
+  //       let condition2 =
+  //         inRange(data.data[i].colStartNew, cStart, cEnd) ||
+  //         inRange(data.data[i].colEndNew, cStart, cEnd);
+  //       if (condition1 && condition2 && filterCheckbox["size"].includes(square)) {
+  //         contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+  //       }else{
+  //         contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+  //       }
+  //       contextFilter.fillRect(x, y, square * size, square * size);
+  //       contextFilter.strokeStyle = color.stroke;
+  //       contextFilter.lineWidth = 0.5;
+  //       contextFilter.strokeRect(x, y, square * size, square * size);
+  //       contextFilter.fill();
+  //       contextFilter.closePath();
+  //       }
+  //       if(filterCheckbox["size"].length > 0 && minCoordinates === ""){
+  //         console.log(2)
+  //         if (filterCheckbox["size"].includes(square)) {
+  //           contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+  //         } else {
+  //           contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+  //         }
+  //         contextFilter.fillRect(x, y, square * size, square * size);
+  //       contextFilter.strokeStyle = color.stroke;
+  //       contextFilter.lineWidth = 0.5;
+  //       contextFilter.strokeRect(x, y, square * size, square * size);
+  //       contextFilter.fill();
+  //       contextFilter.closePath();
+  //       }
 
-    // const initBlur = d3.selectAll(".blur-init");
-    // const activeBlur = d3.selectAll(".blur");
-    // const query = initBlur.empty()
-    //   ? activeBlur.empty()
-    //     ? ".blur-blured"
-    //     : ".blur"
-    //   : ".blur-init";
-
-    // let fields = d3.selectAll(query);
-    // [rStart, cStart] = minCoordinates.split(",");
-    // [rEnd, cEnd] = maxCoordinates.split(",");
-    // let active = [];
-    // fields.filter(function (d) {
-    //   let condition1 =
-    //     inRange(d.rowStartNew, rStart, rEnd) ||
-    //     inRange(d.rowEndNew, rStart, rEnd);
-    //   let condition2 =
-    //     inRange(d.colStartNew, cStart, cEnd) ||
-    //     inRange(d.colEndNew, cStart, cEnd);
-    //   if (condition1 && condition2) {
-    //     active.push(d);
-    //     return this;
-    //   }
-    // });
-    // let index = 0;
-    // d3.selectAll(query).filter(function (d) {
-    //   if (!active.includes(d)) {
-    //     // d3.select(this).classed("blur-field-active", true)
-
-    //     return d3
-    //       .select(this)
-    //       .style("fill-opacity", 0.5)
-    //       .attr("class", "blur-family blur-blured");
-    //   }
-    //   index++;
-
-    //   return d3
-    //     .select(this)
-    //     .style("fill-opacity", 0)
-    //     .attr("class", "blur-family blur");
-    // });
-
-    // if (index === 0) {
-    //   setModal({
-    //     show: true,
-    //     text: "No results",
-    //     showButton: true,
-    //   });
-    // } else {
-    //   setModal({
-    //     show: false,
-    //     text: "",
-    //   });
-    // }
+  //   }
+  //   contextFilter.restore();
+  //   setTimeout(() => {
+  //     setModal({
+  //       show: false,
+  //       text: "",
+  //     });
+  //   }, 1000);
   // };
-  const filterCoordinates = () => {
-    const newModal = { show: true, text: "Applying filter ...." };
-    setModal(newModal);
-    let rStart, cStart, rEnd, cEnd;
-    [rStart, cStart] = minCoordinates.split(",");
-    [rEnd, cEnd] = maxCoordinates.split(",");
-    let active = [];
-    if(filterArray.length > 0){
-      for(let i = 0; i < filterArray.length; i++){
-        let condition1 =
-        inRange(filterArray[i].rowStartNew, rStart, rEnd) ||
-        inRange(filterArray[i].rowEndNew, rStart, rEnd);
-      let condition2 =
-        inRange(filterArray[i].colStartNew, cStart, cEnd) ||
-        inRange(filterArray[i].colEndNew, cStart, cEnd);
-        if (condition1 && condition2) {
-          active.push(filterArray[i]);
-          setFilterArray(active);
-        }
-        let canvasFilter = d3.select("#canvas-filter");
+  const drawNew = () => {
+    let canvasFilter = d3.select("#canvas-filter");
     let contextFilter = canvasFilter.node().getContext("2d");
     const transform = d3.zoomTransform(d3.select("#map svg").node());
+    const blured = d3.selectAll(".blur-blured");
     contextFilter.save();
     contextFilter.clearRect(0, 0, width, height);
 
     contextFilter.translate(transform.x, transform.y);
     contextFilter.scale(transform.k, transform.k);
-    // handleFilterSize(filterCheckbox);
-    for (let i = 0; i < active.length; i++) {
-      let square =
-        active[i].position.rowEnd - active[i].position.rowStart + 1;
-      let x = active[i].position.colStart * size;
-      let y = active[i].position.rowStart * size;
+    blured.filter((d) => {
+      let square = d.position.rowEnd - d.position.rowStart + 1;
+
+      let x = d.position.colStart * size;
+      let y = d.position.rowStart * size;
       contextFilter.beginPath();
       //Drawing a rectangle
-  
-        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+
+      contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+
       contextFilter.fillRect(x, y, square * size, square * size);
       //Optional if you also sizeant to give the rectangle a stroke
       contextFilter.strokeStyle = color.stroke;
@@ -1129,31 +1126,103 @@ const Map = ({ props }) => {
 
       contextFilter.fill();
       contextFilter.closePath();
-    }
-    contextFilter.restore();
-      }
-      
-    }
-    // if (index === 0) {
-    //   setModal({
-    //     show: true,
-    //     text: "No results",
-    //     showButton: true,
-    //   });
-    // } else {
-      // setModal({
-      //   show: false,
-      //   text: "",
-      // });
-    // }
-    setModal({
-      show: false,
-      text: "",
     });
-  }
-  
+    contextFilter.restore();
+  };
+  const resetFilterCanvas = () => {
+    let canvasFilter = d3.select("#canvas-filter");
+    let contextFilter = canvasFilter.node().getContext("2d");
+    const transform = d3.zoomTransform(d3.select("#map svg").node());
+    contextFilter.save();
+    contextFilter.clearRect(0, 0, width, height);
+    contextFilter.translate(transform.x, transform.y);
+    contextFilter.scale(transform.k, transform.k);
+    contextFilter.restore();
+  };
 
+  // const filterCoordinates = () => {
+  //   setModal({ show: true, text: "Applying filter ...." });
+  //   let rStart, cStart, rEnd, cEnd;
+  //   [rStart, cStart] = minCoordinates.split(",");
+  //   [rEnd, cEnd] = maxCoordinates.split(",");
+  //   let active = [];
+  //   if (filterArray.length > 0) {
+  //     for (let i = 0; i < filterArray.length; i++) {
+  //       let condition1 =
+  //         inRange(filterArray[i].rowStartNew, rStart, rEnd) ||
+  //         inRange(filterArray[i].rowEndNew, rStart, rEnd);
+  //       let condition2 =
+  //         inRange(filterArray[i].colStartNew, cStart, cEnd) ||
+  //         inRange(filterArray[i].colEndNew, cStart, cEnd);
+  //       if (condition1 && condition2) {
+  //         active.push(filterArray[i]);
+  //       }
+  //     }
+  //     // setFilterArray([...active]);
+  //     // setFilterArray([1]);
+  //     // drawFilter(active);
+  //   }
+  //   setModal({
+  //     show: false,
+  //     text: "",
+  //   });
+  // };
+  const filterCoordinates = () => {
+    const newModal = {show: true, text: "Applying filter ...."}
+    setModal(newModal);
+    let rStart, cStart, rEnd, cEnd;
+
+    
+    const initBlur = d3.selectAll(".field");
+    const activeBlur = d3.selectAll(".blur")
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".field";
+
+    let fields = d3.selectAll(query);
+    console.log(fields);
+    [rStart, cStart] = minCoordinates.split(",");
+    [rEnd, cEnd] = maxCoordinates.split(",");
+    let active = [];
+    fields.filter(function (d) {
+      let condition1 =
+        inRange(d.rowStartNew, rStart, rEnd) ||
+        inRange(d.rowEndNew, rStart, rEnd);
+      let condition2 =
+        inRange(d.colStartNew, cStart, cEnd) ||
+        inRange(d.colEndNew, cStart, cEnd);
+      if (condition1 && condition2) {
+        active.push(d);
+        return this;
+      }
+    });
+    let index = 0;
+    d3.selectAll(query)
+      .filter(function (d) {
+        if (!active.includes(d)) {
+          // d3.select(this).classed("blur-field-active", true)
+          
+          return d3.select(this)
+          .attr("class", "blur-family blur-blured field")
+        }
+        index++;
+        
+        return d3.select(this)
+        .attr("class", "blur-family blur field")
+      })
+      drawNew();
+      if(index === 0){
+        setModal({
+          show: true,
+          text: "No results",
+          showButton: true
+        });
+      }else{
+        setModal({
+          show: false,
+          text: "",
+        });
   
+      }
+  };
   // const [minCoordinates, setMinCoordinates] = useState("");
   // const [maxCoordinates, setMaxCoordinates] = useState("");
   // const [filterCheckbox, setFilterCheckbox] = useState({
@@ -1162,7 +1231,53 @@ const Map = ({ props }) => {
   // });
   // const [wallet, setWallet] = useState("");
   // const [partners, setPartners] = useState(null);
+  // const filterCombine = () => {
+  //   let canvasFilter = d3.select("#canvas-filter");
+  //   let contextFilter = canvasFilter.node().getContext("2d");
+  //   const transform = d3.zoomTransform(d3.select("#map svg").node());
+  //   if (
+  //     filterCheckbox["size"].length === 0 &&
+  //     filterCheckbox["sale"].length === 0 &&
+  //     minCoordinates === "" &&
+  //     maxCoordinates === ""
+  //   ) {
+  //     contextFilter.save();
+  //     contextFilter.clearRect(0, 0, width, height);
+  //     contextFilter.restore();
+  //     setTimeout(() => {
+  //       setModal({
+  //         show: false,
+  //         text: "",
+  //       });
+  //     }, 500);
+  //     return;
+  //   }
+  //   let data = data1;
+  //   let filterArrayLocal = [];
+  //   for (let i = 0; i < data.data.length; i++) {
+  //     let square =
+  //       data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+  //     if (filterCheckbox["size"].includes(square)) {
+  //       filterArrayLocal.push(data.data[i]);
+  //     }
+  //   }
+
+  //   // setFilterArray([...filterArrayLocal]);
+  //   setFilterArray([1]);
+  //   drawFilter(filterArrayLocal);
+
+  //   setTimeout(() => {
+  //     setModal({
+  //       show: false,
+  //       text: "",
+  //     });
+  //   }, 500);
+
+  //   setArray([1,2]);
+  //   setTesta("heheh");
+  // };
   const filterCombine = (filter, type) => {
+    console.log(testa);
     let canvasFilter = d3.select("#canvas-filter");
     let contextFilter = canvasFilter.node().getContext("2d");
     const transform = d3.zoomTransform(d3.select("#map svg").node());
@@ -1194,8 +1309,7 @@ const Map = ({ props }) => {
     for (let i = 0; i < data.data.length; i++) {
       let square =
         data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
-      
-  
+
       let x = data.data[i].position.colStart * size;
       let y = data.data[i].position.rowStart * size;
       contextFilter.beginPath();
@@ -1240,9 +1354,10 @@ const Map = ({ props }) => {
       showButton: false,
     });
     d3.selectAll(".blur-blured")
-      .style("fill-opacity", 0)
-      .attr("class", "blur-family blur");
-  };
+  .attr("class", "blur-family blur field");
+    drawNew();
+};
+
   const handleInputRange = (e) => {
     let data = data1;
     let direction = 1,
@@ -1415,31 +1530,31 @@ const Map = ({ props }) => {
       newFilter[name] = value;
     }
     setFilterCheckbox(newFilter);
-    filterCombine();
+
+    // filterCombine();
+    handleFilterSize(newFilter);
   };
   const filterWallet = () => {
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
-    const initBlur = d3.selectAll(".blur-init");
+    const initBlur = d3.selectAll(".field");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty()
       ? activeBlur.empty()
         ? ".blur-blured"
         : ".blur"
-      : ".blur-init";
+      : ".field";
     let index = 0;
     d3.selectAll(query).filter(function (d) {
       if (d.wallet === wallet) {
         index++;
         return d3
           .select(this)
-          .style("fill-opacity", 0)
-          .attr("class", "blur-family blur");
+          .attr("class", "blur-family blur field");
       }
       return d3
         .select(this)
-        .style("fill-opacity", 0.5)
-        .attr("class", "blur-family blur-blured");
+        .attr("class", "blur-family blur-blured field");
     });
     if (index === 0) {
       setModal({
@@ -1453,34 +1568,35 @@ const Map = ({ props }) => {
           show: false,
           text: "",
         });
-      }, 1000);
+      }, 500);
     }
   };
   const filterPartners = (value) => {
     setPartners(value);
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
-    const initBlur = d3.selectAll(".blur-init");
+    const initBlur = d3.selectAll(".field");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty()
       ? activeBlur.empty()
         ? ".blur-blured"
         : ".blur"
-      : ".blur-init";
+      : ".field";
     let index = 0;
     d3.selectAll(query).filter(function (d) {
       if (d.partners === Number(value)) {
         index++;
         return d3
           .select(this)
-          .style("fill-opacity", 0)
-          .attr("class", "blur-family blur");
+
+          .attr("class", "blur-family blur field");
       }
       return d3
         .select(this)
-        .style("fill-opacity", 0.5)
-        .attr("class", "blur-family blur-blured");
+
+        .attr("class", "blur-family blur-blured field");
     });
+    drawNew();
     if (index === 0) {
       setModal({
         show: true,
@@ -1493,7 +1609,7 @@ const Map = ({ props }) => {
           show: false,
           text: "",
         });
-      }, 1000);
+      }, 500);
     }
   };
   const handleChangeSelect = (value) => {
@@ -1570,6 +1686,7 @@ const Map = ({ props }) => {
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
+      
     });
   };
   return (
@@ -1591,6 +1708,7 @@ const Map = ({ props }) => {
       <div className={cx("nav")}>Nav</div>
       <Action
         submit={filterCoordinates}
+        // submit={drawFilter}
         visibleAction={visibleAction}
         setVisibleAction={setVisibleAction}
         handleFilterSize={handleFilterSize}
