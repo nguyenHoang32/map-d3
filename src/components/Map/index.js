@@ -336,7 +336,7 @@ const Map = ({ props }) => {
         .data(dataPool[poolPosition])
         .enter()
         .append("rect")
-        .attr("class", "field")
+        .attr("class", "field-init")
         .attr("x", function (d) {
           return d.position.colStart * size;
         })
@@ -973,10 +973,10 @@ const Map = ({ props }) => {
   const handleFilterSize = async (filter) => {
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
-    const initBlur = d3.selectAll(".field");
+    const initBlur = d3.selectAll(".field-init");
     const activeBlur = d3.selectAll(".blur");
     // const query = initBlur.empty() ? (activeBlur.empty() ? ".blur" :".blur-blured") : ".blur-init";
-    const query = initBlur.empty() ? ".blur-family" : ".field";
+    const query = initBlur.empty() ? ".blur-family" : ".field-init";
     let index = 0;
     d3.selectAll(query).filter(function (d) {
       let area = d.position.rowEnd - d.position.rowStart + 1;
@@ -1173,9 +1173,9 @@ const Map = ({ props }) => {
     let rStart, cStart, rEnd, cEnd;
 
     
-    const initBlur = d3.selectAll(".field");
+    const initBlur = d3.selectAll(".field-init");
     const activeBlur = d3.selectAll(".blur")
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".field";
+    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".field-init";
 
     let fields = d3.selectAll(query);
     console.log(fields);
@@ -1537,13 +1537,13 @@ const Map = ({ props }) => {
   const filterWallet = () => {
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
-    const initBlur = d3.selectAll(".field");
+    const initBlur = d3.selectAll(".field-init");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty()
       ? activeBlur.empty()
         ? ".blur-blured"
         : ".blur"
-      : ".field";
+      : ".field-init";
     let index = 0;
     d3.selectAll(query).filter(function (d) {
       if (d.wallet === wallet) {
@@ -1575,13 +1575,13 @@ const Map = ({ props }) => {
     setPartners(value);
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
-    const initBlur = d3.selectAll(".field");
+    const initBlur = d3.selectAll(".field-init");
     const activeBlur = d3.selectAll(".blur");
     const query = initBlur.empty()
       ? activeBlur.empty()
         ? ".blur-blured"
         : ".blur"
-      : ".field";
+      : ".field-init";
     let index = 0;
     d3.selectAll(query).filter(function (d) {
       if (d.partners === Number(value)) {
