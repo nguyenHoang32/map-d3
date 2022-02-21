@@ -459,7 +459,7 @@ const Map = ({ props }) => {
                 .scale(myTransform.k);
               d3.select("svg")
                 .transition()
-                .duration(200)
+                .duration(100)
                 .call(zoom.transform, transform);
               setSearchParams({
                 zoom: myTransform.k,
@@ -473,7 +473,7 @@ const Map = ({ props }) => {
                 .translate(Number(-x), Number(-y));
               d3.select("svg")
                 .transition()
-                .duration(200)
+                .duration(100)
                 .call(zoom.transform, transform);
               setSearchParams({
                 zoom: myTransform.k,
