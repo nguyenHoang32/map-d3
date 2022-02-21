@@ -211,12 +211,23 @@ const Map = ({ props }) => {
         currentY: transform.y,
       });
     }
+    function debounce(fn, delay) {
+      var timer = null;
+      return function() {
+        var context = this,
+          args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          fn.apply(context, args);
+        }, delay);
+      };
+    }
     function start(e) {
       const transform = e.transform;
       d3.select("svg g").attr("transform", transform);
     }
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
-    zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
+    zoom.on("zoom", debounce(handleZoom, 1)).scaleExtent([1, 10]);
     // .translateExtent([
     //   [-100, -100],
     //   [width * 1.5, height * 1.5],
@@ -1108,7 +1119,7 @@ const Map = ({ props }) => {
           context.beginPath();
 
           //Drawing a rectangle
-          context.fillStyle = color.black;
+          context.fillStyle = color.dark;
           context.fillRect(x, y, size, size);
           //Optional if you also sizeant to give the rectangle a stroke
           context.strokeStyle = color.stroke;
@@ -1186,7 +1197,7 @@ const Map = ({ props }) => {
           context.beginPath();
 
           //Drawing a rectangle
-          context.fillStyle = color.black;
+          context.fillStyle = color.dark;
           context.fillRect(x, y, size, size);
           //Optional if you also sizeant to give the rectangle a stroke
           context.strokeStyle = color.stroke;
