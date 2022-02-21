@@ -58,7 +58,7 @@ div.tooltip {
     height: 100vh;
     background: #1b2026;
 }
-#canvas, #canvas-filter,#canvas-mini{
+#canvas, #canvas-filter,#canvas-mini, #canvas-mini-rect{
     position: absolute;
     top: 0;
     left: 0;
@@ -69,6 +69,9 @@ div.tooltip {
     left: 2;
     z-index: 2 !important;
     pointer-events: none !important;
+}
+#canvas-mini-rect{
+    pointer-events: none;
 }
 #canvas-mini-filter{
     position: absolute;
