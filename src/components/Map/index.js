@@ -45,8 +45,7 @@ const Map = ({ props }) => {
 
   // ---------------------------
   const [filterArray, setFilterArray] = useState([]);
-  const [array, setArray] = useState([]);
-  const [testa, setTesta] = useState("");
+
   //------------------------------
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
@@ -152,11 +151,7 @@ const Map = ({ props }) => {
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
       // );
-      setSearchParams({
-        zoom: transform.k,
-        currentX: transform.x,
-        currentY: transform.y,
-      });
+     
 
       d3.select("svg g").attr("transform", transform);
       if (e.sourceEvent !== null) {
@@ -210,9 +205,15 @@ const Map = ({ props }) => {
       // drawFilter();
       drawNew();
       // console.log(testa)
+      setSearchParams({
+        zoom: transform.k,
+        currentX: transform.x,
+        currentY: transform.y,
+      });
     }
     function start(e) {
-      console.log(e);
+      const transform = e.transform;
+      d3.select("svg g").attr("transform", transform);
     }
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
     zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
@@ -387,7 +388,6 @@ const Map = ({ props }) => {
         .style("stroke-width", "0.1px")
         .style("stroke", color.stroke)
         .on("click", function (e, d) {
-          console.log("click")
           div.style("opacity", 0);
           let active = d3.select(this);
           if (active.attr("class").includes("active")) {
@@ -584,7 +584,6 @@ const Map = ({ props }) => {
           div.style("opacity", 0);
           let active = d3.select(this);
           let allField = document.querySelectorAll(".field");
-            console.log(allField)
           if (active.attr("class").includes("active")) {
             // reset();
           } else {
@@ -927,7 +926,6 @@ const Map = ({ props }) => {
     const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".field-init";
 
     let fields = d3.selectAll(query);
-    console.log(fields);
     [rStart, cStart] = minCoordinates.split(",");
     [rEnd, cEnd] = maxCoordinates.split(",");
     let active = [];
@@ -974,72 +972,71 @@ const Map = ({ props }) => {
       }
   };
  
-  const filterCombine = (filter, type) => {
-    console.log(testa);
-    let canvasFilter = d3.select("#canvas-filter");
-    let contextFilter = canvasFilter.node().getContext("2d");
-    const transform = d3.zoomTransform(d3.select("#map svg").node());
-    if (
-      filterCheckbox["size"].length === 0 &&
-      filterCheckbox["sale"].length === 0 &&
-      minCoordinates === "" &&
-      maxCoordinates === ""
-    ) {
-      contextFilter.save();
-      contextFilter.clearRect(0, 0, width, height);
-      contextFilter.restore();
-      setTimeout(() => {
-        setModal({
-          show: false,
-          text: "",
-        });
-      }, 1000);
-      return;
-    }
-    contextFilter.save();
-    contextFilter.clearRect(0, 0, width, height);
+  // const filterCombine = (filter, type) => {
+  //   let canvasFilter = d3.select("#canvas-filter");
+  //   let contextFilter = canvasFilter.node().getContext("2d");
+  //   const transform = d3.zoomTransform(d3.select("#map svg").node());
+  //   if (
+  //     filterCheckbox["size"].length === 0 &&
+  //     filterCheckbox["sale"].length === 0 &&
+  //     minCoordinates === "" &&
+  //     maxCoordinates === ""
+  //   ) {
+  //     contextFilter.save();
+  //     contextFilter.clearRect(0, 0, width, height);
+  //     contextFilter.restore();
+  //     setTimeout(() => {
+  //       setModal({
+  //         show: false,
+  //         text: "",
+  //       });
+  //     }, 1000);
+  //     return;
+  //   }
+  //   contextFilter.save();
+  //   contextFilter.clearRect(0, 0, width, height);
 
-    contextFilter.translate(transform.x, transform.y);
-    contextFilter.scale(transform.k, transform.k);
-    // handleFilterSize(filterCheckbox);
-    let data = data1;
-    let filterArrayLocal = [];
-    for (let i = 0; i < data.data.length; i++) {
-      let square =
-        data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
+  //   contextFilter.translate(transform.x, transform.y);
+  //   contextFilter.scale(transform.k, transform.k);
+  //   // handleFilterSize(filterCheckbox);
+  //   let data = data1;
+  //   let filterArrayLocal = [];
+  //   for (let i = 0; i < data.data.length; i++) {
+  //     let square =
+  //       data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
 
-      let x = data.data[i].position.colStart * size;
-      let y = data.data[i].position.rowStart * size;
-      contextFilter.beginPath();
-      //Drawing a rectangle
-      if (filterCheckbox["size"].includes(square)) {
-        filterArrayLocal.push(data.data[i]);
+  //     let x = data.data[i].position.colStart * size;
+  //     let y = data.data[i].position.rowStart * size;
+  //     contextFilter.beginPath();
+  //     //Drawing a rectangle
+  //     if (filterCheckbox["size"].includes(square)) {
+  //       filterArrayLocal.push(data.data[i]);
 
-        contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
-      } else {
-        contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
-      }
+  //       contextFilter.fillStyle = "rgba(0, 0, 0, 0)";
+  //     } else {
+  //       contextFilter.fillStyle = "rgba(0, 0, 0, 0.5)";
+  //     }
 
-      contextFilter.fillRect(x, y, square * size, square * size);
-      //Optional if you also sizeant to give the rectangle a stroke
-      contextFilter.strokeStyle = color.stroke;
-      contextFilter.lineWidth = 0.5;
-      contextFilter.strokeRect(x, y, square * size, square * size);
+  //     contextFilter.fillRect(x, y, square * size, square * size);
+  //     //Optional if you also sizeant to give the rectangle a stroke
+  //     contextFilter.strokeStyle = color.stroke;
+  //     contextFilter.lineWidth = 0.5;
+  //     contextFilter.strokeRect(x, y, square * size, square * size);
 
-      contextFilter.fill();
-      contextFilter.closePath();
-    }
-    contextFilter.restore();
+  //     contextFilter.fill();
+  //     contextFilter.closePath();
+  //   }
+  //   contextFilter.restore();
 
-    setFilterArray(filterArrayLocal);
+  //   setFilterArray(filterArrayLocal);
 
-    setTimeout(() => {
-      setModal({
-        show: false,
-        text: "",
-      });
-    }, 1000);
-  };
+  //   setTimeout(() => {
+  //     setModal({
+  //       show: false,
+  //       text: "",
+  //     });
+  //   }, 1000);
+  // };
   const resetFilter = () => {
     setFilterCheckbox({ sale: [], size: [] });
     setMinCoordinates("");
@@ -1320,7 +1317,6 @@ const Map = ({ props }) => {
     field.filter(function (d) {
       if (d.company === Number(value)) {
         const active = d3.select(this);
-        console.log(this);
         const size = Number(active.attr("height"));
         const x = Number(active.attr("x")) + size / 2;
         const y = Number(active.attr("y")) + size / 2;
