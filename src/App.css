@@ -70,18 +70,24 @@ div.tooltip {
     z-index: 2 !important;
     pointer-events: none !important;
 }
-
+#canvas-mini-filter{
+    position: absolute;
+    top: 2;
+    left: 2;
+    z-index: 3 !important;
+    pointer-events: none !important;
+}
 
 #canvas-filter{
-    pointer-events: none;
+    pointer-events: none !important;
 }
-#blur{
+/* #blur{
     pointer-events: none;
     position: absolute;
     top: 0;
     left: 0;
     z-index: 21;
-}
+} */
 #map{
     
     position: absolute;
@@ -99,7 +105,7 @@ div.tooltip {
     position: absolute;
     background: green;
 }
-.active{
+#active{
     fill: pink !important;
     opacity: 0.8;
 }
@@ -130,10 +136,10 @@ div.tooltip {
     pointer-events: none;
 }
 
-.blur-init, .blur, .blur-blured{
+/* .blur-init, .blur, .blur-blured{
     z-index: 21 !important;
     pointer-events: none;
-}
+} */
 .selection{
     /* fill: none; */
     /* stroke: none; */
@@ -144,5 +150,8 @@ div.tooltip {
 }
 #minimapRect{
     pointer-events: all;
-    z-index:99999 !important;
+    z-index: 100 !important;
+}
+.mini-rect{
+    z-index: 100 !important;
 }
