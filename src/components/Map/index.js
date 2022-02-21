@@ -167,6 +167,23 @@ const Map = ({ props }) => {
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
       if (!isMobile) {
+        
+
+      //   const canvasMiniRect = d3
+      //   .select("#canvas-mini-rect")
+      //   .attr("width", minimapWidth)
+      //   .attr("height", minimapHeight);
+  
+      //   const contextMiniRect = canvasMiniRect.node().getContext("2d");
+      //   contextMiniRect.clearRect(0, 0, minimapWidth, minimapHeight);
+      // // contextMini.fillStyle = "rgba(33,33,55, 1)";
+      // // contextMiniRect.fillStyle = "white";
+      // contextMiniRect.fillRect(0, 0, minimapWidth, minimapHeight);
+      // contextMiniRect.strokeStyle = "red"
+      // contextMiniRect.lineWidth = 2;
+      // contextMiniRect.strokeRect(2 + dx * ratio, 2 + dy * ratio, minimapWidth / transform.k - 4, minimapHeight / transform.k - 4);
+      // contextMiniRect.fill();
+      // contextMiniRect.closePath();
         d3.select("#minimapRect").remove();
         let minimapRect = d3
           .select("#mini-map svg g")
@@ -296,7 +313,8 @@ const Map = ({ props }) => {
 
       const contextMiniField = canvasMiniField.node().getContext("2d");
     contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
-    contextMini.fillStyle = "#212137";
+    contextMini.fillStyle = "rgba(33,33,55, 1)";
+    // contextMini.fillStyle = "white";
     contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
 
     contextMini.fill();
@@ -843,7 +861,7 @@ const Map = ({ props }) => {
       contextMiniFilter.beginPath();
       //Drawing a rectangle
 
-      contextMiniFilter.fillStyle = "rgba(0, 0, 0, 0.9)";
+      contextMiniFilter.fillStyle = "rgba(0, 0, 0, 0.7)";
       contextMiniFilter.fillRect(xmini, ymini, square * minimapSize, square * minimapSize);
       //Optional if you also sizeant to give the rectangle a stroke
       // contextMiniFilter.strokeStyle = color.stroke;
@@ -879,7 +897,7 @@ const Map = ({ props }) => {
         square * minimapSize
       );
       //Optional if you also sizeant to give the rectangle a stroke
-      contextMiniField.strokeStyle = color.stroke;
+      // contextMiniField.strokeStyle = color.stroke;
 
       contextMiniField.fill();
       contextMiniField.closePath();
@@ -1441,6 +1459,14 @@ const Map = ({ props }) => {
           ></canvas>
            <canvas
             id="canvas-mini-field"
+            style={{
+              visibility: `${displayMinimap ? "visible" : "hidden"}`,
+              pointerEvents: displayMinimap ? "all" : "none",
+              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+            }}
+          ></canvas>
+          <canvas
+            id="canvas-mini-rect"
             style={{
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
