@@ -148,6 +148,9 @@ const Map = ({ props }) => {
     const zoomFactor = 0.5;
     function handleZoom(e) {
       const transform = e.transform;
+      // transform.k = transform.k * 1.2;
+      // transform.x = transform.x * 1.2;
+      // transform.y = transform.y * 1.2;
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
       // );
@@ -227,7 +230,7 @@ const Map = ({ props }) => {
       d3.select("svg g").attr("transform", transform);
     }
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
-    zoom.on("zoom", debounce(handleZoom, 1)).scaleExtent([1, 10]);
+    zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
     // .translateExtent([
     //   [-100, -100],
     //   [width * 1.5, height * 1.5],
@@ -465,32 +468,32 @@ const Map = ({ props }) => {
               },
             };
             if (isMobile.any()) {
-              let transform = d3.zoomIdentity
-                .translate(-x / 2, -y / 2)
-                .scale(myTransform.k);
-              d3.select("svg")
-                .transition()
-                .duration(100)
-                .call(zoom.transform, transform);
-              setSearchParams({
-                zoom: myTransform.k,
-                currentX: Number(-x / 2),
-                currentY: Number(-y / 2),
-              });
+              // let transform = d3.zoomIdentity
+              //   .translate(-x / 2, -y / 2)
+              //   .scale(myTransform.k);
+              // d3.select("svg")
+              //   .transition()
+              //   .duration(100)
+              //   .call(zoom.transform, transform);
+              // setSearchParams({
+              //   zoom: myTransform.k,
+              //   currentX: Number(-x / 2),
+              //   currentY: Number(-y / 2),
+              // });
             } else {
-              let transform = d3.zoomIdentity
-                .translate(width / 2, height / 2)
-                .scale(myTransform.k)
-                .translate(Number(-x), Number(-y));
-              d3.select("svg")
-                .transition()
-                .duration(100)
-                .call(zoom.transform, transform);
-              setSearchParams({
-                zoom: myTransform.k,
-                currentX: Number(width / 2 - x),
-                currentY: Number(height / 2 - y),
-              });
+              // let transform = d3.zoomIdentity
+              //   .translate(width / 2, height / 2)
+              //   .scale(myTransform.k)
+              //   .translate(Number(-x), Number(-y));
+              // d3.select("svg")
+              //   .transition()
+              //   .duration(100)
+              //   .call(zoom.transform, transform);
+              // setSearchParams({
+              //   zoom: myTransform.k,
+              //   currentX: Number(width / 2 - x),
+              //   currentY: Number(height / 2 - y),
+              // });
             }
 
             if (!isMobile.any()) {
@@ -503,8 +506,10 @@ const Map = ({ props }) => {
                   <div>Estate: ... </div>
                 </div>`
                 )
-                .style("left", width / 2 + 90 + "px")
-                .style("top", height / 2 + 60 + "px");
+                .style("left", myTransform.x + x*myTransform.k + 90 + "px")
+                .style("top",  myTransform.y + y*myTransform.k + 60 + "px");
+                // .style("left", width / 2 + 90 + "px")
+                // .style("top", height / 2 + 60 + "px");
             }
 
             setField(d);
