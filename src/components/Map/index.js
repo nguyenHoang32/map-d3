@@ -148,6 +148,9 @@ const Map = ({ props }) => {
     const zoomFactor = 0.5;
     function handleZoom(e) {
       const transform = e.transform;
+      // transform.k = transform.k * 1.2;
+      // transform.x = transform.x * 1.2;
+      // transform.y = transform.y * 1.2;
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
       // );
@@ -210,6 +213,17 @@ const Map = ({ props }) => {
         currentX: transform.x,
         currentY: transform.y,
       });
+    }
+    function debounce(fn, delay) {
+      var timer = null;
+      return function() {
+        var context = this,
+          args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+          fn.apply(context, args);
+        }, delay);
+      };
     }
     function start(e) {
       const transform = e.transform;
@@ -454,32 +468,32 @@ const Map = ({ props }) => {
               },
             };
             if (isMobile.any()) {
-              let transform = d3.zoomIdentity
-                .translate(-x / 2, -y / 2)
-                .scale(myTransform.k);
-              d3.select("svg")
-                .transition()
-                .duration(100)
-                .call(zoom.transform, transform);
-              setSearchParams({
-                zoom: myTransform.k,
-                currentX: Number(-x / 2),
-                currentY: Number(-y / 2),
-              });
+              // let transform = d3.zoomIdentity
+              //   .translate(-x / 2, -y / 2)
+              //   .scale(myTransform.k);
+              // d3.select("svg")
+              //   .transition()
+              //   .duration(100)
+              //   .call(zoom.transform, transform);
+              // setSearchParams({
+              //   zoom: myTransform.k,
+              //   currentX: Number(-x / 2),
+              //   currentY: Number(-y / 2),
+              // });
             } else {
-              let transform = d3.zoomIdentity
-                .translate(width / 2, height / 2)
-                .scale(myTransform.k)
-                .translate(Number(-x), Number(-y));
-              d3.select("svg")
-                .transition()
-                .duration(100)
-                .call(zoom.transform, transform);
-              setSearchParams({
-                zoom: myTransform.k,
-                currentX: Number(width / 2 - x),
-                currentY: Number(height / 2 - y),
-              });
+              // let transform = d3.zoomIdentity
+              //   .translate(width / 2, height / 2)
+              //   .scale(myTransform.k)
+              //   .translate(Number(-x), Number(-y));
+              // d3.select("svg")
+              //   .transition()
+              //   .duration(100)
+              //   .call(zoom.transform, transform);
+              // setSearchParams({
+              //   zoom: myTransform.k,
+              //   currentX: Number(width / 2 - x),
+              //   currentY: Number(height / 2 - y),
+              // });
             }
 
             if (!isMobile.any()) {
@@ -492,8 +506,10 @@ const Map = ({ props }) => {
                   <div>Estate: ... </div>
                 </div>`
                 )
-                .style("left", width / 2 + 90 + "px")
-                .style("top", height / 2 + 60 + "px");
+                .style("left", myTransform.x + x*myTransform.k + 90 + "px")
+                .style("top",  myTransform.y + y*myTransform.k + 60 + "px");
+                // .style("left", width / 2 + 90 + "px")
+                // .style("top", height / 2 + 60 + "px");
             }
 
             setField(d);
@@ -1108,7 +1124,7 @@ const Map = ({ props }) => {
           context.beginPath();
 
           //Drawing a rectangle
-          context.fillStyle = color.black;
+          context.fillStyle = color.dark;
           context.fillRect(x, y, size, size);
           //Optional if you also sizeant to give the rectangle a stroke
           context.strokeStyle = color.stroke;
@@ -1186,7 +1202,7 @@ const Map = ({ props }) => {
           context.beginPath();
 
           //Drawing a rectangle
-          context.fillStyle = color.black;
+          context.fillStyle = color.dark;
           context.fillRect(x, y, size, size);
           //Optional if you also sizeant to give the rectangle a stroke
           context.strokeStyle = color.stroke;
