@@ -76,7 +76,7 @@ div.tooltip {
 #canvas-mini-rect {
   pointer-events: none;
 }
-#canvas-mini-filter {
+#canvas-mini {
   position: absolute;
   top: 2;
   left: 2;
