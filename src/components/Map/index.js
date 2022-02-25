@@ -310,19 +310,8 @@ const Map = ({ props }) => {
       .attr("width", minimapWidth)
       .attr("height", minimapHeight);
 
-    const canvasMiniFilter = d3
-      .select("#canvas-mini-filter")
-      .attr("width", minimapWidth)
-      .attr("height", minimapHeight);
+   
     const contextMini = canvasMini.node().getContext("2d");
-    const contextMiniFilter = canvasMiniFilter.node().getContext("2d");
-
-    const canvasMiniField = d3
-      .select("#canvas-mini-field")
-      .attr("width", minimapWidth)
-      .attr("height", minimapHeight);
-
-    const contextMiniField = canvasMiniField.node().getContext("2d");
     contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
     contextMini.fillStyle = "rgba(33,33,55, 1)";
     // contextMini.fillStyle = "white";
@@ -336,21 +325,21 @@ const Map = ({ props }) => {
         let y = data.data[i].position.rowStart * minimapSize;
         let square =
           data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
-        contextMiniField.beginPath();
+        contextMini.beginPath();
         //Drawing a rectangle
-        contextMiniField.fillStyle = color.green;
+        contextMini.fillStyle = color.green;
         //   context.fillStyle = "yellow";
-        contextMiniField.fillRect(
+        contextMini.fillRect(
           x,
           y,
           square * minimapSize,
           square * minimapSize
         );
         //Optional if you also sizeant to give the rectangle a stroke
-        contextMiniField.strokeStyle = color.stroke;
+        contextMini.strokeStyle = color.stroke;
 
-        contextMiniField.fill();
-        contextMiniField.closePath();
+        contextMini.fill();
+        contextMini.closePath();
       }
     }
     drawMiniField();
@@ -851,29 +840,34 @@ const Map = ({ props }) => {
     contextFilter.restore();
   };
   const drawNewMini = () => {
-    const canvasMiniFilter = d3.select("#canvas-mini-filter");
-    const contextMiniFilter = canvasMiniFilter.node().getContext("2d");
+    const canvasMini = d3.select("#canvas-mini");
+    const contextMini = canvasMini.node().getContext("2d");
     const blured = d3.selectAll(".blur-blured");
 
     
 
     let data = data1;
-    const canvasMiniField = d3.select("#canvas-mini-field");
-    const contextMiniField = canvasMiniField.node().getContext("2d");
-    contextMiniField.save();
+    contextMini.save();
 
-    contextMiniField.clearRect(0, 0, width, height);
-    contextMiniField.translate(2, 2);
+    contextMini.clearRect(0, 0, width, height);
+    contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
+    contextMini.fillStyle = "rgba(33,33,55, 1)";
+    // contextMini.fillStyle = "white";
+    contextMini.fillRect(0, 0, minimapWidth, minimapHeight);
+
+    contextMini.fill();
+    contextMini.closePath();
+    // contextMini.translate(2, 2);
     for (let i = 0; i < data.data.length; i++) {
       let x = data.data[i].position.colStart * minimapSize;
       let y = data.data[i].position.rowStart * minimapSize;
       let square =
         data.data[i].position.rowEnd - data.data[i].position.rowStart + 1;
-      contextMiniField.beginPath();
+        contextMini.beginPath();
       //Drawing a rectangle
-      contextMiniField.fillStyle = color.green;
+      contextMini.fillStyle = color.green;
       //   context.fillStyle = "yellow";
-      contextMiniField.fillRect(
+      contextMini.fillRect(
         x,
         y,
         square * minimapSize,
@@ -882,24 +876,22 @@ const Map = ({ props }) => {
       //Optional if you also sizeant to give the rectangle a stroke
       // contextMiniField.strokeStyle = color.stroke;
 
-      contextMiniField.fill();
-      contextMiniField.closePath();
+      contextMini.fill();
+      contextMini.closePath();
     }
-    contextMiniField.restore();
-    contextMiniFilter.save();
+   
 
-    contextMiniFilter.clearRect(0, 0, width, height);
-    contextMiniFilter.translate(2, 2);
+    // contextMini.translate(2, 2);
     blured.filter((d) => {
       let square = d.position.rowEnd - d.position.rowStart + 1;
 
       let xmini = d.position.colStart * minimapSize;
       let ymini = d.position.rowStart * minimapSize;
-      contextMiniFilter.beginPath();
+      contextMini.beginPath();
       //Drawing a rectangle
 
-      contextMiniFilter.fillStyle = "rgba(0, 0, 0, 0.7)";
-      contextMiniFilter.fillRect(
+      contextMini.fillStyle = "rgba(0, 0, 0, 0.7)";
+      contextMini.fillRect(
         xmini,
         ymini,
         square * minimapSize,
@@ -910,10 +902,10 @@ const Map = ({ props }) => {
       // contextMiniFilter.lineWidth = 0.5;
       // contextMiniFilter.strokeRect(xmini, ymini, square * minimapSize, square * minimapSize);
 
-      contextMiniFilter.fill();
-      contextMiniFilter.closePath();
+      contextMini.fill();
+      contextMini.closePath();
     });
-    contextMiniFilter.restore();
+    contextMini.restore();
   };
   const resetFilterCanvas = () => {
     let canvasFilter = d3.select("#canvas-filter");
@@ -1446,31 +1438,6 @@ const Map = ({ props }) => {
         >
           <canvas
             id="canvas-mini"
-            style={{
-              visibility: `${displayMinimap ? "visible" : "hidden"}`,
-              pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
-            }}
-          ></canvas>
-        
-          <canvas
-            id="canvas-mini-field"
-            style={{
-              visibility: `${displayMinimap ? "visible" : "hidden"}`,
-              pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
-            }}
-          ></canvas>
-            <canvas
-            id="canvas-mini-filter"
-            style={{
-              visibility: `${displayMinimap ? "visible" : "hidden"}`,
-              pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
-            }}
-          ></canvas>
-          <canvas
-            id="canvas-mini-rect"
             style={{
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
