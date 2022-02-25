@@ -108,7 +108,7 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height);
     // --------------------------
-    // image(map, data);
+    image(map, data);
     let center = {
       rowStart: Math.floor(data.nRow / 2),
       colStart: Math.floor(data.nCol / 2),
@@ -207,12 +207,12 @@ const Map = ({ props }) => {
       context.restore();
 
 
-      contextImg.save();
-      contextImg.clearRect(0, 0, width, height);
-      contextImg.translate(transform.x, transform.y);
-      contextImg.scale(transform.k, transform.k);
-      drawImage();
-      contextImg.restore();
+      // contextImg.save();
+      // contextImg.clearRect(0, 0, width, height);
+      // contextImg.translate(transform.x, transform.y);
+      // contextImg.scale(transform.k, transform.k);
+      // drawImage();
+      // contextImg.restore();
       
       // drawFilter(filterArray);
       // filterCombine();
@@ -305,7 +305,7 @@ const Map = ({ props }) => {
       }
       
     }
-    drawImage();
+    // drawImage();
     function drawCanvas() {
       for (let i = 0; i < data.nCol; i++) {
         for (let j = 0; j < data.nRow; j++) {
@@ -410,7 +410,6 @@ const Map = ({ props }) => {
         })
         // .style("cursor", "pointer")
         .style("fill", function (d) {
-          return color.green;
           if (!d.img) {
             return color.green;
           }
