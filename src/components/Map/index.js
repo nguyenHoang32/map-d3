@@ -84,7 +84,12 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height);
     const context = canvas.node().getContext("2d");
-
+    
+    const canvasImg = d3
+      .select("#canvas-image")
+      .attr("width", width)
+      .attr("height", height);
+    const contextImg = canvasImg.node().getContext("2d");
     const canvasFilter = d3
       .select("#canvas-filter")
       .attr("width", width)
@@ -148,6 +153,7 @@ const Map = ({ props }) => {
     const zoomFactor = 0.5;
     function handleZoom(e) {
       const transform = e.transform;
+      
       // transform.k = transform.k * 1.2;
       // transform.x = transform.x * 1.2;
       // transform.y = transform.y * 1.2;
@@ -200,6 +206,14 @@ const Map = ({ props }) => {
       drawCanvas();
       context.restore();
 
+
+      contextImg.save();
+      contextImg.clearRect(0, 0, width, height);
+      contextImg.translate(transform.x, transform.y);
+      contextImg.scale(transform.k, transform.k);
+      drawImage();
+      contextImg.restore();
+      
       // drawFilter(filterArray);
       // filterCombine();
       // drawFilter();
@@ -275,6 +289,23 @@ const Map = ({ props }) => {
           return "";
         });
     }
+    function drawImage() {
+      const myTransform = d3.zoomTransform(d3.select("#map svg").node());
+      for(let i=0; i < data.data.length; i++){
+        if(data.data[i].img){
+          var img = new Image();
+          let x = data.data[i].position.colStart * size * myTransform.k;
+          let y = data.data[i].position.rowStart * size  * myTransform.k;
+          let square = data.data[i].position.colEnd - data.data[i].position.colStart + 1;
+          img.src = `/${data.data[i].img}`;
+          img.onload = function () {
+            contextImg.drawImage(img, myTransform.x + x, myTransform.y + y, square * size  * myTransform.k, square * size * myTransform.k );
+          };
+        }
+      }
+      
+    }
+    drawImage();
     function drawCanvas() {
       for (let i = 0; i < data.nCol; i++) {
         for (let j = 0; j < data.nRow; j++) {
@@ -379,6 +410,7 @@ const Map = ({ props }) => {
         })
         // .style("cursor", "pointer")
         .style("fill", function (d) {
+          return color.green;
           if (!d.img) {
             return color.green;
           }
@@ -1426,6 +1458,7 @@ const Map = ({ props }) => {
         <div id="map-container">
           <canvas id="canvas"></canvas>
           <div id="map"></div>
+          <canvas id="canvas-image"></canvas>
           <canvas id="canvas-filter"></canvas>
         </div>
 

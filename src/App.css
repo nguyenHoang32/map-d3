@@ -61,10 +61,13 @@ div.tooltip {
 #canvas,
 #canvas-filter,
 #canvas-mini,
-#canvas-mini-rect {
+#canvas-image {
   position: absolute;
   top: 0;
   left: 0;
+}
+#canvas-image{
+  pointer-events: none !important; 
 }
 #canvas-mini-field {
   position: absolute;
