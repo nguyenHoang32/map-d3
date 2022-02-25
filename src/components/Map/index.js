@@ -154,7 +154,6 @@ const Map = ({ props }) => {
       // navigate(
       //   `/map?zoom=${transform.k}&currentX=${transform.x}&currentY=${transform.y}`
       // );
-     
 
       d3.select("svg g").attr("transform", transform);
       if (e.sourceEvent !== null) {
@@ -165,23 +164,21 @@ const Map = ({ props }) => {
       let dx = -transform.x / transform.k;
       let dy = -transform.y / transform.k;
       if (!isMobile) {
-        
+        //   const canvasMiniRect = d3
+        //   .select("#canvas-mini-rect")
+        //   .attr("width", minimapWidth)
+        //   .attr("height", minimapHeight);
 
-      //   const canvasMiniRect = d3
-      //   .select("#canvas-mini-rect")
-      //   .attr("width", minimapWidth)
-      //   .attr("height", minimapHeight);
-  
-      //   const contextMiniRect = canvasMiniRect.node().getContext("2d");
-      //   contextMiniRect.clearRect(0, 0, minimapWidth, minimapHeight);
-      // // contextMini.fillStyle = "rgba(33,33,55, 1)";
-      // // contextMiniRect.fillStyle = "white";
-      // contextMiniRect.fillRect(0, 0, minimapWidth, minimapHeight);
-      // contextMiniRect.strokeStyle = "red"
-      // contextMiniRect.lineWidth = 2;
-      // contextMiniRect.strokeRect(2 + dx * ratio, 2 + dy * ratio, minimapWidth / transform.k - 4, minimapHeight / transform.k - 4);
-      // contextMiniRect.fill();
-      // contextMiniRect.closePath();
+        //   const contextMiniRect = canvasMiniRect.node().getContext("2d");
+        //   contextMiniRect.clearRect(0, 0, minimapWidth, minimapHeight);
+        // // contextMini.fillStyle = "rgba(33,33,55, 1)";
+        // // contextMiniRect.fillStyle = "white";
+        // contextMiniRect.fillRect(0, 0, minimapWidth, minimapHeight);
+        // contextMiniRect.strokeStyle = "red"
+        // contextMiniRect.lineWidth = 2;
+        // contextMiniRect.strokeRect(2 + dx * ratio, 2 + dy * ratio, minimapWidth / transform.k - 4, minimapHeight / transform.k - 4);
+        // contextMiniRect.fill();
+        // contextMiniRect.closePath();
         d3.select("#minimapRect").remove();
         let minimapRect = d3
           .select("#mini-map svg g")
@@ -193,7 +190,7 @@ const Map = ({ props }) => {
           .attr("stroke", "red")
           .attr("stroke-width", 2)
           .attr("fill", "none")
-          
+
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
       context.save();
@@ -216,11 +213,11 @@ const Map = ({ props }) => {
     }
     function debounce(fn, delay) {
       var timer = null;
-      return function() {
+      return function () {
         var context = this,
           args = arguments;
         clearTimeout(timer);
-        timer = setTimeout(function() {
+        timer = setTimeout(function () {
           fn.apply(context, args);
         }, delay);
       };
@@ -318,15 +315,14 @@ const Map = ({ props }) => {
       .attr("width", minimapWidth)
       .attr("height", minimapHeight);
     const contextMini = canvasMini.node().getContext("2d");
-    const contextMiniFilter= canvasMiniFilter.node().getContext("2d");
-    
+    const contextMiniFilter = canvasMiniFilter.node().getContext("2d");
 
     const canvasMiniField = d3
-      .select("#canvas-mini-filter")
+      .select("#canvas-mini-field")
       .attr("width", minimapWidth)
       .attr("height", minimapHeight);
 
-      const contextMiniField = canvasMiniField.node().getContext("2d");
+    const contextMiniField = canvasMiniField.node().getContext("2d");
     contextMini.clearRect(0, 0, minimapWidth, minimapHeight);
     contextMini.fillStyle = "rgba(33,33,55, 1)";
     // contextMini.fillStyle = "white";
@@ -408,12 +404,12 @@ const Map = ({ props }) => {
             // reset();
           } else {
             let allField = document.querySelectorAll(".field-init");
-            if(allField.length === 0){
+            if (allField.length === 0) {
               allField = document.querySelectorAll(".field");
             }
-            allField.forEach((a) => a.removeAttribute('id'));
+            allField.forEach((a) => a.removeAttribute("id"));
             // active.classed("active", !active.classed("active"));
-            active.attr("id", "active")
+            active.attr("id", "active");
             // active.style("fill", "pink");
             const size = Number(active.attr("height"));
             // const blurField = d3.select("#blur-init-" + d.id);
@@ -506,10 +502,10 @@ const Map = ({ props }) => {
                   <div>Estate: ... </div>
                 </div>`
                 )
-                .style("left", myTransform.x + x*myTransform.k + 90 + "px")
-                .style("top",  myTransform.y + y*myTransform.k + 60 + "px");
-                // .style("left", width / 2 + 90 + "px")
-                // .style("top", height / 2 + 60 + "px");
+                .style("left", myTransform.x + x * myTransform.k + 90 + "px")
+                .style("top", myTransform.y + y * myTransform.k + 60 + "px");
+              // .style("left", width / 2 + 90 + "px")
+              // .style("top", height / 2 + 60 + "px");
             }
 
             setField(d);
@@ -522,7 +518,7 @@ const Map = ({ props }) => {
         });
 
       //
-      
+
       // let fieldsMini = d3
       // .select("#mini-map svg g")
       // .selectAll("abc")
@@ -547,11 +543,10 @@ const Map = ({ props }) => {
       // })
       // .style("fill", function (d) {
       //   return color.green;
-      //   // if (!d.img) 
+      //   // if (!d.img)
       //   // return `url(#${d.id})`;
       // });
 
-     
       poolPosition += 1;
       if (poolPosition >= dataPool.length) {
         setModal(update(modal, { show: { $set: false }, text: { $set: "" } }));
@@ -560,7 +555,6 @@ const Map = ({ props }) => {
     }
 
     iterator = setInterval(updateVisualization, 10);
-    
 
     function drawMap() {
       map.append("g").attr("class", "grid-square");
@@ -603,7 +597,6 @@ const Map = ({ props }) => {
           if (active.attr("class").includes("active")) {
             // reset();
           } else {
-            
             allField.forEach((a) => a.classList.remove("active"));
             active.classed("active", !active.classed("active"));
             const size = Number(active.attr("height"));
@@ -768,7 +761,7 @@ const Map = ({ props }) => {
   }, []);
 
   useEffect(() => {}, []);
- 
+
   const handleFilterSize = async (filter) => {
     const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
@@ -798,7 +791,6 @@ const Map = ({ props }) => {
     });
 
     if (filter["size"].length === 0 && filter["sale"].length === 0) {
-      
       d3.selectAll(".blur-blured").attr("class", "blur-family blur field");
       index = 1;
     }
@@ -826,7 +818,7 @@ const Map = ({ props }) => {
   const onClose = () => {
     setVisible(false);
   };
-  
+
   const drawNew = () => {
     let canvasFilter = d3.select("#canvas-filter");
     let contextFilter = canvasFilter.node().getContext("2d");
@@ -859,41 +851,17 @@ const Map = ({ props }) => {
     contextFilter.restore();
   };
   const drawNewMini = () => {
-    const canvasMiniFilter = d3
-    .select("#canvas-mini-filter")
+    const canvasMiniFilter = d3.select("#canvas-mini-filter");
     const contextMiniFilter = canvasMiniFilter.node().getContext("2d");
     const blured = d3.selectAll(".blur-blured");
+
     
-    contextMiniFilter.save();
 
-    contextMiniFilter.clearRect(0, 0, width, height);
-    contextMiniFilter.translate(2, 2);
-    blured.filter((d) => {
-      let square = d.position.rowEnd - d.position.rowStart + 1;
-
-      let xmini = d.position.colStart * minimapSize;
-      let ymini = d.position.rowStart * minimapSize;
-      contextMiniFilter.beginPath();
-      //Drawing a rectangle
-
-      contextMiniFilter.fillStyle = "rgba(0, 0, 0, 0.7)";
-      contextMiniFilter.fillRect(xmini, ymini, square * minimapSize, square * minimapSize);
-      //Optional if you also sizeant to give the rectangle a stroke
-      // contextMiniFilter.strokeStyle = color.stroke;
-      // contextMiniFilter.lineWidth = 0.5;
-      // contextMiniFilter.strokeRect(xmini, ymini, square * minimapSize, square * minimapSize);
-
-      contextMiniFilter.fill();
-      contextMiniFilter.closePath();
-    });
-    contextMiniFilter.restore();
-
-    let data =data1;
-    const canvasMiniField = d3
-    .select("#canvas-mini-field")
+    let data = data1;
+    const canvasMiniField = d3.select("#canvas-mini-field");
     const contextMiniField = canvasMiniField.node().getContext("2d");
     contextMiniField.save();
-    
+
     contextMiniField.clearRect(0, 0, width, height);
     contextMiniField.translate(2, 2);
     for (let i = 0; i < data.data.length; i++) {
@@ -918,7 +886,35 @@ const Map = ({ props }) => {
       contextMiniField.closePath();
     }
     contextMiniField.restore();
-  }
+    contextMiniFilter.save();
+
+    contextMiniFilter.clearRect(0, 0, width, height);
+    contextMiniFilter.translate(2, 2);
+    blured.filter((d) => {
+      let square = d.position.rowEnd - d.position.rowStart + 1;
+
+      let xmini = d.position.colStart * minimapSize;
+      let ymini = d.position.rowStart * minimapSize;
+      contextMiniFilter.beginPath();
+      //Drawing a rectangle
+
+      contextMiniFilter.fillStyle = "rgba(0, 0, 0, 0.7)";
+      contextMiniFilter.fillRect(
+        xmini,
+        ymini,
+        square * minimapSize,
+        square * minimapSize
+      );
+      //Optional if you also sizeant to give the rectangle a stroke
+      // contextMiniFilter.strokeStyle = color.stroke;
+      // contextMiniFilter.lineWidth = 0.5;
+      // contextMiniFilter.strokeRect(xmini, ymini, square * minimapSize, square * minimapSize);
+
+      contextMiniFilter.fill();
+      contextMiniFilter.closePath();
+    });
+    contextMiniFilter.restore();
+  };
   const resetFilterCanvas = () => {
     let canvasFilter = d3.select("#canvas-filter");
     let contextFilter = canvasFilter.node().getContext("2d");
@@ -930,16 +926,18 @@ const Map = ({ props }) => {
     contextFilter.restore();
   };
 
-  
   const filterCoordinates = () => {
-    const newModal = {show: true, text: "Applying filter ...."}
+    const newModal = { show: true, text: "Applying filter ...." };
     setModal(newModal);
     let rStart, cStart, rEnd, cEnd;
 
-    
     const initBlur = d3.selectAll(".field-init");
-    const activeBlur = d3.selectAll(".blur")
-    const query = initBlur.empty() ? (activeBlur.empty() ? ".blur-blured"  :".blur") : ".field-init";
+    const activeBlur = d3.selectAll(".blur");
+    const query = initBlur.empty()
+      ? activeBlur.empty()
+        ? ".blur-blured"
+        : ".blur"
+      : ".field-init";
 
     let fields = d3.selectAll(query);
     [rStart, cStart] = minCoordinates.split(",");
@@ -958,36 +956,32 @@ const Map = ({ props }) => {
       }
     });
     let index = 0;
-    d3.selectAll(query)
-      .filter(function (d) {
-        if (!active.includes(d)) {
-          // d3.select(this).classed("blur-field-active", true)
-          
-          return d3.select(this)
-          .attr("class", "blur-family blur-blured field")
-        }
-        index++;
-        
-        return d3.select(this)
-        .attr("class", "blur-family blur field")
-      })
-      drawNew();
-      drawNewMini();
-      if(index === 0){
-        setModal({
-          show: true,
-          text: "No results",
-          showButton: true
-        });
-      }else{
-        setModal({
-          show: false,
-          text: "",
-        });
-  
+    d3.selectAll(query).filter(function (d) {
+      if (!active.includes(d)) {
+        // d3.select(this).classed("blur-field-active", true)
+
+        return d3.select(this).attr("class", "blur-family blur-blured field");
       }
+      index++;
+
+      return d3.select(this).attr("class", "blur-family blur field");
+    });
+    drawNew();
+    drawNewMini();
+    if (index === 0) {
+      setModal({
+        show: true,
+        text: "No results",
+        showButton: true,
+      });
+    } else {
+      setModal({
+        show: false,
+        text: "",
+      });
+    }
   };
- 
+
   // const filterCombine = (filter, type) => {
   //   let canvasFilter = d3.select("#canvas-filter");
   //   let contextFilter = canvasFilter.node().getContext("2d");
@@ -1064,11 +1058,10 @@ const Map = ({ props }) => {
       text: "",
       showButton: false,
     });
-    d3.selectAll(".blur-blured")
-  .attr("class", "blur-family blur field");
+    d3.selectAll(".blur-blured").attr("class", "blur-family blur field");
     drawNew();
     drawNewMini();
-};
+  };
 
   const handleInputRange = (e) => {
     let data = data1;
@@ -1260,13 +1253,9 @@ const Map = ({ props }) => {
     d3.selectAll(query).filter(function (d) {
       if (d.wallet === wallet) {
         index++;
-        return d3
-          .select(this)
-          .attr("class", "blur-family blur field");
+        return d3.select(this).attr("class", "blur-family blur field");
       }
-      return d3
-        .select(this)
-        .attr("class", "blur-family blur-blured field");
+      return d3.select(this).attr("class", "blur-family blur-blured field");
     });
     if (index === 0) {
       setModal({
@@ -1327,7 +1316,10 @@ const Map = ({ props }) => {
   };
   const handleChangeSelect = (value) => {
     let data = data1;
-    const field = d3.selectAll("#map .field");
+    const fieldInit = d3.selectAll("#map .field-init");
+    const query = fieldInit.empty()
+      ? ".field": ".field-init";
+      const field = d3.selectAll(query);
     const preZoom = Number(searchParams.get("zoom"));
     const context = d3.select("#canvas").node().getContext("2d");
     field.filter(function (d) {
@@ -1398,7 +1390,6 @@ const Map = ({ props }) => {
           .attr("fill", "none")
           .attr("transform", `translate(${2 + dx * ratio},${2 + dy * ratio})`);
       }
-      
     });
   };
   return (
@@ -1461,16 +1452,17 @@ const Map = ({ props }) => {
               transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
             }}
           ></canvas>
+        
           <canvas
-            id="canvas-mini-filter"
+            id="canvas-mini-field"
             style={{
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
               transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
             }}
           ></canvas>
-           <canvas
-            id="canvas-mini-field"
+            <canvas
+            id="canvas-mini-filter"
             style={{
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
@@ -1492,7 +1484,7 @@ const Map = ({ props }) => {
               width: minimapWidth + 30,
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
-              transform: `translate(${!displayMinimap ? "-500px" : "0px"})`,
+              transform: `translate(${!displayMinimap ? "-9999px" : "0px"})`,
             }}
           >
             <div className={cx("inputrange-wrapper")} id="input-range-minimap">
@@ -1550,7 +1542,7 @@ const Map = ({ props }) => {
               className={cx("select-filter")}
               onChange={handleChangeSelect}
             >
-              ><Option value="1">binance</Option>
+              <Option value="1">binance</Option>
               <Option value="2">Lucy</Option>
             </Select>
           </div>

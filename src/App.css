@@ -1,88 +1,91 @@
-body,html{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    position: relative;
-    font-family: 'Montserrat', sans-serif;
-    overflow: hidden;
+body,
+html {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  position: relative;
+  font-family: "Montserrat", sans-serif;
+  overflow: hidden;
 }
 div.tooltip {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    position: absolute;
-    text-align: center;
-    min-width: 140px;
-    height: 60px;
-    padding: 2px;
-    font: 14px;
-    font-weight: bold;
-    background: white;
-    border: 0px;
-    border-radius: 4px;
-    pointer-events: none;
-    color: black;
-  }
-  @media(max-width: 800px){
-      .tooltip{
-          display: none;
-      }
-  }
-.tooltip-img{
-    width: 30px; 
-    height: 30px;
-    border: 1px solid black;
-    border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  position: absolute;
+  text-align: center;
+  min-width: 140px;
+  height: 60px;
+  padding: 2px;
+  font: 14px;
+  font-weight: bold;
+  background: white;
+  border: 0px;
+  border-radius: 4px;
+  pointer-events: none;
+  color: black;
 }
-.tooltip-content{
-    
+@media (max-width: 800px) {
+  .tooltip {
+    display: none;
+  }
+}
+.tooltip-img {
+  width: 30px;
+  height: 30px;
+  border: 1px solid black;
+  border-radius: 50%;
+}
+.tooltip-content {
 }
 
-.nav{
-    opacity: 1;
-    text-align: center;
-    color: white;
-    font-size: 24px;
-    height: 60px;
-    width: 100%;
-    /* background:#14181d; */
-    background:blue;
+.nav {
+  opacity: 1;
+  text-align: center;
+  color: white;
+  font-size: 24px;
+  height: 60px;
+  width: 100%;
+  /* background:#14181d; */
+  background: blue;
 }
-.container{
-    display: flex;
-    position: relative;
+.container {
+  display: flex;
+  position: relative;
 }
-#map-container{
-    position: relative;
-    width: calc(100%);
-    height: 100vh;
-    background: #1b2026;
+#map-container {
+  position: relative;
+  width: calc(100%);
+  height: 100vh;
+  background: #1b2026;
 }
-#canvas, #canvas-filter,#canvas-mini, #canvas-mini-rect{
-    position: absolute;
-    top: 0;
-    left: 0;
+#canvas,
+#canvas-filter,
+#canvas-mini,
+#canvas-mini-rect {
+  position: absolute;
+  top: 0;
+  left: 0;
 }
-#canvas-mini-field{
-    position: absolute;
-    top: 2;
-    left: 2;
-    z-index: 2 !important;
-    pointer-events: none !important;
+#canvas-mini-field {
+  position: absolute;
+  top: 2;
+  left: 2;
+  /* z-index: 1 !important; */
+  pointer-events: none !important;
 }
-#canvas-mini-rect{
-    pointer-events: none;
+#canvas-mini-rect {
+  pointer-events: none;
 }
-#canvas-mini-filter{
-    position: absolute;
-    top: 2;
-    left: 2;
-    z-index: 3 !important;
-    pointer-events: none !important;
+#canvas-mini-filter {
+  position: absolute;
+  top: 2;
+  left: 2;
+  /* z-index: 2 !important; */
+  pointer-events: none !important;
 }
 
-#canvas-filter{
-    pointer-events: none !important;
+#canvas-filter {
+  pointer-events: none !important;
 }
 /* #blur{
     pointer-events: none;
@@ -91,70 +94,54 @@ div.tooltip {
     left: 0;
     z-index: 21;
 } */
-#map{
-    
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: calc(100vh);
-    border: 1px solid black;
-    
-    
-
-    overflow: hidden;
+#map {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(100vh);
+  border: 1px solid black;
+  overflow: hidden;
 }
-#map #square{
-    position: absolute;
-    background: green;
+#map #square {
+  position: absolute;
+  background: green;
 }
-#active{
-    fill: pink !important;
-    opacity: 0.8;
+#active {
+  fill: pink !important;
+  opacity: 0.8;
 }
 
 .field-image {
-    pointer-events: none;
-  }
-
-
-#mini-map{
-    /* background: red; */
-   
-    /* left: 400px; */
-    border: 2px solid grey;
-    border-radius: 4px;
-    overflow: hidden;
+  pointer-events: none;
 }
-@media(max-width: 800){
-    
-#mini-map{
+#minimapRect {
+  pointer-events: all;
+  z-index: 100 !important;
+  position: relative;
+}
+#mini-map {
+  border: 2px solid grey;
+  border-radius: 4px;
+  overflow: hidden;
+}
+#mini-map svg g {
+  position: relative;
+  z-index: 99999 !important;
+}
+@media (max-width: 800) {
+  #mini-map {
     display: none;
+  }
 }
-}
-#mini-map svg{
-    
-}
-#mini-map svg g{
-    pointer-events: none;
-}
-
 /* .blur-init, .blur, .blur-blured{
     z-index: 21 !important;
     pointer-events: none;
 } */
-.selection{
-    /* fill: none; */
-    /* stroke: none; */
-    cursor: default;
+.selection {
+  /* fill: none; */
+  /* stroke: none; */
+  cursor: default;
 }
-.overlay{
-    
-}
-#minimapRect{
-    pointer-events: all;
-    z-index: 100 !important;
-}
-.mini-rect{
-    z-index: 100 !important;
+.overlay {
 }
