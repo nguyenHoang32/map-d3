@@ -103,7 +103,7 @@ const Map = ({ props }) => {
       .attr("width", width)
       .attr("height", height);
     // --------------------------
-    image(map, data);
+    // image(map, data);
     let center = {
       rowStart: Math.floor(data.nRow / 2),
       colStart: Math.floor(data.nCol / 2),
@@ -336,7 +336,7 @@ const Map = ({ props }) => {
           square * minimapSize
         );
         //Optional if you also sizeant to give the rectangle a stroke
-        contextMini.strokeStyle = color.stroke;
+        // contextMini.strokeStyle = color.stroke;
 
         contextMini.fill();
         contextMini.closePath();

@@ -15,7 +15,7 @@ const Information = ({ visible, field, isEmpty, onClose }) => {
       placement="right"
       onClose={onClose}
       visible={visible}
-      width={window.innerWidth > 800 ? 420 : window.innerWidth}
+      width={window.innerWidth > 800 ? 360 : window.innerWidth}
       style={{ marginTop: 50, visibility: !visible &&'hidden'  }}
     >
       {!isEmpty(field) && visible && (
