@@ -11,7 +11,7 @@ const Modal = ({show, text,resetFilter, showButton}) => {
     <div className={cx("container")}>
       <div>
       <div className={cx("text")}>{text}</div>
-      <div className={cx("loading", !show && cx("hide"))}><Spin /></div>
+      <div className={cx("loading", (!show || showButton) && cx("hide"))}><Spin /></div>
       <div>
       {showButton && <button className={cx("btn")} onClick={resetFilter}>Clear Filter</button>}
       </div>
