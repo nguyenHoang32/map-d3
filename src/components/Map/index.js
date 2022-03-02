@@ -32,7 +32,6 @@ const Map = ({ props }) => {
     text: "Creating map...",
     showButton: false,
   });
-  const location = useLocation();
   // FIlter
   const [minCoordinates, setMinCoordinates] = useState("");
   const [maxCoordinates, setMaxCoordinates] = useState("");
@@ -45,8 +44,6 @@ const Map = ({ props }) => {
 
   // ---------------------------
 
-  //------------------------------
-  const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = window.innerWidth < 800;
   const calSize = (width, height, row, col) => {
     let size;
@@ -169,7 +166,9 @@ const Map = ({ props }) => {
     // drawMap();
 
     function handleZoom(e) {
+
       const transform = e.transform;
+      setCurrentZoom(transform.k);
       d3.select("svg g").attr("transform", transform);
       if (e.sourceEvent !== null) {
         div.transition().duration(100).style("opacity", 0);
@@ -666,6 +665,8 @@ const Map = ({ props }) => {
   };
 
   const handleInputRange = (e) => {
+    
+
     let data = data1;
     let direction = 1,
       factor = 0.5,
@@ -675,6 +676,7 @@ const Map = ({ props }) => {
       l = [],
       view = {};
       const transform = d3.zoomTransform(d3.select("#map svg").node());
+      setCurrentZoom(transform.k);
     const preZoom = transform.k
     const preX = transform.x
     const preY = transform.y
@@ -913,11 +915,6 @@ const Map = ({ props }) => {
           .transition()
           .duration(500)
           .call(zoom.transform, transform);
-        // setSearchParams({
-        //   zoom: preZoom,
-        //   currentX: Number(-x + width / (2 * preZoom)),
-        //   currentY: Number(-y + height / (2 * preZoom)),
-        // });
         d3.select("svg g").attr("transform", transform);
         context.clearRect(0, 0, width, height);
         context.save();
@@ -949,7 +946,6 @@ const Map = ({ props }) => {
       }
     });
   };
-  // let zoomValue = Number(d3.zoomTransform(d3.select("#map svg").node()).k) || 3;
   return (
     <div className="App">
       {modal.show && (
@@ -1031,7 +1027,7 @@ const Map = ({ props }) => {
                 onChange={(e) => handleInputRange(e)}
                 type="range"
                 className={cx("input-range")}
-                value={3}
+                value={currentZoom}
                 min={1}
                 max={10}
                 step={0.5}
