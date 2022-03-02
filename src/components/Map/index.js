@@ -19,7 +19,6 @@ import { color, inRange, isEmpty, isMobile } from "../../ultis.js";
 const cx = cn.bind(styles);
 const { Option } = Select;
 const Map = ({ props }) => {
-  const navigate = useNavigate();
   const [currentZoom, setCurrentZoom] = useState(3);
   const [visible, setVisible] = useState(false);
 
@@ -58,7 +57,7 @@ const Map = ({ props }) => {
   if (window.innerWidth < 800) {
     width = Number(window.innerWidth);
   }
-  const RATIO = 1 / 7;
+  const RATIO = 1 / 8;
   let minimapWidth = (width * RATIO).toFixed(2);
   let minimapHeight = (height * RATIO).toFixed(2);
   const minimapSize = calSize(
@@ -198,7 +197,7 @@ const Map = ({ props }) => {
       d3.select("svg g").attr("transform", transform);
     }
     let transform = d3.zoomIdentity.translate(0, 0).scale(3);
-    zoom.on("zoom", handleZoom).scaleExtent([1, 10]);
+    zoom.on("zoom", handleZoom).scaleExtent([2, 10]);
     // .translateExtent([
     //   [-100, -100],
     //   [width * 1.5, height * 1.5],
@@ -684,7 +683,7 @@ const Map = ({ props }) => {
       direction = e.target.id === "mobi_zoom_in" ? 1 : -1;
       target_zoom = preZoom + factor * direction;
       view = { x: preX, y: preY, k: preZoom };
-      if (target_zoom < 1 || target_zoom > 10) {
+      if (target_zoom < 2 || target_zoom > 10) {
         return false;
       }
       translate0 = [
@@ -962,7 +961,7 @@ const Map = ({ props }) => {
         isEmpty={isEmpty}
         onClose={onClose}
       />
-      <div className={cx("nav")}>Nav</div>
+      
       <Action
         submit={filterCoordinates}
         // submit={drawFilter}
@@ -984,7 +983,8 @@ const Map = ({ props }) => {
       />
 
       <div className={cx("container")}>
-        <div className={cx("menu")}>Menu</div>
+      <div className={cx("menu")}>Menu</div>
+
         <div id="map-container">
           <canvas id="canvas"></canvas>
           <div id="map"></div>
@@ -1011,7 +1011,7 @@ const Map = ({ props }) => {
             id="mini-map"
             style={{
               height: minimapHeight + 4,
-              width: minimapWidth + 30,
+              width: minimapWidth + 26,
               visibility: `${displayMinimap ? "visible" : "hidden"}`,
               pointerEvents: displayMinimap ? "all" : "none",
               transform: `translate(${!displayMinimap ? "-9999px" : "0px"})`,
@@ -1028,7 +1028,7 @@ const Map = ({ props }) => {
                 type="range"
                 className={cx("input-range")}
                 value={currentZoom}
-                min={1}
+                min={2}
                 max={10}
                 step={0.5}
               />
