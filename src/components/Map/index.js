@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import Action from "../Action/Action";
 import Information from "../Information/index";
 import Modal from "../Modal/index";
-import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
+// import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import {
   MenuOutlined,
   LeftOutlined,
@@ -70,14 +70,6 @@ const Map = ({ props }) => {
   minimapHeight = minimapSize * data1.nRow;
   const size = calSize(width, height, data1.nRow, data1.nCol);
   let zoom = d3.zoom();
-
-
-  function setup(){
-
-  }
-  function customData(data) {
-    
-  }
   function updateMinimapRect({ width,height,x,y }){
     d3.select("#minimapRect").remove();
         d3.select("#mini-map svg g")
@@ -489,7 +481,7 @@ const Map = ({ props }) => {
       index = 1;
     }
     drawFilter();
-    drawNewMini();
+    drawMiniFilter();
     if (index === 0) {
       setModal({
         show: true,
@@ -536,7 +528,7 @@ const Map = ({ props }) => {
     });
     contextFilter.restore();
   };
-  const drawNewMini = () => {
+  const drawMiniFilter = () => {
     const canvasMini = d3.select("#canvas-mini");
     const contextMini = canvasMini.node().getContext("2d");
     const blured = d3.selectAll(".blur-blured");
@@ -632,7 +624,7 @@ const Map = ({ props }) => {
       return d3.select(this).attr("class", "blur-family blur field");
     });
     drawFilter();
-    drawNewMini();
+    drawMiniFilter();
     if (index === 0) {
       setModal({
         show: true,
@@ -660,7 +652,7 @@ const Map = ({ props }) => {
     });
     d3.selectAll(".blur-blured").attr("class", "blur-family blur field");
     drawFilter();
-    drawNewMini();
+    drawMiniFilter();
   };
 
   const handleInputRange = (e) => {
@@ -872,7 +864,7 @@ const Map = ({ props }) => {
         .attr("class", "blur-family blur-blured field");
     });
     drawFilter();
-    drawNewMini();
+    drawMiniFilter();
     if (index === 0) {
       setModal({
         show: true,
